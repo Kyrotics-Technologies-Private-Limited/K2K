@@ -1,28 +1,16 @@
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import ProductSection from './components/ProductSection';
-import FeaturesSection from './components/FeaturesSection';
-import TestimonialsSection from './components/TestimonialsSection';
-import Footer from './components/Footer';
-import GuaranteeCycle from './components/GuaranteeCycle';
-import RecognizedBy from './components/RecognizedBy';
-import KishanParivar from './components/KishanParivar';
-import FarmerBanner from './components/FarmerBanner';
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage';
 
 function App() {
   return (
-    <div className="min-h-screen">
-      <Navbar />
-      <Hero />
-      <RecognizedBy/>
-      <FeaturesSection />
-      <ProductSection />
-      <GuaranteeCycle  />
-      <FarmerBanner/>
-      <KishanParivar/>
-      <TestimonialsSection />
-      <Footer />
-    </div>
+    
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      </BrowserRouter>
+    
   );
 }
 
