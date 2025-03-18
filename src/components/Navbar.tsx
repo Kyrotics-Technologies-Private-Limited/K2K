@@ -32,7 +32,7 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center md:justify-center flex-1">
             <div className="flex space-x-8">
-              <a href="#" className={`${isScrolled ? 'text-gray-700 hover:text-green-600' : 'text-white hover:text-green-200'} transition`}>All Products</a>
+              <a href="/all-products" className={`${isScrolled ? 'text-gray-700 hover:text-green-600' : 'text-white hover:text-green-200'} transition`}>All Products</a>
               <a href="#" className={`${isScrolled ? 'text-gray-700 hover:text-green-600' : 'text-white hover:text-green-200'} transition`}>Try Our Sample</a>
               <a href="#" className={`${isScrolled ? 'text-gray-700 hover:text-green-600' : 'text-white hover:text-green-200'} transition`}>Kishan Parivar</a>
               <a href="#" className={`${isScrolled ? 'text-gray-700 hover:text-green-600' : 'text-white hover:text-green-200'} transition`}>Traceability</a>
