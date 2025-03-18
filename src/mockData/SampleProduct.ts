@@ -23,7 +23,7 @@ export const sampleProducts : Product[] = [
           'https://media.istockphoto.com/id/1413268611/photo/ghee-butter-oil.jpg?s=1024x1024&w=is&k=20&c=_zCH0sX7r980zx2Tndxtn_kQZ_HE0yglHKfJZaHC6p8=',
           'https://media.istockphoto.com/id/1413268632/photo/ghee-butter-oil.jpg?s=1024x1024&w=is&k=20&c=xu957dBzuNHTjAHu_5L0DMH9wA439oYdrPGv0IxyyHM='
         ],
-        thumbnail: 'https://media.istockphoto.com/id/878164316/photo/desi-pure-ghee-or-clarified-butter-in-glass-or-copper-container-with-spoon-selective-focus.jpg?s=1024x1024&w=is&k=20&c=CB_CSe6JADzU9oZ56W-XmHYxnFe_jft0WNJI-Onlh00='
+
       },
       stockStatus: 'in_stock',
       ratings: 4.5,
@@ -52,7 +52,7 @@ export const sampleProducts : Product[] = [
           'https://media.istockphoto.com/id/494081470/photo/fresh-honey.jpg?s=1024x1024&w=is&k=20&c=b8FevPpTKo78kpRyrmQFgdMaRB_1bneVMkQmpq7Irw0=',
           'https://plus.unsplash.com/premium_photo-1663851330303-2cfb17822dbb?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
         ],
-        thumbnail: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38'
+        
       },
       stockStatus: 'in_stock',
       ratings: 4.8,

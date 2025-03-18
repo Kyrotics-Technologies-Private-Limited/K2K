@@ -20,6 +20,7 @@ const HomePage = () => {
       <GuaranteeCycle  />
       <FarmerBanner/>
       <KishanParivar/>
+     
       <TestimonialsSection />
       <Footer />
     </div>
