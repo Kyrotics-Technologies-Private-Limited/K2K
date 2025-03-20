@@ -46,12 +46,12 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
   }, [products, filters, activeCategory]);
 
   return (
-    <div className="min-h-screen bg-[#FDFBD4] py-12">
+    <div className="min-h-screen bg-[#E0E7D7] py-12">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
           <p className="text-[#4A5D23] font-medium mb-2">Pure. Natural. Authentic.</p>
-          <h1 className="text-4xl font-bold text-[#36486b] mb-4">Our Natural Products</h1>
+          <h1 className="text-4xl font-bold text-[#2C3639] mb-4">Our Natural Products</h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Carefully sourced from nature, minimally processed, and delivered fresh to your door. Each
             product maintains its natural goodness and nutritional integrity.
@@ -66,7 +66,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
               onClick={() => setActiveCategory(category)}
               className={`px-6 py-2 rounded-full transition-all ${
                 activeCategory === category
-                  ? 'bg-green-800 text-white'
+                  ? 'bg-[#4A5D23] text-white'
                   : 'bg-white hover:bg-gray-50'
               }`}
             >

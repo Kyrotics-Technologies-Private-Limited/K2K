@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Star, ShoppingCart, Heart } from 'lucide-react';
 import { Product } from '../../types';
-//import { useCart } from '../context/CartContext';
+import { useCart } from '../../context/CartContext';
 import { ProductCard } from './ProductCard';
 
 interface ProductDetailProps {
@@ -13,21 +13,26 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedPr
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  // const { dispatch } = useCart();
+  const { dispatch } = useCart();
 
-  // const handleAddToCart = () => {
-  //   dispatch({
-  //     type: 'ADD_ITEM',
-  //     payload: {
-  //       ...product,
-  //       quantity,
-  //       selectedVariant,
-  //     },
-  //   });
-  // };
+  const handleAddToCart = () => {
+    if (product?.id) {
+      dispatch({
+        type: 'ADD_ITEM',
+        payload: {
+          ...product,
+          id: product.id,
+          quantity,
+          selectedVariant,
+        },
+      });
+    } else {
+      console.error('Product ID is missing');
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#F5F5DC] py-12">
+    <div className="min-h-screen bg-[#E0E7D7] py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
@@ -155,7 +160,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedPr
 
               <div className="flex gap-4">
                 <button
-                  // onClick={handleAddToCart}
+                   onClick={handleAddToCart}
                   className="flex-1 bg-green-800 text-white py-3 px-6 rounded-lg flex items-center justify-center gap-2 hover:bg-[#3A4D13] transition-colors"
                   disabled={!product?.price.variants[selectedVariant].inStock}
                 >

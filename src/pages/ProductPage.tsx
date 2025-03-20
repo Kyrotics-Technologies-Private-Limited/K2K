@@ -1,6 +1,3 @@
-import React from 'react'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 import { ProductDetail } from '../components/products/ProductDetail'
 import { sampleProducts } from '../mockData/SampleProduct'
 import { useParams } from 'react-router-dom'
@@ -14,11 +11,11 @@ const ProductPage = () => {
 
   return (
         <div>
-            <Navbar/>
+            
             <div className="bg-green-800 py-8"></div>
             <ProductDetail product={Product}
                     relatedProducts={sampleProducts}/>
-                    <Footer/>
+                    
                     </div>
   )
 }
