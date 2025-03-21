@@ -49,7 +49,7 @@ const KishanParivarHero = () => {
         <div className="w-full max-w-1/2">
           <img
             className="w-[800px] p-10"
-            src="public\assets\images\KishanParivarHeroImage.png"
+            src="/assets/images/KishanParivarHeroImage.png"
             alt=""
           />
         </div>
@@ -59,3 +59,4 @@ const KishanParivarHero = () => {
 };
 
 export default KishanParivarHero;
+
