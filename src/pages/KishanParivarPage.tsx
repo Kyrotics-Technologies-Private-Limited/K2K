@@ -1,6 +1,4 @@
 import { useRef } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import KishanParivarForm from '../components/kishanParivar/KishanParivarForm';
 import KishanParivarHero from '../components/kishanParivar/KishanParivarHero';
 import GreenBar from '../components/kishanParivar/GreenBar';
@@ -22,13 +20,11 @@ const KishanParivarPage = () => {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
       <GreenBar />
       <KishanParivarHero />
       <FeaturesKishanParivar scrollToTarget={scrollToTarget} />
       <TrialPackSection/>
       <KishanParivarForm targetRef={targetRef} />
-      <Footer />
     </div>
   );
 };
