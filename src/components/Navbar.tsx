@@ -45,7 +45,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             <div className="flex space-x-8">
               <a href="/all-products" className={`${isScrolled ? 'text-gray-700 hover:text-green-600' : 'text-white hover:text-green-200'} transition`}>All Products</a>
               <a href="#" className={`${isScrolled ? 'text-gray-700 hover:text-green-600' : 'text-white hover:text-green-200'} transition`}>Try Our Sample</a>
-              <a href="#" className={`${isScrolled ? 'text-gray-700 hover:text-green-600' : 'text-white hover:text-green-200'} transition`}>Kishan Parivar</a>
+              <a href="/kishanParivarPage" className={`${isScrolled ? 'text-gray-700 hover:text-green-600' : 'text-white hover:text-green-200'} transition`}>Kishan Parivar</a>
               <a href="#" className={`${isScrolled ? 'text-gray-700 hover:text-green-600' : 'text-white hover:text-green-200'} transition`}>Traceability</a>
               <a href="#" className={`${isScrolled ? 'text-gray-700 hover:text-green-600' : 'text-white hover:text-green-200'} transition`}>Our Story</a>
               <a href="#" className={`${isScrolled ? 'text-gray-700 hover:text-green-600' : 'text-white hover:text-green-200'} transition`}>Blog</a>

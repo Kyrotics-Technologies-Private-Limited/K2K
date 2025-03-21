@@ -9,6 +9,7 @@ import { CartDrawer } from './components/CartDrawer';
 import { useState } from 'react';
 import { CheckoutPage } from './pages/Checkout';
 import Footer from './components/Footer';
+import KishanParivarPage from './pages/KishanParivarPage';
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -23,11 +24,11 @@ function App() {
           <Route path="/all-products" element={<AllProductPage/>}/>
           <Route path="/product/:id" element={<ProductPage/>}  />
           <Route path="/checkout" element={<CheckoutPage />} />
-          </Routes>
-          <Footer />
+          <Route path="/kishanParivarPage" element={<KishanParivarPage />} />
+        </Routes>
           <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+          <Footer />
       </CartProvider>    
-        
       </BrowserRouter>
     
   );
