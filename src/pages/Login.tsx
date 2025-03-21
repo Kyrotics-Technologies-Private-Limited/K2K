@@ -4,8 +4,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+//import Navbar from "../components/Navbar";
+//import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
 
 const loginSchema = z.object({
@@ -32,10 +32,10 @@ const Login = () => {
 
   return (
     <div className="min-h-screen ">
-      <Navbar />
-      <div className="bg-green-800 h-2 py-8"></div>
-      <div className="h-screen bg-gradient-to-r from-green-100 via-green-300 to-green-700 animate-gradient-x flex items-center justify-center bg-cover bg-center">
-        <div className="bg-white bg-opacity-10 backdrop-blur-lg shadow-2xl rounded-2xl p-8 max-w-md w-full">
+     
+      
+      <div className="h-screen bg-green-100 from-green-100 via-green-300 to-green-100 animate-gradient-x flex items-center justify-center bg-cover bg-center">
+        <div className="shadow-xl rounded-2xl p-8 max-w-md w-full bg-white">
           <h2 className="text-2xl font-bold text-green-700 text-center mb-4">
             Login to Your Account
           </h2>
@@ -90,12 +90,12 @@ const Login = () => {
 
             <div className="text-center mt-4 text-sm">
               Don't have an account?
-             <Link
-                             to="/register"
-                             className="text-green-700 hover:underline cursor-pointer ml-1"
-                           >
-                             Sign Up
-                           </Link>
+              <Link
+                to="/register"
+                className="text-green-700 hover:underline cursor-pointer ml-1"
+              >
+                Sign Up
+              </Link>
             </div>
 
             <div className="flex items-center my-4">
@@ -113,7 +113,7 @@ const Login = () => {
           </form>
         </div>
       </div>
-      <Footer />
+     
     </div>
   );
 };

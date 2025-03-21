@@ -4,8 +4,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+//import Navbar from "../components/Navbar";
+//import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
 
 const signUpSchema = z.object({
@@ -33,10 +33,9 @@ const SignUp = () => {
 
   return (
     <div className="min-h-screen ">
-      <Navbar />
-      <div className="bg-green-800 h-2 py-8"></div>
-      <div className="h-screen bg-gradient-to-r from-green-100 via-green-300 to-green-700 animate-gradient-x flex items-center justify-center bg-cover bg-center">
-        <div className="bg-white bg-opacity-10 backdrop-blur-lg shadow-2xl rounded-2xl p-8 max-w-md w-full">
+      
+      <div className="h-screen bg-green-100 from-green-100 via-green-300 to-green-100 animate-gradient-x flex items-center justify-center bg-cover bg-center">
+        <div className=" shadow-xl rounded-2xl p-8 max-w-md w-full bg-white ">
           <h2 className="text-2xl font-bold text-green-700 text-center mb-4">
             Create an Account
           </h2>
@@ -128,7 +127,7 @@ const SignUp = () => {
           </form>
         </div>
       </div>
-      <Footer />
+      
     </div>
   );
 };
