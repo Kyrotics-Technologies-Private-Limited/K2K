@@ -30,7 +30,7 @@ function App() {
           <Footer />
       </CartProvider>    
       </BrowserRouter>
-    
+      
   );
 }
 

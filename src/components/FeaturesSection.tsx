@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Leaf, Droplets, PackageCheck } from "lucide-react";
 
 const features = [
