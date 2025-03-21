@@ -10,6 +10,13 @@ import { useState } from 'react';
 import { CheckoutPage } from './pages/Checkout';
 import Footer from './components/Footer';
 import KishanParivarPage from './pages/KishanParivarPage';
+// import { BrowserRouter, Routes, Route } from "react-router-dom";
+// import HomePage from "./pages/HomePage";
+import SignUp from "./pages/SignUp";
+import Login from "./pages/Login";
+import AdminLayout from "./layout/AdminLayout";
+import OverviewPage from "./pages/admin/OverviewPage";
+// import ProductPage from "./pages/admin/ProductPage";
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -25,12 +32,22 @@ function App() {
           <Route path="/product/:id" element={<ProductPage/>}  />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/kishanParivarPage" element={<KishanParivarPage />} />
+          <Route path="/" element={<HomePage />} />
+        <Route path="/register" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
+
+        {/* Admin Routes with Persistent Sidebar & Navbar */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<OverviewPage />} />
+          <Route path="products" element={<ProductPage />} />
+        </Route>
         </Routes>
           <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
           <Footer />
       </CartProvider>    
       </BrowserRouter>
       
+    
   );
 }
 
