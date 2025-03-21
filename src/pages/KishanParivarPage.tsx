@@ -1,10 +1,11 @@
-import { useRef, RefObject } from 'react';
+import { useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import KishanParivarForm from '../components/kishanParivar/KishanParivarForm';
 import KishanParivarHero from '../components/kishanParivar/KishanParivarHero';
 import GreenBar from '../components/kishanParivar/GreenBar';
 import FeaturesKishanParivar from '../components/kishanParivar/FeaturesKishanParivar';
+import TrialPackSection from '../components/kishanParivar/TrialPackSection';
 
 
 
@@ -25,6 +26,7 @@ const KishanParivarPage = () => {
       <GreenBar />
       <KishanParivarHero />
       <FeaturesKishanParivar scrollToTarget={scrollToTarget} />
+      <TrialPackSection/>
       <KishanParivarForm targetRef={targetRef} />
       <Footer />
     </div>

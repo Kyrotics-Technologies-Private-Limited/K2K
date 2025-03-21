@@ -1,17 +1,17 @@
-import { CreditCard, Award } from "lucide-react";
+import { CreditCard, BadgePercent } from "lucide-react";
 
 const KishanParivarHero = () => {
   return (
     <>
       <header className="w-full h-screen flex flex-col-reverse lg:flex-row items-center justify-center md:p-10 bg-green-100">
         <div className="w-full max-w-1/2 p-10">
-          <div className="p-10 border-2 border-green-700 bg-white rounded-lg h-full flex flex-col justify-center items-center gap-10 shadow-xl">
+          <div className="p-10 border-2 border-yellow-500 bg-white rounded-lg h-full flex flex-col justify-center items-center gap-10 shadow-xl">
             <div className="text-center flex">
-              <Award size={60} className="text-green-600" />
+              <BadgePercent size={60} className="text-yellow-500" />
               <span className="lg:text-4xl md:text-2xl sm:text-lg text-green-700 font-semibold px-0">
                 Become a Premium member with Kishan Parivar
               </span>
-              <Award size={60} className="text-green-600" />
+              <BadgePercent size={60} className="text-yellow-500" />
             </div>
             {/* card */}
             <div className="bg-gradient-to-br from-green-600 to-green-800 rounded-lg p-6 w-full lg:max-w-lg shadow-xl">

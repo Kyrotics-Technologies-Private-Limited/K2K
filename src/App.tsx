@@ -12,7 +12,7 @@ function App() {
           <Route path="/kishanParivarPage" element={<KishanParivarPage />} />
         </Routes>
       </BrowserRouter>
-    
+      
   );
 }
 
