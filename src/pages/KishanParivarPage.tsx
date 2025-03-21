@@ -1,25 +1,34 @@
+import { useRef, RefObject } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import KishanParivar from '../components/KishanParivar';
 import KishanParivarForm from '../components/kishanParivar/KishanParivarForm';
+import KishanParivarHero from '../components/kishanParivar/KishanParivarHero';
+import GreenBar from '../components/kishanParivar/GreenBar';
+import FeaturesKishanParivar from '../components/kishanParivar/FeaturesKishanParivar';
+
+
 
 const KishanParivarPage = () => {
+  // Type the ref properly
+  const targetRef = useRef<HTMLDivElement>(null);
+  
+  // Scroll function in the Kishan Parivar Page
+  const scrollToTarget = () => {
+    if (targetRef.current) {
+      targetRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen">
       <Navbar />
-      {/* <Hero />
-      <RecognizedBy/>
-      <FeaturesSection />
-      <ProductSection />
-      <GuaranteeCycle  />
-      <FarmerBanner/>
-      <KishanParivar/>
-      <TestimonialsSection /> */}
-      <KishanParivar/>
-      <KishanParivarForm/>
+      <GreenBar />
+      <KishanParivarHero />
+      <FeaturesKishanParivar scrollToTarget={scrollToTarget} />
+      <KishanParivarForm targetRef={targetRef} />
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default KishanParivarPage
+export default KishanParivarPage;
