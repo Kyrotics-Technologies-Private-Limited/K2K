@@ -135,12 +135,12 @@ const featureCircles = [
   {
     title: "Zero Adulteration",
     description: "Experience the health benefits with our Zero Adulteration Food",
-    image: "/assets/images/Zero Adulteration.png",
+    image: "/assets/images/ADULTERATION FREE FOOD.png",
   },
   {
     title: "Direct From Farmers",
     description: "Taste the authenticity - sourced directly from Passionate Farmers",
-    image: "/assets/images/Direct from Farmers.png",
+    image: "/assets/images/DIRECT FROM FARMER COMMUNITY.png",
   },
   {
     title: "Traditionally Made",
