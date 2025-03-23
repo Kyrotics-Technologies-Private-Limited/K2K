@@ -149,7 +149,7 @@
 //                      isActive
 //                        ? "bg-green-600 text-white shadow-lg"
 //                        : "bg-white text-green-700 shadow-md"
-//                    } 
+//                    }
 //                    border-2 ${isActive ? "border-white" : "border-green-100"}`}
 //                   whileHover={{ scale: 1.1 }}
 //                   animate={{ scale: isActive ? 1.1 : 1 }}
@@ -210,7 +210,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Check, Shield } from "lucide-react";
+import { Check } from "lucide-react";
 
 const GuaranteeCycle = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -218,43 +218,37 @@ const GuaranteeCycle = () => {
   const guarantees = [
     {
       title: "Authenticity",
-      description:
-        "Pure Food Guaranteed- No Adulteration",
+      description: "Pure Food Guaranteed- No Adulteration",
       image: "/assets/images/Authenticity.png",
       color: "amber",
     },
     {
       title: "Fully Transparent",
-      description:
-        "Track your Food from Farm to Manufacturing to Kitchen",
+      description: "Track your Food from Farm to Manufacturing to Kitchen",
       image: "/assets/images/TRANSPARENT.png",
       color: "emerald",
     },
     {
       title: "Lab Tested",
-      description:
-        "Each Product comes with Lab Tested Report",
+      description: "Each Product comes with Lab Tested Report",
       image: "/assets/images/LAB TESTED.png",
       color: "green",
     },
     {
       title: "Non Refined",
-      description:
-        "Embrace the natural goodness & Taste",
+      description: "Embrace the natural goodness & Taste",
       image: "/assets/images/NON REFINED.png",
       color: "teal",
     },
     {
       title: "No Preservatives Added",
-      description:
-        "Toxin-free- Pure. Delicious. Naturally Nourishing",
+      description: "Toxin-free- Pure. Delicious. Naturally Nourishing",
       image: "/assets/images/NO PRESERVATIVES.png",
       color: "blue",
     },
     {
       title: "Long Term Health Benefits",
-      description:
-        "Pure Food, Lifelong Wellness, Embrace Healthier Living",
+      description: "Pure Food, Lifelong Wellness, Embrace Healthier Living",
       image: "/assets/images/LONG TERM HEALTH BENEFITS.png",
       color: "blue",
     },
@@ -279,18 +273,19 @@ const GuaranteeCycle = () => {
             transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-1 md:gap-2 mb-3 md:mb-4 flex-wrap justify-center px-2"
           >
-            <Shield className="w-4 h-4 md:w-6 md:h-6 text-green-600" />
+            {/* <Shield className="w-4 h-4 md:w-6 md:h-6 text-green-600" /> */}
             <h2 className="text-2xl md:text-4xl font-bold text-green-800 text-center">
-              OUR MISSION AGAINST ADULTERATED FOOD:
+              OUR MISSION AGAINST ADULTERATED FOOD
             </h2>
-            <Shield className="w-4 h-4 md:w-6 md:h-6 text-green-600" />
+            {/* <Shield className="w-4 h-4 md:w-6 md:h-6 text-green-600" /> */}
           </motion.div>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.8 }}
-            className="text-green-700 text-sm md:text-base max-w-lg mx-auto px-2"
+            className="text-green-700 text-sm md:text-lg max-w-lg mx-auto px-2"
           >
-            Adulterated food causes Heart Failure, Cholesterol, Epidemic Dropsy, Colon Cancer and many chronic diseases
+            Adulterated food causes Heart Failure, Cholesterol, Epidemic Dropsy,
+            Colon Cancer and many chronic diseases
           </motion.p>
         </div>
 
@@ -304,9 +299,9 @@ const GuaranteeCycle = () => {
                 alt="Quality Guarantee"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 flex items-center justify-center">
-                {/* Center text removed as requested */}
-              </div>
+              {/* <div className="absolute inset-0 flex items-center justify-center"> */}
+              {/* Center text removed as requested */}
+              {/* </div> */}
             </div>
           </div>
 
@@ -345,7 +340,7 @@ const GuaranteeCycle = () => {
                     className={`w-20 h-20 md:w-36 md:h-36 rounded-full flex items-center justify-center cursor-pointer
                      ${
                        isActive
-                         ? "ring-4 ring-green-400 shadow-lg"
+                         ? "ring-4 ring-green-800 shadow-lg"
                          : "ring-2 ring-white/50 shadow-md"
                      } 
                      overflow-hidden mb-1 md:mb-2`}
@@ -354,8 +349,8 @@ const GuaranteeCycle = () => {
                     transition={{ type: "spring", stiffness: 200, damping: 20 }}
                     onClick={() => setActiveIndex(index)}
                   >
-                    <img 
-                      src={`${item.image}?w=300&h=300&auto=format&fit=crop&q=80`} 
+                    <img
+                      src={`${item.image}?w=300&h=300&auto=format&fit=crop&q=80`}
                       alt={item.title}
                       className="w-full h-full object-cover"
                     />
@@ -381,8 +376,8 @@ const GuaranteeCycle = () => {
         >
           <div className="flex items-start gap-3 md:gap-4">
             <div className="bg-green-100 p-2 md:p-3 rounded-full w-16 h-16 md:w-20 md:h-20 overflow-hidden shrink-0">
-              <img 
-                src={`${guarantees[activeIndex].image}?w=200&h=200&auto=format&fit=crop&q=80`} 
+              <img
+                src={`${guarantees[activeIndex].image}?w=200&h=200&auto=format&fit=crop&q=80`}
                 alt={guarantees[activeIndex].title}
                 className="w-full h-full object-cover rounded-full"
               />
