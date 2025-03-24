@@ -26,6 +26,7 @@ const KishanParivarPage = () => {
       <TrialPackSection/>
       <KishanParivarForm targetRef={targetRef} />
     </div>
+    
   );
 };
 
