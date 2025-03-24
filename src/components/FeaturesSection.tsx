@@ -274,7 +274,7 @@ const FeaturesSection = () => {
                   />
                 </div>
               </div>
-              <h3 className="text-base sm:text-lg md:text-xl font-medium text-white mb-3 sm:mb-3 text-center h-[40px] sm:h-[50px] flex items-center justify-center">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-medium text-white mb-3 sm:mb-3 text-center h-[40px] sm:h-[50px] flex items-center justify-center">
                 {feature.title}
               </h3>
               <p className="text-sm sm:text-base md:text-base text-white/80 text-center px-1 sm:px-2">

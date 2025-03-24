@@ -266,7 +266,7 @@ const GuaranteeCycle = () => {
     <div className="w-full min-h-screen bg-gradient-to-b from-white via-green-50 to-green-100 p-4 md:p-8 backdrop-blur-sm opacity-95">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8 md:mb-16 mt-4 md:mt-8">
+        <div className="text-center mb-2 md:mb-4 mt-4 md:mt-8">
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -290,34 +290,24 @@ const GuaranteeCycle = () => {
         </div>
 
         {/* Main Circle Display */}
-        <div className="relative h-[400px] md:h-[600px] mb-8 md:mb-16 flex items-center justify-center">
-          {/* Center Circle with Image */}
+        <div className="relative h-[400px] md:h-[500px] mb-2 md:mb-4 flex items-center justify-center">
+          {/* Center Circle with Image - reduced by 0.8x */}
           <div className="absolute z-20">
-            <div className="w-40 h-40 md:w-60 md:h-60 bg-white rounded-full shadow-lg flex items-center justify-center border-4 border-green-100 overflow-hidden">
+            <div className="w-32 h-32 md:w-48 md:h-48 bg-white rounded-full shadow-lg flex items-center justify-center border-4 border-green-100 overflow-hidden">
               <img
                 src="/assets/images/Center Image.png"
                 alt="Quality Guarantee"
                 className="w-full h-full object-cover"
               />
-              {/* <div className="absolute inset-0 flex items-center justify-center"> */}
-              {/* Center text removed as requested */}
-              {/* </div> */}
             </div>
           </div>
 
-          {/* Orbital Circle */}
-          {/* <motion.div
-            className="absolute w-[300px] h-[300px] md:w-[450px] md:h-[450px] rounded-full border-2 border-dashed border-green-200"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-          /> */}
-
-          {/* Guarantees with Images */}
+          {/* Guarantees with Images - using a smaller radius (reduced by 0.8x) */}
           {guarantees.map((item, index) => {
             // Calculate the angle for even spacing around the circle
             const angle = (index / guarantees.length) * (2 * Math.PI);
-            // Responsive radius
-            const radius = window.innerWidth < 768 ? 150 : 225;
+            // Responsive radius reduced by 0.8x
+            const radius = window.innerWidth < 768 ? 120 : 180;
 
             // Calculate x and y positions along the circle
             // Start from the top (12 o'clock position)
@@ -337,7 +327,7 @@ const GuaranteeCycle = () => {
               >
                 <div className="flex flex-col items-center">
                   <motion.div
-                    className={`w-20 h-20 md:w-36 md:h-36 rounded-full flex items-center justify-center cursor-pointer
+                    className={`w-16 h-16 md:w-28 md:h-28 rounded-full flex items-center justify-center cursor-pointer
                      ${
                        isActive
                          ? "ring-4 ring-green-800 shadow-lg"
@@ -375,7 +365,7 @@ const GuaranteeCycle = () => {
           className="bg-white p-4 md:p-6 rounded-xl shadow-md border border-green-100 max-w-2xl mx-auto"
         >
           <div className="flex items-start gap-3 md:gap-4">
-            <div className="bg-green-100 p-2 md:p-3 rounded-full w-16 h-16 md:w-20 md:h-20 overflow-hidden shrink-0">
+            <div className="bg-green-100 p-2 md:p-3 rounded-full w-13 h-13 md:w-16 md:h-16 overflow-hidden shrink-0">
               <img
                 src={`${guarantees[activeIndex].image}?w=200&h=200&auto=format&fit=crop&q=80`}
                 alt={guarantees[activeIndex].title}
