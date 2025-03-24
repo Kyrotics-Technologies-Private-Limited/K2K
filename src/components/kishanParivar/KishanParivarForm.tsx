@@ -210,9 +210,9 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
     >
       {/* Blur overlay */}
       <div className="absolute inset-0 backdrop-blur-sm bg-green-950/60"></div>
-      
+    
       {/* Form container */}
-      <form className="w-full max-w-lg border-2 border-green-700 p-4 rounded-md bg-white relative z-10">
+      <form className="w-full max-w-lg border-2 border-green-700 p-4 rounded-md bg-white relative z-10 mx-2">
         <div className="flex flex-wrap -mx-3 mb-6">
           <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
             <label
