@@ -11,7 +11,7 @@ export interface Product {
       }[];
     };
     description: string;
-    ingredients: string[];
+    // ingredients: string[];
     origin: string;
     category: "ghee" | "oils" | "honey";
     images: {
@@ -22,6 +22,15 @@ export interface Product {
     stockStatus: "in_stock" | "low_stock" | "out_of_stock";
     ratings: number;
     reviews: number;
+    badges: {
+      text: string;
+      type: "organic" | "natural" | "premium" | "limited";
+    }[];
+    benefits: {
+      title: string;
+      description: string;
+      icon: string;
+    }[];
   }
   
   export type SortOption = "price_high" | "price_low" | "popularity" | "newest";
