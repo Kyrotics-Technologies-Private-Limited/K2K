@@ -1,15 +1,17 @@
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage";
-import AllProductPage from "./pages/AllProductPage";
-import ProductPage from "./pages/ProductPage";
-import { CartProvider } from "./context/CartContext";
-import Navbar from "./components/Navbar";
-import { CartDrawer } from "./components/CartDrawer";
-import { useState } from "react";
-import { CheckoutPage } from "./pages/Checkout";
-import Footer from "./components/Footer";
-import KishanParivarPage from "./pages/KishanParivarPage";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import  AllProductPage  from './pages/AllProductPage';
+import ProductPage from './pages/ProductPage';
+import { CartProvider } from './context/CartContext';
+import Navbar from './components/Navbar';
+import { CartDrawer } from './components/CartDrawer';
+import { useState } from 'react';
+import { CheckoutPage } from './pages/Checkout';
+import Footer from './components/Footer';
+import KishanParivarPage from './pages/KishanParivarPage';
+// import { BrowserRouter, Routes, Route } from "react-router-dom";
+// import HomePage from "./pages/HomePage";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import AdminLayout from "./layout/AdminLayout";

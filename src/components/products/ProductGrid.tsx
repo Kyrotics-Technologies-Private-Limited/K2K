@@ -46,49 +46,61 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
   }, [products, filters, activeCategory]);
 
   return (
-    <div className="min-h-screen bg-[#E0E7D7] py-12">
+    <div className="min-h-screen bg-[#E0E7D7] py-4">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-12">
-          <p className="text-[#4A5D23] font-medium mb-2">Pure. Natural. Authentic.</p>
-          <h1 className="text-4xl font-bold text-[#2C3639] mb-4">Our Natural Products</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Carefully sourced from nature, minimally processed, and delivered fresh to your door. Each
-            product maintains its natural goodness and nutritional integrity.
-          </p>
-        </div>
-
-        {/* Category Filters */}
-        <div className="flex flex-wrap gap-3 justify-center mb-8">
-          {categories.map(category => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-6 py-2 rounded-full transition-all ${
-                activeCategory === category
-                  ? 'bg-[#4A5D23] text-white'
-                  : 'bg-white hover:bg-gray-50'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-
-        {/* Search Bar */}
-        <div className="max-w-md mx-auto mb-12">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={filters.searchQuery}
-              onChange={(e) => setFilters(prev => ({ ...prev, searchQuery: e.target.value }))}
-              className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#4A5D23]"
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <div 
+          className="relative rounded-xl shadow-lg p-8 my-8 bg-cover bg-center h-[300px]"
+          style={{
+            backgroundImage: 'url("https://picsum.photos/2000/1000")',
+          }}
+        >
+          <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl"></div>
+          <div className="relative z-10 text-center">
+            <p className="text-white font-medium mb-2">Pure. Natural. Authentic.</p>
+            <h1 className="text-4xl font-bold text-white mb-4">Our Natural Products</h1>
+            <p className="text-gray-100 max-w-2xl mx-auto">
+              Carefully sourced from nature, minimally processed, and delivered fresh to your door. Each
+              product maintains its natural goodness and nutritional integrity.
+            </p>
           </div>
         </div>
 
+        {/* Category Filters */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 py-10">
+          {/* Category Filters */}
+          <div className="flex flex-wrap gap-3">
+            {categories.map(category => (
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={`px-6 py-2 rounded-full transition-all ${
+                  activeCategory === category
+                    ? 'bg-[#4A5D23] text-white'
+                    : 'bg-white hover:bg-gray-50'
+                }`}
+              >
+                {category}
+              </button>
+              ))}
+              </div>
+    
+              {/* Search Bar */}
+              <div className="w-full md:w-[300px]">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={filters.searchQuery}
+                    onChange={(e) => setFilters(prev => ({ ...prev, searchQuery: e.target.value }))}
+                    className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#4A5D23]"
+                  />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                </div>
+              </div>
+            </div>
+    
+        
         {/* Product Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProducts.map(product => (
