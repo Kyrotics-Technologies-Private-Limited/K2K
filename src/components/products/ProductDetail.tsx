@@ -237,9 +237,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedPr
          <HealthBenefits product={product} />
 
         {/* Related Products */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Related Products</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="mt-8 ">
+          <h2 className="text-2xl font-bold text-gray-800 mb-3">Related Products</h2>
+          <div className="md:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-20 justify-items-center">
             {relatedProducts.slice(0, 4).map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
