@@ -5,7 +5,8 @@ import { ProductCard } from './ProductCard';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '../../types';
 import { ProductBadges } from './Productbadge';
-import { BenefitsBanner } from './BenefitsBanner';
+import { BenefitsBanner } from './InformationBanner';
+import { HealthBenefits } from './HealthBenefits';
 
 interface ProductDetailProps {
   product: Product | undefined; 
@@ -59,7 +60,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedPr
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12">
+    <div className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-7xl mx-auto px-4">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
@@ -232,6 +233,8 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedPr
          {/* Benefits Banner */}
          <BenefitsBanner product={product} />
 
+         {/* Health Benefits */}
+         <HealthBenefits product={product} />
 
         {/* Related Products */}
         <div className="mt-12">
