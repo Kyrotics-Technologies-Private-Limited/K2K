@@ -16,6 +16,7 @@ import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import AdminLayout from "./layout/AdminLayout";
 import OverviewPage from "./pages/admin/OverviewPage";
+import OurStory from "./pages/OurStory";
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -32,6 +33,7 @@ function App() {
           <Route path="/kishanParivarPage" element={<KishanParivarPage />} />
           <Route path="/register" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
+          <Route path='/our-story' element={<OurStory/>}/>
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
