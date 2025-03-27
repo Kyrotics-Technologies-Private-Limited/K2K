@@ -182,7 +182,7 @@ const PrivacyPolicy: React.FC = () => {
         </a>
       </p>
       <p>
-        <strong>Postal Address:</strong> Univillage Agro Pvt. Ltd. Sector 6,
+        <strong>Postal Address:</strong> Univillage Agro Pvt. Ltd. ,
         Uttar Narayan Pur, PO: BK Chungri, PS: Margram, District: Birbhum, West
         Bengal - 731202, India
       </p>
