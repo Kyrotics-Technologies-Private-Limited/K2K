@@ -16,40 +16,39 @@ import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import AdminLayout from "./layout/AdminLayout";
 import OverviewPage from "./pages/admin/OverviewPage";
+import OurStory from "./pages/OurStory";
 import AdvertisementBar from './components/AdvertisementBar';
 // import ProductPage from "./pages/admin/ProductPage";
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
-  
+
   return (
-    
-      <BrowserRouter>
+    <BrowserRouter>
       <CartProvider>
         <AdvertisementBar/>
         <Navbar onCartClick={() => setIsCartOpen(true)} />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/all-products" element={<AllProductPage/>}/>
-          <Route path="/product/:id" element={<ProductPage/>}  />
+          <Route path="/all-products" element={<AllProductPage />} />
+          <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/kishanParivarPage" element={<KishanParivarPage />} />
-          <Route path="/" element={<HomePage />} />
-        <Route path="/register" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
+          <Route path='/our-story' element={<OurStory/>}/>
 
-        {/* Admin Routes with Persistent Sidebar & Navbar */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<OverviewPage />} />
-          <Route path="products" element={<ProductPage />} />
-        </Route>
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<OverviewPage />} />
+            <Route path="products" element={<ProductPage />} />
+          </Route>
         </Routes>
-          <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-          <Footer />
-      </CartProvider>    
-      </BrowserRouter>
-      
-    
+
+        <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+        <Footer />
+      </CartProvider>
+    </BrowserRouter>
   );
 }
 

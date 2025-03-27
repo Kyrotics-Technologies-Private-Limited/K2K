@@ -5,10 +5,11 @@ import { useCart } from '../context/CartContext';
 
 interface NavbarProps {
   onCartClick: () => void;
+  className?: string;
 }
 
 
-const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
+const Navbar: React.FC<NavbarProps> = ({ onCartClick, className=''}) => {
   const [isOpen, setIsOpen] = useState(false);
   // const [isScrolled, setIsScrolled] = useState(false);
   const { state } = useCart();
@@ -37,7 +38,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               </span>
             
           </a>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center md:justify-center flex-1">
             <div className="flex space-x-8">
@@ -45,11 +46,11 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               <a href="#" className={`text-gray-700 hover:text-green-600 transition`}>Try Our Sample</a>
               <a href="/kishanParivarPage" className={`text-gray-700 hover:text-green-600 transition`}>Kishan Parivar</a>
               <a href="#" className={`text-gray-700 hover:text-green-600 transition`}>Traceability</a>
-              <a href="#" className={`text-gray-700 hover:text-green-600 transition`}>Our Story</a>
+              <a href="/our-story" className={`text-gray-700 hover:text-green-600 transition`}>Our Story</a>
               <a href="#" className={`text-gray-700 hover:text-green-600 transition`}>Blog</a>
             </div>
           </div>
-          
+
           {/* Right section - Search and Cart */}
           <div className="hidden md:flex items-center space-x-4">
             <button className={`text-gray-700 hover:text-green-600 transition`}>
@@ -74,7 +75,11 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               onClick={() => setIsOpen(!isOpen)}
               className={`text-gray-700 hover:text-green-600 transition`}
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
@@ -84,10 +89,30 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
       {isOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white">
-            <a href="#" className="block px-3 py-2 text-gray-700 hover:text-green-600 transition">Home</a>
-            <a href="#" className="block px-3 py-2 text-gray-700 hover:text-green-600 transition">Shop</a>
-            <a href="#" className="block px-3 py-2 text-gray-700 hover:text-green-600 transition">About</a>
-            <a href="#" className="block px-3 py-2 text-gray-700 hover:text-green-600 transition">Contact</a>
+            <a
+              href="#"
+              className="block px-3 py-2 text-gray-700 hover:text-green-600 transition"
+            >
+              Home
+            </a>
+            <a
+              href="#"
+              className="block px-3 py-2 text-gray-700 hover:text-green-600 transition"
+            >
+              Shop
+            </a>
+            <a
+              href="#"
+              className="block px-3 py-2 text-gray-700 hover:text-green-600 transition"
+            >
+              About
+            </a>
+            <a
+              href="#"
+              className="block px-3 py-2 text-gray-700 hover:text-green-600 transition"
+            >
+              Contact
+            </a>
             <div className="flex items-center space-x-4 px-3 py-2">
               <button className="text-gray-700 hover:text-green-600 transition">
                 <Search className="h-5 w-5" />
