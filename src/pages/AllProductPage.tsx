@@ -84,7 +84,6 @@ const AllProductPage = () => {
 
   return (
     <div className='bg-[#E0E7D7]'>
-      <div className="bg-green-800 py-8"></div>
       
       {/* Health Issues Section */}
       <div className="pt-8">
