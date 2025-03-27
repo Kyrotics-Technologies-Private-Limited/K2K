@@ -25,7 +25,7 @@ const slides = [
 
 const Hero = () => {
   return (
-    <div className="h-[75vh] w-full max-w-full relative">
+    <div className="h-[77vh] w-full max-w-full relative">
       <Swiper
         modules={[Autoplay, Pagination]}
         autoplay={{

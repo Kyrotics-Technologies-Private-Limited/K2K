@@ -210,7 +210,6 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
 
 const GuaranteeCycle = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -263,26 +262,23 @@ const GuaranteeCycle = () => {
   }, [guarantees.length]);
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-white via-green-50 to-green-100 p-4 md:p-8 backdrop-blur-sm opacity-95">
+    <div className="w-full bg-gradient-to-b from-white via-green-50 to-green-100 p-4 pb-8 md:p-8 md:pb-16">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-2 md:mb-4 mt-4 md:mt-8">
+        <div className="text-center mb-8 md:mb-12 mt-4 md:mt-8">
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-1 md:gap-2 mb-3 md:mb-4 flex-wrap justify-center px-2"
           >
-            {/* <Shield className="w-4 h-4 md:w-6 md:h-6 text-green-600" /> */}
-            <h2 className="text-2xl md:text-4xl font-bold text-green-800 text-center">
+            <h2 className="text-xl md:text-3xl font-bold text-black">
               OUR MISSION AGAINST ADULTERATED FOOD
             </h2>
-            {/* <Shield className="w-4 h-4 md:w-6 md:h-6 text-green-600" /> */}
           </motion.div>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.8 }}
-            className="text-green-700 text-sm md:text-lg max-w-lg mx-auto px-2"
+            className="text-gray-700 text-sm md:text-base max-w-lg mx-auto mt-2"
           >
             Adulterated food causes Heart Failure, Cholesterol, Epidemic Dropsy,
             Colon Cancer and many chronic diseases
@@ -290,10 +286,10 @@ const GuaranteeCycle = () => {
         </div>
 
         {/* Main Circle Display */}
-        <div className="relative h-[400px] md:h-[500px] mb-2 md:mb-4 flex items-center justify-center">
-          {/* Center Circle with Image - reduced by 0.8x */}
+        <div className="relative h-[300px] md:h-[400px] flex items-center justify-center">
+          {/* Center Circle with Image */}
           <div className="absolute z-20">
-            <div className="w-32 h-32 md:w-48 md:h-48 bg-white rounded-full shadow-lg flex items-center justify-center border-4 border-green-100 overflow-hidden">
+            <div className="w-24 h-24 md:w-36 md:h-36 bg-white rounded-full shadow-lg flex items-center justify-center border-4 border-green-100 overflow-hidden">
               <img
                 src="/assets/images/Center Image.png"
                 alt="Quality Guarantee"
@@ -302,19 +298,12 @@ const GuaranteeCycle = () => {
             </div>
           </div>
 
-          {/* Guarantees with Images - using a smaller radius (reduced by 0.8x) */}
+          {/* Guarantees with Images */}
           {guarantees.map((item, index) => {
-            // Calculate the angle for even spacing around the circle
             const angle = (index / guarantees.length) * (2 * Math.PI);
-            // Responsive radius reduced by 0.8x
-            const radius = window.innerWidth < 768 ? 120 : 180;
-
-            // Calculate x and y positions along the circle
-            // Start from the top (12 o'clock position)
+            const radius = window.innerWidth < 768 ? 105 : 150; // Reduced to 75% of original (140->105, 200->150)
             const x = Math.cos(angle - Math.PI / 2) * radius;
             const y = Math.sin(angle - Math.PI / 2) * radius;
-
-            const isActive = activeIndex === index;
 
             return (
               <div
@@ -327,16 +316,8 @@ const GuaranteeCycle = () => {
               >
                 <div className="flex flex-col items-center">
                   <motion.div
-                    className={`w-16 h-16 md:w-28 md:h-28 rounded-full flex items-center justify-center cursor-pointer
-                     ${
-                       isActive
-                         ? "ring-4 ring-green-800 shadow-lg"
-                         : "ring-2 ring-white/50 shadow-md"
-                     } 
-                     overflow-hidden mb-1 md:mb-2`}
+                    className="w-12 h-12 md:w-20 md:h-20 rounded-full flex items-center justify-center cursor-pointer overflow-hidden mb-2 md:mb-3"
                     whileHover={{ scale: 1.1 }}
-                    animate={{ scale: isActive ? 1.1 : 1 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
                     onClick={() => setActiveIndex(index)}
                   >
                     <img
@@ -346,7 +327,7 @@ const GuaranteeCycle = () => {
                     />
                   </motion.div>
                   <div className="w-24 md:w-32 text-center">
-                    <p className="font-semibold text-green-800 text-xs md:text-sm bg-white/80 px-1 md:px-2 py-0.5 md:py-1 rounded-full shadow-sm truncate">
+                    <p className="font-semibold text-black text-xs md:text-sm whitespace-normal">
                       {item.title}
                     </p>
                   </div>
@@ -355,42 +336,6 @@ const GuaranteeCycle = () => {
             );
           })}
         </div>
-
-        {/* Featured Guarantee Detail */}
-        <motion.div
-          key={activeIndex}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="bg-white p-4 md:p-6 rounded-xl shadow-md border border-green-100 max-w-2xl mx-auto"
-        >
-          <div className="flex items-start gap-3 md:gap-4">
-            <div className="bg-green-100 p-2 md:p-3 rounded-full w-13 h-13 md:w-16 md:h-16 overflow-hidden shrink-0">
-              <img
-                src={`${guarantees[activeIndex].image}?w=200&h=200&auto=format&fit=crop&q=80`}
-                alt={guarantees[activeIndex].title}
-                className="w-full h-full object-cover rounded-full"
-              />
-            </div>
-            <div>
-              <h3 className="text-lg md:text-xl font-bold text-green-800 flex items-center gap-1 md:gap-2">
-                {guarantees[activeIndex].title}
-                <Check className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
-              </h3>
-              <p className="text-green-700 text-sm md:text-base mt-1">
-                {guarantees[activeIndex].description}
-              </p>
-              <div className="mt-2 md:mt-3 flex gap-2 flex-wrap">
-                <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 md:py-1 rounded-full font-medium">
-                  Premium Quality
-                </span>
-                <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 md:py-1 rounded-full font-medium">
-                  Verified
-                </span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </div>
   );
