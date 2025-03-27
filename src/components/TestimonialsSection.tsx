@@ -95,57 +95,74 @@
 
 // export default TestimonialsSection;
 
-import React from "react";
-import { Star, Quote } from "lucide-react";
+import { Star } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 
 const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "Wellness Enthusiast",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=200",
-      content: "The quality of Natura's organic honey is unmatched. It's pure, raw, and you can truly taste the difference.",
-      rating: 5
-    },
-    {
-      name: "Michael Chen",
-      role: "Holistic Practitioner",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200",
-      content: "I've been using their essential oils in my practice for years. The purity and potency are exceptional.",
-      rating: 4
-    },
-    {
-      name: "Emma Rodriguez",
-      role: "Organic Skincare Advocate",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
-      content: "Their herbal skincare line transformed my skin. The rose hip oil is my holy grail!",
-      rating: 5
-    },
-    {
-      name: "Emma Stone",
-      role: "Organic Skincare Advocate",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
-      content: "Their herbal skincare line transformed my skin. The rose hip oil is my holy grail!",
-      rating: 5
-    },
-    {
-      name: "James Rodriguez",
-      role: "Organic Skincare Advocate",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
-      content: "Their herbal skincare line transformed my skin. The rose hip oil is my holy grail!",
-      rating: 4
-    },
-    {
-      name: "Jonathan Smith",
-      role: "Organic Skincare Advocate",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
-      content: "Their herbal skincare line transformed my skin. The rose hip oil is my holy grail!",
-      rating: 4
-    }
-  ];
+  {
+    name: "Olivia Martinez",
+    role: "Nutritionist",
+    image:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200",
+    content:
+      "The organic protein powder blends perfectly into my morning smoothies. It's the cleanest plant-based protein I've found with no aftertaste.",
+    rating: 5,
+    product: "Vanilla Protein Powder"
+  },
+  {
+    name: "Raj Patel",
+    role: "Yoga Instructor",
+    image:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200",
+    content:
+      "The meditation candles create the perfect ambiance for my evening sessions. The subtle lavender scent helps my students relax deeply.",
+    rating: 5,
+    product: "Lavender Meditation Candles"
+  },
+  {
+    name: "Sophia Chen",
+    role: "Dermatologist",
+    image:
+      "https://images.unsplash.com/photo-1554151228-14d9def656e4?auto=format&fit=crop&q=80&w=200",
+    content:
+      "I recommend the hyaluronic acid serum to all my patients. It's fragrance-free and doesn't irritate even the most sensitive skin.",
+    rating: 5,
+    product: "Hyaluronic Acid Serum"
+  },
+  {
+    name: "Marcus Johnson",
+    role: "Personal Trainer",
+    image:
+      "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200",
+    content:
+      "The post-workout recovery balm is a game-changer. My clients love how it soothes sore muscles without any greasy residue.",
+    rating: 5,
+    product: "Arnica Recovery Balm"
+  },
+  {
+    name: "Aisha Williams",
+    role: "Aromatherapist",
+    image:
+      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200",
+    content:
+      "The eucalyptus essential oil has the perfect therapeutic aroma. I use it in my diffuser blends for respiratory support.",
+    rating: 5,
+    product: "Eucalyptus Essential Oil"
+  },
+  {
+    name: "Ethan Thompson",
+    role: "Holistic Chef",
+    image:
+      "https://images.unsplash.com/photo-1542178243-bc20204b769f?auto=format&fit=crop&q=80&w=200",
+    content:
+      "The organic coconut oil has become my kitchen staple. Its rich flavor elevates both raw and cooked dishes beautifully.",
+    rating: 5,
+    product: "Cold-Pressed Coconut Oil"
+  }
+];
 
 const TestimonialsSection = () => {
   return (
@@ -177,10 +194,10 @@ const TestimonialsSection = () => {
             }}
             className="px-2 pb-12"
           >
-            {testimonials.map(({ name, role, image, content, rating }) => (
+            {testimonials.map(({ name, role, image, content, rating, product }) => (
               <SwiperSlide key={name}>
                 <div
-                  className="bg-white border border-green-200 p-6 h-full flex flex-col backdrop-blur-sm bg-opacity-70 transition-all duration-300 hover:shadow-lg hover:border-green-300 hover:scale-[1.02] hover:bg-opacity-90"
+                  className="bg-white border border-green-200 p-6 h-full flex flex-col backdrop-blur-sm bg-opacity-70 transition-all duration-300 hover:shadow-lg hover:border-green-300 hover:scale-[1.02] hover:bg-opacity-90 group"
                   style={{
                     borderRadius: "16px 16px 50px 16px",
                     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
@@ -209,10 +226,14 @@ const TestimonialsSection = () => {
                       />
                     ))}
                   </div>
-                  <Quote className="text-green-200 w-6 h-6 mb-2 transition-transform duration-300 group-hover:scale-110" />
-                  <p className="text-gray-700 text-sm flex-grow group-hover:text-gray-800 transition-colors duration-300">
+                  <p className="text-gray-700 text-sm flex-grow group-hover:text-gray-800 transition-colors duration-300 mb-4">
                     "{content}"
                   </p>
+                  <div className="mt-auto pt-3 border-t border-green-100 group-hover:border-green-200 transition-colors duration-300">
+                    <span className="inline-block px-3 py-1 text-xs font-medium bg-green-50 text-green-700 rounded-full group-hover:bg-green-100 group-hover:text-green-800 transition-colors duration-300">
+                      {product}
+                    </span>
+                  </div>
                 </div>
               </SwiperSlide>
             ))}
