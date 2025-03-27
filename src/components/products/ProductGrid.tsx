@@ -46,8 +46,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
   }, [products, filters, activeCategory]);
 
   return (
-    <div className="min-h-screen bg-[#E0E7D7] py-4">
-      <div className="max-w-7xl mx-auto px-4">
+    <div className="min-h-screen bg-inherit max-w-7xl">
+      <div className="mx-auto ">
         {/* Header */}
         <div 
           className="relative rounded-xl shadow-lg p-8 my-8 bg-cover bg-center h-[300px]"
@@ -67,7 +67,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
         </div>
 
         {/* Category Filters */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 py-10">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4  py-6">
           {/* Category Filters */}
           <div className="flex flex-wrap gap-3">
             {categories.map(category => (
@@ -102,10 +102,12 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
     
         
         {/* Product Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+        <div className="py-5 md:px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-20 justify-items-center">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
