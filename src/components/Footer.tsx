@@ -32,10 +32,38 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-300 hover:text-white transition">Shop</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition">About Us</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition">Blog</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition">Contact</a></li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition"
+                >
+                  Shop
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition"
+                >
+                  About Us
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition"
+                >
+                  Blog
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition"
+                >
+                  Contact
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -43,10 +71,38 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Categories</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-300 hover:text-white transition">Honey</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition">Essential Oils</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition">Herbal Products</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition">Skincare</a></li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition"
+                >
+                  Honey
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition"
+                >
+                  Essential Oils
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition"
+                >
+                  Herbal Products
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition"
+                >
+                  Skincare
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -54,7 +110,8 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Stay Updated</h3>
             <p className="text-gray-300 mb-4">
-              Subscribe to our newsletter for the latest products and organic living tips.
+              Subscribe to our newsletter for the latest products and organic
+              living tips.
             </p>
             <div className="flex">
               <input
@@ -75,14 +132,30 @@ const Footer = () => {
               © 2025 Kishan2Kitchen. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-300 hover:text-white text-sm transition">
+              <a
+                href="/privacypolicy"
+                className="text-gray-300 hover:text-white text-sm transition"
+              >
                 Privacy Policy
               </a>
-              <a href="#" className="text-gray-300 hover:text-white text-sm transition">
+              <a
+                href="/termsofservice"
+                className="text-gray-300 hover:text-white text-sm transition"
+              >
                 Terms of Service
               </a>
-              <a href="#" className="text-gray-300 hover:text-white text-sm transition">
+              <a
+                href="/shipping"
+                className="text-gray-300 hover:text-white text-sm transition"
+              >
                 Shipping Info
+              </a>
+
+              <a
+                href="/refund"
+                className="text-gray-300 hover:text-white text-sm transition"
+              >
+                Refund Policy
               </a>
             </div>
           </div>
