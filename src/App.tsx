@@ -10,14 +10,16 @@ import { useState } from 'react';
 import { CheckoutPage } from './pages/Checkout';
 import Footer from './components/Footer';
 import KishanParivarPage from './pages/KishanParivarPage';
-// import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import HomePage from "./pages/HomePage";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import AdminLayout from "./layout/AdminLayout";
 import OverviewPage from "./pages/admin/OverviewPage";
 import OurStory from "./pages/OurStory";
 import AdvertisementBar from './components/AdvertisementBar';
+import PrivacyPolicy from './pages/privacypolicy';
+import TermsOfService from './pages/TermsOfService';
+import ShippingPolicy from './pages/ShippingPolicy';
+import RefundPolicy from './pages/RefundPolicy'
 // import ProductPage from "./pages/admin/ProductPage";
 
 function App() {
@@ -37,7 +39,10 @@ function App() {
           <Route path="/register" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path='/our-story' element={<OurStory/>}/>
-
+          <Route path='/privacypolicy' element={<PrivacyPolicy/>}/>
+          <Route path='/termsofservice' element={<TermsOfService/>}/>
+          <Route path='/shipping' element={<ShippingPolicy/>}/>
+          <Route path='/refund' element={<RefundPolicy/>}/>
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<OverviewPage />} />

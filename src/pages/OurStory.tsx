@@ -1,22 +1,16 @@
 import React, { useEffect } from "react";
-import {motion} from 'framer-motion'
+import { motion } from "framer-motion";
 
 const AboutUs: React.FC = () => {
- 
-
   useEffect(() => {
     console.log("AboutUs component mounted");
   }, []);
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Sticky Navbar to Avoid Overlap */}
-      <div className="top-0 left-0 w-full z-50">
-      
-      </div>
-      {/* Hero Section with Full Cover Background */}
+      {/* Hero Section */}
       <section
-        className="relative w-full h-screen flex items-center justify-center text-center text-white"
+        className="relative w-full h-[70vh] flex items-center justify-center text-center text-white"
         style={{
           backgroundImage: "url(/assets/images/ourstory.png)",
           backgroundSize: "cover",
@@ -24,10 +18,11 @@ const AboutUs: React.FC = () => {
           backgroundRepeat: "no-repeat",
         }}
       ></section>
-      {/* About Us Content Section */}
-      <section className="max-w-7xl mx-auto px-6 lg:px-12 py-12">
+
+      {/* Section 1: Fair Price for Farmers */}
+      <section className="max-w-7xl mx-auto px-6 lg:px-12 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Left: Text Content */}
+          {/* Text */}
           <div>
             <h2 className="text-4xl font-bold text-gray-900">
               Fair Price for Farmers
@@ -49,86 +44,30 @@ const AboutUs: React.FC = () => {
             </p>
           </div>
 
-          {/* Right: Image */}
-          <div className="rounded-lg overflow-hidden shadow-lg flex justify-center">
+          {/* Image */}
+          <div className="flex justify-center">
             <img
               src="/assets/images/Farmers.png"
               alt="Farmers"
-              className="w-full max-w-[500px] h-[500px] object-cover rounded-md"
+              className="w-full max-w-[400px] h-[400px] object-cover rounded-lg shadow-md"
             />
           </div>
         </div>
       </section>
-      {/* Our Founders Section */}
-      <section className="bg-yellow-100 py-16 px-6">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-gray-900">Our Founders</h2>
-          <p className="text-lg text-gray-700 mt-4">
-            Young and agile graduates from IIT Guwahati wanted to use their
-            technical skills in the food and agriculture industry. They have the
-            vision to bring food processing to the farm level and provide
-            traditional superfoods to everyone.
-          </p>
-        </div>
-        <div className="max-w-6xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Founder 1 */}
-          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-            <img
-              src="/assets/images/founder1.jpg"
-              //alt="Founder 1"
-              className="w-32 h-32 mx-auto rounded-full object-cover"
-            />
-            <h3 className="text-2xl font-bold mt-4">Kuldeep Parewa</h3>
-            <p className="text-gray-700 mt-2">
-              Being from a farming family, I know the hardships they face.
-              Equipping them with technology, financial aid, and food-processing
-              machines will generate more value for them.
-            </p>
-          </div>
 
-          {/* Founder 2 */}
-          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-            <img
-              src="/assets/images/founder2.jpg"
-              //alt="Founder 2"
-              className="w-32 h-32 mx-auto rounded-full object-cover"
-            />
-            <h3 className="text-2xl font-bold mt-4">Aayushi Khandelwal</h3>
-            <p className="text-gray-700 mt-2">
-              I have always missed my nani’s recipes and nuskhe in this modern
-              lifestyle. I have the vision to preserve these with India’s lost
-              superfoods.
-            </p>
-          </div>
-
-          {/* Founder 3 */}
-          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-            <img
-              src="/assets/images/founder3.jpg"
-              // alt="Founder 3"
-              className="w-32 h-32 mx-auto rounded-full object-cover"
-            />
-            <h3 className="text-2xl font-bold mt-4">Akhil Kansal</h3>
-            <p className="text-gray-700 mt-2">
-              Using technology to assess food quality and create a
-              direct-from-farm supply chain excites me the most. Consumers need
-              access to quality food, and farmers need to be empowered.
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* Section 2: Empowering Rural Women */}
       <section className="max-w-7xl mx-auto px-6 lg:px-12 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Left: Image */}
+          {/* Image */}
           <div className="flex justify-center">
             <img
-              src="/assets/images/empowering rural women.png"
+              src="/assets/images/Empowering Rural Women.png"
               alt="Empowering Rural Women"
-              className="rounded-lg shadow-xl w-full max-w-md object-cover"
+              className="w-full max-w-[400px] h-[400px] object-cover rounded-lg shadow-md"
             />
           </div>
 
-          {/* Right: Text Content */}
+          {/* Text */}
           <div>
             <h2 className="text-4xl font-bold text-gray-900">
               Empowering Rural Women
@@ -155,9 +94,11 @@ const AboutUs: React.FC = () => {
           </div>
         </div>
       </section>
-      <section className="max-w-7xl mx-auto px-6 lg:px-12 py-16  rounded-lg ">
+
+      {/* Section 3: Adulteration Free Food */}
+      <section className="max-w-7xl mx-auto px-6 lg:px-12 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Left: Text Content with Staggered Fade-in */}
+          {/* Text with Animation */}
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -180,7 +121,7 @@ const AboutUs: React.FC = () => {
                 hidden: { opacity: 0, y: -20 },
                 visible: { opacity: 1, y: 0 },
               }}
-              className="text-3xl font-extrabold text-gray-900 leading-tight"
+              className="text-4xl font-bold text-gray-900"
             >
               Adulteration free Food
             </motion.h2>
@@ -205,9 +146,8 @@ const AboutUs: React.FC = () => {
               <span className="font-semibold text-green-900">
                 Kishan2Kitchen
               </span>
-              , we are committed to providing
+              , we are committed to providing{" "}
               <span className="font-bold text-green-800">
-                {" "}
                 100% adulteration-free food
               </span>
               , handcrafted by skilled rural women across India. Every product
@@ -222,26 +162,24 @@ const AboutUs: React.FC = () => {
               className="text-lg text-gray-700 mt-4 leading-relaxed"
             >
               By choosing our products, you’re not only nourishing yourself but
-              also <strong>empowering rural communities</strong>
-              and <strong>preserving traditional food craftsmanship</strong>.
+              also <strong>empowering rural communities</strong> and{" "}
+              <strong>preserving traditional food craftsmanship</strong>.
             </motion.p>
           </motion.div>
 
-          {/* Right: Image with Subtle Zoom-in & Float Effect */}
+          {/* Image with Animation */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, ease: "easeOut" }}
             viewport={{ once: true }}
-            className="rounded-lg  flex justify-center"
+            className="flex justify-center"
           >
             <motion.img
               src="/assets/images/Adulteration free.png"
               alt="Adulteration Free Food"
-              className="w-full max-w-[450px] h-[450px] object-cover rounded-lg"
-              animate={{
-                y: [0, -5, 0], // Floating effect
-              }}
+              className="w-full max-w-[400px] h-[400px] object-cover rounded-lg shadow-md"
+              animate={{ y: [0, -5, 0] }}
               transition={{
                 duration: 3,
                 repeat: Infinity,
@@ -252,7 +190,6 @@ const AboutUs: React.FC = () => {
           </motion.div>
         </div>
       </section>
-      ; ;
     </div>
   );
 };
