@@ -9,17 +9,19 @@ import KishanParivar from "../components/KishanParivar";
 import FarmerBanner from "../components/FarmerBanner";
 import SecondFarmerBanner from "../components/SecondFarmerBanner";
 
+
 const HomePage = () => {
   return (
     <div className="min-h-screen">
+      {/* <WhiteBar/> */}
       <Hero />
       <RecognizedBy />
-      <FeaturesSection />
       <ProductSection />
-      <GuaranteeCycle />
+      <FeaturesSection />
       <FarmerBanner />
-      <KishanParivar />
+      <GuaranteeCycle />
       <SecondFarmerBanner />
+      <KishanParivar />
       <TestimonialsSection />
     </div>
   );

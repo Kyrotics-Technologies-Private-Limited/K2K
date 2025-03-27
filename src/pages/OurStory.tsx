@@ -1,11 +1,8 @@
 import React, { useEffect } from "react";
-import Navbar from "../components/Navbar";
 import {motion} from 'framer-motion'
 
 const AboutUs: React.FC = () => {
-  const handleCartClick = () => {
-    console.log("Cart clicked");
-  };
+ 
 
   useEffect(() => {
     console.log("AboutUs component mounted");
@@ -15,10 +12,7 @@ const AboutUs: React.FC = () => {
     <div className="bg-white min-h-screen">
       {/* Sticky Navbar to Avoid Overlap */}
       <div className="top-0 left-0 w-full z-50">
-        <Navbar
-          onCartClick={handleCartClick}
-          className="!bg-green-900 !text-white shadow-lg"
-        />
+      
       </div>
       {/* Hero Section with Full Cover Background */}
       <section

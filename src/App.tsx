@@ -17,6 +17,8 @@ import Login from "./pages/Login";
 import AdminLayout from "./layout/AdminLayout";
 import OverviewPage from "./pages/admin/OverviewPage";
 import OurStory from "./pages/OurStory";
+import AdvertisementBar from './components/AdvertisementBar';
+// import ProductPage from "./pages/admin/ProductPage";
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -24,6 +26,7 @@ function App() {
   return (
     <BrowserRouter>
       <CartProvider>
+        <AdvertisementBar/>
         <Navbar onCartClick={() => setIsCartOpen(true)} />
         <Routes>
           <Route path="/" element={<HomePage />} />

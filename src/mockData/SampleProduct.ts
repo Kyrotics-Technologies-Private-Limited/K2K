@@ -133,5 +133,71 @@ export const sampleProducts : Product[] = [
           icon: '/assets/benefits/honey/natural-energy.png'
         }
       ]
+    },
+    {
+      id: '3',
+      name: 'Cold Pressed Groundnut Oil',
+      price: {
+        amount: 750,
+        currency: 'INR',
+        variants: [
+          { weight: '500ml', price: 750, inStock: true },
+          { weight: '1L', price: 1400, inStock: true },
+          { weight: '2L', price: 2700, inStock: true }
+        ]
+      },
+      description: "Experience the authentic taste and health benefits of our traditional cold-pressed groundnut oil. Extracted using age-old wooden ghani method, this pure and natural oil retains all its nutrients, natural aroma, and original flavor. Perfect for cooking, it's rich in vitamin E, antioxidants, and healthy fats that promote heart health and overall wellness.",
+      origin: 'Gujarat',
+      category: 'oils',
+      images: {
+        main: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        gallery: [
+          'https://images.unsplash.com/photo-1608571702346-bf078a741b19?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+          'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=1436&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+          'https://images.unsplash.com/photo-1588413333412-82148535db53?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+        ]
+      },
+      stockStatus: 'in_stock',
+      ratings: 4.7,
+      reviews: 82,
+      badges: [
+        { text: 'Cold Pressed', type: 'organic' },
+        { text: 'No Chemicals', type: 'natural' },
+        { text: 'Traditional Process', type: 'premium' },
+        { text: 'Zero Preservatives', type: 'organic' },
+        { text: 'Heart Healthy', type: 'natural' }
+      ],
+      benefits: [
+        {
+          title: 'Heart Health',
+          description: 'Rich in monounsaturated fats that help maintain healthy cholesterol levels and support cardiovascular health',
+          icon: '/assets/benefits/oil/heart-health.png'
+        },
+        {
+          title: 'Antioxidant Rich',
+          description: 'Contains vitamin E and other antioxidants that protect cells from damage and support immune function',
+          icon: '/assets/benefits/oil/antioxidant.png'
+        },
+        {
+          title: 'Skin Care',
+          description: 'Natural vitamin E content helps maintain skin health and provides protection against free radicals',
+          icon: '/assets/benefits/oil/skin-care.png'
+        },
+        {
+          title: 'Joint Health',
+          description: 'Anti-inflammatory properties help reduce joint pain and support overall joint health',
+          icon: '/assets/benefits/oil/joint-health.png'
+        },
+        {
+          title: 'Energy Boost',
+          description: 'Healthy fats provide sustained energy and support proper nutrient absorption',
+          icon: '/assets/benefits/oil/energy.png'
+        },
+        {
+          title: 'Brain Function',
+          description: 'Essential fatty acids support cognitive function and maintain brain health',
+          icon: '/assets/benefits/oil/brain.png'
+        }
+      ]
     }
-  ];
+];
