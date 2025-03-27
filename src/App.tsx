@@ -16,6 +16,7 @@ import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import AdminLayout from "./layout/AdminLayout";
 import OverviewPage from "./pages/admin/OverviewPage";
+import AdvertisementBar from './components/AdvertisementBar';
 // import ProductPage from "./pages/admin/ProductPage";
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
     
       <BrowserRouter>
       <CartProvider>
+        <AdvertisementBar/>
         <Navbar onCartClick={() => setIsCartOpen(true)} />
         <Routes>
           <Route path="/" element={<HomePage />} />
