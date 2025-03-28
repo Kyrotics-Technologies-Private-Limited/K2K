@@ -2,7 +2,7 @@ import React from "react";
 
 const PrivacyPolicy: React.FC = () => {
   return (
-    <div className="min-h-screen bg-white text-gray-800 px-6 py-10 max-w-4xl mx-auto bg-yellow-50">
+    <div className="min-h-screen  text-gray-800 px-4 py-1 max-w-7xl mx-auto bg-green-50">
       <h1 className="text-3xl font-bold mb-6 text-center">Privacy Policy</h1>
       <p className="mb-6">
         This Privacy Policy describes how your personal information is

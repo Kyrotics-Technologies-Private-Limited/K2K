@@ -2,11 +2,11 @@ import React from "react";
 
 const TermsOfService: React.FC = () => {
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6 text-justify bg-yellow-50">
+    <div className="min-h-screen  text-gray-800 px-4 py-4 max-w-7xl mx-auto bg-green-50">
       <h1 className="text-3xl font-bold text-green-700">Terms of Service</h1>
 
       <section>
-        <h2 className="text-2xl font-semibold">OVERVIEW</h2>
+        <h2 className="text-2xl py-2 font-semibold">OVERVIEW</h2>
         <p>
           This website is operated by Kishan2Kitchen (A Brand of UniVillage Agro
           Pvt. Ltd.). Throughout the site, the terms “we”, “us” and “our” refer
@@ -20,7 +20,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Acceptance of Terms</h2>
+        <h2 className="text-2xl py-2  font-semibold">Acceptance of Terms</h2>
         <p>
           By accessing and using our website, you agree to be bound by these
           Terms of Service. If you do not agree with any of the terms stated
@@ -29,7 +29,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Use of Website</h2>
+        <h2 className="text-2xl py-2  font-semibold">Use of Website</h2>
         <p>
           Our website is intended for personal, non-commercial use only. You may
           not use this website to engage in any activities that violate any laws
@@ -40,7 +40,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Privacy Policy</h2>
+        <h2 className="text-2xl py-2  font-semibold">Privacy Policy</h2>
         <p>
           We take your privacy seriously and have put together a Privacy Policy
           that explains how we collect, use, and disclose your personal
@@ -50,7 +50,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Online Payment</h2>
+        <h2 className="text-2xl py-2  font-semibold">Online Payment</h2>
         <p>
           Our e-commerce website provides online payment options for your
           convenience. All transactions made on our website are processed
@@ -61,7 +61,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Cookies and Tracking</h2>
+        <h2 className="text-2xl py-2  font-semibold">Cookies and Tracking</h2>
         <p>
           Our e-commerce website uses cookies and other tracking technologies to
           improve your browsing experience and to provide you with relevant
@@ -73,7 +73,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Intellectual Property</h2>
+        <h2 className="text-2xl py-2 font-semibold">Intellectual Property</h2>
         <p>
           All content and materials on our website, including but not limited to
           text, images, graphics, logos, and software, are the property of our
@@ -84,7 +84,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Intellectual Property</h2>
+        <h2 className="text-2xl py-2 font-semibold">Intellectual Property</h2>
         <p>
           We are not responsible if information made available on this site is
           not accurate, complete or current. The material on this site is
@@ -101,7 +101,7 @@ const TermsOfService: React.FC = () => {
         </p>
       </section>
       <section>
-        <h2 className="text-2xl font-semibold">Eligibility</h2>
+        <h2 className="text-2xl py-2  font-semibold">Eligibility</h2>
         <p>
           To use our Services, you must be at least 18 years old or the age of
           majority in your jurisdiction. By using our Services, you represent
@@ -110,7 +110,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Account Registration</h2>
+        <h2 className="text-2xl py-2  font-semibold">Account Registration</h2>
         <ul className="list-disc ml-5 space-y-1">
           <li>
             You may be required to create an account to access certain features
@@ -129,7 +129,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Use of Services</h2>
+        <h2 className="text-2xl py-2  font-semibold">Use of Services</h2>
         <ul className="list-disc ml-5 space-y-1">
           <li>Violate any applicable laws or regulations...</li>
           <li>Interfere with or disrupt the integrity of our Services...</li>
@@ -144,7 +144,9 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Intellectual Property Rights</h2>
+        <h2 className="text-2xl py-2  font-semibold">
+          Intellectual Property Rights
+        </h2>
         <p>
           All content, trademarks, logos, and intellectual property displayed
           through our Services are the exclusive property of the Company or its
@@ -167,7 +169,9 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Termination and Suspension</h2>
+        <h2 className="text-2xl py-2  font-semibold">
+          Termination and Suspension
+        </h2>
         <p>
           We reserve the right to suspend or terminate your access to our
           Services at our discretion if we determine that you have violated
@@ -177,7 +181,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">
+        <h2 className="text-2xl py-2 font-semibold">
           Disclaimers and Limitation of Liability
         </h2>
         <p>
@@ -200,7 +204,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">
+        <h2 className="text-2xl py-2 font-semibold">
           Modifications to the Service and Prices
         </h2>
         <p>
@@ -216,7 +220,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Products or Services</h2>
+        <h2 className="text-2xl py-2 font-semibold">Products or Services</h2>
         <p>
           We have made every effort to display as accurately as possible the
           colours and images of our products that appear at the store. We cannot
@@ -237,7 +241,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">
+        <h2 className="text-2xl py-2 font-semibold">
           Accuracy of Billing and Account Information
         </h2>
         <p>
@@ -261,7 +265,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Optional Tools</h2>
+        <h2 className="text-2xl py-2 font-semibold">Optional Tools</h2>
         <p>
           <ul>
             <li>
@@ -293,7 +297,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Third-party Links</h2>
+        <h2 className="text-2xl py-2 font-semibold">Third-party Links</h2>
         <p>
           <ul>
             <li>
@@ -322,7 +326,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">
+        <h2 className="text-2xl py-2 font-semibold">
           User Comments, Feedback and Other Submissions
         </h2>
         <p>
@@ -335,9 +339,12 @@ const TermsOfService: React.FC = () => {
               (collectively, 'comments'), you agree that we may, at any time,
               without restriction, edit, copy, publish, distribute, translate
               and otherwise use in any medium any comments that you forward to
-              us. We are and shall be under no obligation (1) to maintain any
-              comments in confidence; (2) to pay compensation for any comments;
-              or (3) to respond to any comments.{" "}
+              us. We are and shall be under no obligation{" "}
+              <ul>
+                <li>to maintain any comments in confidence</li>
+                <li>to pay compensation for any comments </li>
+                <li>to respond to any comments.</li>
+              </ul>
             </li>
             <li>
               We may, but have no obligation to, monitor, edit or remove content
@@ -365,7 +372,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Personal Information</h2>
+        <h2 className="text-2xl py-2 font-semibold">Personal Information</h2>
         <p>
           Your submission of personal information through the store is governed
           by our Privacy Policy. You are requested to view our privacy policy
@@ -373,7 +380,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">
+        <h2 className="text-2xl py-2 font-semibold">
           Errors, Inaccuracies and Omissions
         </h2>
         <p>
@@ -383,7 +390,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Indemnification</h2>
+        <h2 className="text-2xl py-2 font-semibold">Indemnification</h2>
         <p>
           You agree to indemnify and hold harmless our company, its affiliates,
           and their respective officers, directors, employees, and agents, from
@@ -394,7 +401,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Severability</h2>
+        <h2 className="text-2xl py-2 font-semibold">Severability</h2>
         <p>
           In the event that any provision of these Terms of Service is
           determined to be unlawful, void or unenforceable, such provision shall
@@ -407,7 +414,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Termination</h2>
+        <h2 className="text-2xl py-2 font-semibold">Termination</h2>
         <p>
           The obligations and liabilities of the parties incurred prior to the
           termination date shall survive the termination of this agreement for
@@ -424,7 +431,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Limitation of Liability</h2>
+        <h2 className="text-2xl py-2 font-semibold">Limitation of Liability</h2>
         <p>
           To the fullest extent permitted by applicable law, our company and its
           affiliates shall not be liable for any damages, including without
@@ -435,7 +442,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Entire Agreement</h2>
+        <h2 className="text-2xl py-2 font-semibold">Entire Agreement</h2>
         <p>
           <ul>
             <li>
@@ -461,7 +468,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Governing Law</h2>
+        <h2 className="text-2xl py-2 font-semibold">Governing Law</h2>
         <p>
           These Terms of Service and any separate agreements whereby we provide
           you Services shall be governed by and construed in accordance with the
@@ -470,7 +477,9 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Modification of Terms of Use</h2>
+        <h2 className="text-2xl py-2 font-semibold">
+          Modification of Terms of Use
+        </h2>
         <p>
           We reserve the right to modify these Terms of Use at any time. Your
           continued use of our website after the modification of these Terms of
@@ -479,7 +488,7 @@ const TermsOfService: React.FC = () => {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">Contact Information</h2>
+        <h2 className="text-2xl py-2 font-semibold">Contact Information</h2>
         <p>
           Questions about the Terms of Service should be sent to us at
           kishan2kitchen@gmail.com or please do write to us:
@@ -490,13 +499,10 @@ const TermsOfService: React.FC = () => {
             kishan2kitchen@gmail.com
           </a>
           <ul>
-            <li>
-              Univillage Agro Pvt. Ltd. </li>
-              <li>Uttar Narayan Pur, PO: BK Chungri</li>
-              <li> PS:
-              Margram, District: Birbhum,</li>
-              <li> West Bengal - 731202, India
-            </li>
+            <li>Univillage Agro Pvt. Ltd. </li>
+            <li>Uttar Narayan Pur, PO: BK Chungri</li>
+            <li> PS: Margram, District: Birbhum,</li>
+            <li> West Bengal - 731202, India</li>
           </ul>
         </p>
       </section>
