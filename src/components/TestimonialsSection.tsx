@@ -171,7 +171,7 @@ const TestimonialsSection = () => {
         <h2 className="text-3xl font-bold text-gray-900 mb-3">
           Customer Stories
         </h2>
-        <p className="text-gray-600 max-w-xl mx-auto mb-12">
+        <p className="text-gray-600 max-w-xl mx-auto mb-6">
           Hear from those who've experienced our products
         </p>
 
@@ -192,7 +192,7 @@ const TestimonialsSection = () => {
               768: { slidesPerView: 2 },
               1024: { slidesPerView: 3 },
             }}
-            className="px-2 pb-12"
+            className="px-2 pb-12 pt-6"
           >
             {testimonials.map(({ name, role, image, content, rating, product }) => (
               <SwiperSlide key={name}>

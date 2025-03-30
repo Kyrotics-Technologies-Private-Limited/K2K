@@ -208,12 +208,10 @@
 
 // export default GuaranteeCycle;
 
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const GuaranteeCycle = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
-
   const guarantees = [
     {
       title: "Authenticity",
@@ -253,14 +251,6 @@ const GuaranteeCycle = () => {
     },
   ];
 
-  // Auto-rotate through items
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIndex((prevIndex) => (prevIndex + 1) % guarantees.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [guarantees.length]);
-
   return (
     <div className="w-full bg-gradient-to-b from-white via-green-50 to-green-100 p-4 pb-8 md:p-8 md:pb-16">
       <div className="max-w-5xl mx-auto">
@@ -286,10 +276,10 @@ const GuaranteeCycle = () => {
         </div>
 
         {/* Main Circle Display */}
-        <div className="relative h-[300px] md:h-[400px] flex items-center justify-center">
-          {/* Center Circle with Image */}
+        <div className="relative h-[360px] md:h-[480px] flex items-center justify-center"> {/* Increased height by 1.2x */}
+          {/* Center Circle with Image - Increased size by 1.2x */}
           <div className="absolute z-20">
-            <div className="w-24 h-24 md:w-36 md:h-36 bg-white rounded-full shadow-lg flex items-center justify-center border-4 border-green-100 overflow-hidden">
+            <div className="w-28 h-28 md:w-44 md:h-44 bg-white rounded-full shadow-lg flex items-center justify-center border-4 border-green-100 overflow-hidden"> {/* 1.2x larger */}
               <img
                 src="/assets/images/Center Image.png"
                 alt="Quality Guarantee"
@@ -301,7 +291,7 @@ const GuaranteeCycle = () => {
           {/* Guarantees with Images */}
           {guarantees.map((item, index) => {
             const angle = (index / guarantees.length) * (2 * Math.PI);
-            const radius = window.innerWidth < 768 ? 105 : 150; // Reduced to 75% of original (140->105, 200->150)
+            const radius = window.innerWidth < 768 ? 126 : 180; // 1.2x larger (105->126, 150->180)
             const x = Math.cos(angle - Math.PI / 2) * radius;
             const y = Math.sin(angle - Math.PI / 2) * radius;
 
@@ -316,9 +306,8 @@ const GuaranteeCycle = () => {
               >
                 <div className="flex flex-col items-center">
                   <motion.div
-                    className="w-12 h-12 md:w-20 md:h-20 rounded-full flex items-center justify-center cursor-pointer overflow-hidden mb-2 md:mb-3"
+                    className="w-14 h-14 md:w-24 md:h-24 rounded-full flex items-center justify-center cursor-pointer overflow-hidden mb-2 md:mb-3"
                     whileHover={{ scale: 1.1 }}
-                    onClick={() => setActiveIndex(index)}
                   >
                     <img
                       src={`${item.image}?w=300&h=300&auto=format&fit=crop&q=80`}
