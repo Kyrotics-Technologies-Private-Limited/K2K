@@ -13,11 +13,10 @@ import SecondFarmerBanner from "../components/SecondFarmerBanner";
 const HomePage = () => {
   return (
     <div className="min-h-screen">
-      {/* <WhiteBar/> */}
       <Hero />
       <RecognizedBy />
-      <ProductSection />
       <FeaturesSection />
+      <ProductSection />
       <FarmerBanner />
       <GuaranteeCycle />
       <SecondFarmerBanner />

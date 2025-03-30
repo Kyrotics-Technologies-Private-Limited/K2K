@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
-import { Menu, X, ShoppingCart, Search, Leaf } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-
+import React, { useState } from "react";
+import { Menu, X, ShoppingCart, Search, Leaf } from "lucide-react";
+import { useCart } from "../context/CartContext";
 
 interface NavbarProps {
   onCartClick: () => void;
   className?: string;
 }
 
-
-const Navbar: React.FC<NavbarProps> = ({ onCartClick, className=''}) => {
+const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   // const [isScrolled, setIsScrolled] = useState(false);
   const { state } = useCart();
@@ -26,28 +24,62 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick, className=''}) => {
   // }, []);
 
   return (
-    <nav className={`sticky top-0 w-full z-50 transition-all duration-300 bg-white shadow-sm`}>
+    <nav
+      className={`sticky top-0 w-full z-50 transition-all duration-300 bg-white shadow-sm`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo */}
           <a href="/" className="flex-shrink-0 flex items-center">
-            
-              <Leaf className={`h-8 w-8 text-green-600 `} />
-              <span className={`ml-2 text-xl font-semibold text-green-800`}>
-                Kishan2Kitchen
-              </span>
-            
+            <img
+              src="/assets/images/K2K Logo.jpg" // Update this path to your logo image
+              alt="Kishan2Kitchen Logo"
+              className="h-12 w-12 object-cover mr-1" // Added rounded-md for slightly rounded corners
+            />
+            <span className="ml-2 text-xl font-semibold text-green-800">
+              Kishan2Kitchen
+            </span>
           </a>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center md:justify-center flex-1">
             <div className="flex space-x-8">
-              <a href="/all-products" className={`text-gray-700 hover:text-green-600 transition`}>All Products</a>
-              <a href="#" className={`text-gray-700 hover:text-green-600 transition`}>Try Our Sample</a>
-              <a href="/kishanParivarPage" className={`text-gray-700 hover:text-green-600 transition`}>Kishan Parivar</a>
-              <a href="#" className={`text-gray-700 hover:text-green-600 transition`}>Traceability</a>
-              <a href="/our-story" className={`text-gray-700 hover:text-green-600 transition`}>Our Story</a>
-              <a href="#" className={`text-gray-700 hover:text-green-600 transition`}>Blog</a>
+              <a
+                href="/all-products"
+                className={`text-gray-700 hover:text-green-600 transition`}
+              >
+                All Products
+              </a>
+              <a
+                href="#"
+                className={`text-gray-700 hover:text-green-600 transition`}
+              >
+                Try Our Sample
+              </a>
+              <a
+                href="/kishanParivarPage"
+                className={`text-gray-700 hover:text-green-600 transition`}
+              >
+                Kishan Parivar
+              </a>
+              <a
+                href="/traceability"
+                className={`text-gray-700 hover:text-green-600 transition`}
+              >
+                Traceability
+              </a>
+              <a
+                href="/our-story"
+                className={`text-gray-700 hover:text-green-600 transition`}
+              >
+                Our Story
+              </a>
+              <a
+                href="#"
+                className={`text-gray-700 hover:text-green-600 transition`}
+              >
+                Blog
+              </a>
             </div>
           </div>
 
@@ -56,17 +88,18 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick, className=''}) => {
             <button className={`text-gray-700 hover:text-green-600 transition`}>
               <Search className="h-5 w-5" />
             </button>
-            <button
-            onClick={onCartClick}
-            className="relative p-2"
-          >
-            <ShoppingCart className={`text-gray-700 hover:text-green-600 transition w-6 h-6`} />
-            {itemCount > 0 && (
-              <span className={`bg-green-600 text-white absolute -top-1 -right-1 rounded-full h-4 w-4 flex items-center justify-center text-xs`}>
-                {itemCount}
-              </span>
-            )}
-          </button>
+            <button onClick={onCartClick} className="relative p-2">
+              <ShoppingCart
+                className={`text-gray-700 hover:text-green-600 transition w-6 h-6`}
+              />
+              {itemCount > 0 && (
+                <span
+                  className={`bg-green-600 text-white absolute -top-1 -right-1 rounded-full h-4 w-4 flex items-center justify-center text-xs`}
+                >
+                  {itemCount}
+                </span>
+              )}
+            </button>
           </div>
 
           {/* Mobile menu button */}
