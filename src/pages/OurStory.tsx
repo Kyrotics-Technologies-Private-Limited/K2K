@@ -28,19 +28,18 @@ const AboutUs: React.FC = () => {
               Fair Price for Farmers
             </h2>
             <div className="flex flex-wrap gap-6 mt-6">
-              <div className="text-green-800 text-3xl font-bold">
+              <div className="text-green-800 text-2xl font-semibold">
                 300+ Farmers attached with us
               </div>
             </div>
-            <p className="text-lg text-gray-700 mt-6 leading-relaxed">
+            <p className="text-lg text-gray-700 mt-6 leading-relaxed flex items-center justify-center">
               At Kishan2Kitchen, we believe in a sustainable India, where rural
               farmers thrive. By providing competitive fair prices for their
               produce, we empower farmers and create a ripple of happiness.
               Together, let's support local communities, strengthen the
               agricultural backbone, and savour the taste of a brighter future.
               Join us in celebrating the joy of fair trade and contributing to a
-              sustainable, happy India. Kishan2Kitchen - Nurturing Farmers,
-              Spreading Happiness.
+              sustainable, happy India.
             </p>
           </div>
 
@@ -75,7 +74,7 @@ const AboutUs: React.FC = () => {
             <p className="text-green-800 text-2xl font-semibold mt-4">
               100+ Micro-Entrepreneurs & Self-Help Groups
             </p>
-            <p className="text-lg text-gray-700 mt-6 leading-relaxed">
+            <p className="text-lg text-gray-700 mt-6 leading-relaxed flex items-center">
               At Kishan2Kitchen, we are committed to empowering rural women by
               providing them with opportunities to sell their pure, homemade,
               and adulteration-free natural foods. Through skill development and
@@ -133,9 +132,7 @@ const AboutUs: React.FC = () => {
               }}
               className="mt-6 text-green-800 text-2xl font-semibold"
             >
-              <span className="inline-block bg-green-100 px-4 py-2 rounded-lg shadow-sm">
-                Long-Term Health Benefits
-              </span>
+              Long-Term Health Benefits
             </motion.div>
 
             <motion.p
@@ -179,13 +176,6 @@ const AboutUs: React.FC = () => {
               src="/assets/images/Adulteration free.png"
               alt="Adulteration Free Food"
               className="w-full max-w-[400px] h-[400px] object-cover rounded-lg shadow-md"
-              animate={{ y: [0, -5, 0] }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                repeatType: "reverse",
-                ease: "easeInOut",
-              }}
             />
           </motion.div>
         </div>
