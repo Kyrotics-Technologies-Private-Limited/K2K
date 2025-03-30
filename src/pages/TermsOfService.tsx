@@ -2,8 +2,8 @@ import React from "react";
 
 const TermsOfService: React.FC = () => {
   return (
-    <div className="min-h-screen  text-gray-800 px-4 py-4 max-w-7xl mx-auto bg-green-50">
-      <h1 className="text-3xl font-bold text-green-700">Terms of Service</h1>
+    <div className="min-h-screen text-gray-800 px-20 py-8 w-full bg-green-50 shadow-md rounded-lg">
+      <h1 className="text-4xl font-bold mb-8 text-center">Terms of Service</h1>
 
       <section>
         <h2 className="text-2xl py-2 font-semibold">OVERVIEW</h2>
