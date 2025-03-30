@@ -8,6 +8,9 @@ import unpro from '/assets/productbadgeimg/UNPROCESSED.png';
 import source from '/assets/productbadgeimg/SOURCED FROM BEEKEEPERS.png';
 import noadd from '/assets/productbadgeimg/NO ADDED SUGAR.png';
 import immunity from '/assets/productbadgeimg/IMMUNITY BOOSTER.png';
+import rural from '/assets/productbadgeimg/SOURCEDFROM RURAL FARMER.png';
+import cold from '/assets/productbadgeimg/COLD PRESSED.png';
+import refined from '/assets/productbadgeimg/NON REFINED.png';
 import { Product } from '../../types';
 
 interface ProductBadgeProps {
@@ -23,7 +26,10 @@ const badgeIcons: { [key: string]: string } = {
   'No added sugar': noadd,
   'Unprocessed': unpro,
   'Immunity Booster': immunity,
-  'Sourced from Beekeepers': source
+  'Sourced from Beekeepers': source,
+  'Sourced from Rural Farmers': rural,
+  'Cold Pressed': cold,
+  'Non Refined': refined,
 };
 
 export const ProductBadges: React.FC<ProductBadgeProps> = ({ product }) => {

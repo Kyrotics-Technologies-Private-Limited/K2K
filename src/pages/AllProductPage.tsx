@@ -2,6 +2,7 @@ import React from 'react';
 import { ProductGrid } from '../components/products/ProductGrid'
 import { sampleProducts } from '../mockData/SampleProduct';
 import { Brain, Heart, Leaf, Scale, Zap, Weight, Utensils, Battery, Moon, Shield } from 'lucide-react';
+import RecognizedBy from '../components/RecognizedBy';
 
 const AllProductPage = () => {
   const healthIssues = [
@@ -83,16 +84,15 @@ const AllProductPage = () => {
   ];
 
   return (
-    <div className='bg-[#E0E7D7]'>
-      
+    <div className='bg-white'>
       {/* Health Issues Section */}
       <div className="pt-8">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-3 text-[#2C3639]">Health Concerns?</h2>
+          <h2 className="text-4xl font-bold  font-playfair text-center mb-3">Health Concerns?</h2>
           <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
             Discover natural solutions for your everyday health challenges
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
             {healthIssues.map((issue, index) => (
               <div 
                 key={index} 
@@ -101,7 +101,7 @@ const AllProductPage = () => {
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                      style={{ backgroundImage: `url(${issue.bgImage})` }}>
-                  <div className="absolute inset-0 bg-[#2D6A4F]"></div>
+                  <div className="absolute inset-0 bg-green-800"></div>
                 </div>
 
                 {/* Content */}
@@ -111,7 +111,7 @@ const AllProductPage = () => {
                       className: "w-8 h-8 text-green-700 transition-colors duration-500 group-hover:text-green-600"
                     })}
                   </div>
-                  <h3 className="text-xl font-semibold text-[#FFC107] mb-2 transition-transform duration-500 group-hover:-translate-y-1">
+                  <h3 className="text-xl font-semibold text-[#FFC107]  font-playfair mb-2 transition-transform duration-500 group-hover:-translate-y-1">
                     {issue.title}
                   </h3>
                   <p className="text-[#E9ECEF] text-sm transition-transform duration-500 group-hover:-translate-y-1">
@@ -124,9 +124,50 @@ const AllProductPage = () => {
         </div>
       </div>
 
+      {/* Banner Section */}
+      <div className="max-w-7xl mx-auto px-4">
+        <div 
+          className="relative rounded-xl shadow-lg p-8 my-4 bg-cover bg-center h-[300px]"
+          style={{
+            backgroundImage: 'url("/assets/bannerimg/banner.jpg")',
+          }}
+        >
+          <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl"></div>
+          <div className="relative z-10 text-center">
+            <h1 className="text-2xl font-bold font-titillium text-white mb-4">DID YOU KNOW ?</h1>
+            <p className="text-gray-100 max-w-2xl mx-auto">
+              Carefully sourced from nature, minimally processed, and delivered fresh to your door. Each
+              product maintains its natural goodness and nutritional integrity.
+            </p>
+          </div>
+        </div>
+      </div>
+      
       {/* Natural Solutions Section */}
       <div className="max-w-7xl mx-auto px-4">
         <ProductGrid products={sampleProducts} />
+      </div>
+
+      {/* Bottom Banner Section */}
+      <div className="max-w-7xl mx-auto px-4">
+        <div 
+          className="relative rounded-xl shadow-lg p-8 my-4 bg-cover bg-center h-[300px]"
+          style={{
+            backgroundImage: 'url("/assets/bannerimg/banner.jpg")',
+          }}
+        >
+          <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl"></div>
+          <div className="relative z-10 text-center">
+            <h1 className="text-2xl font-bold font-titillium text-white mb-4">DID YOU KNOW ?</h1>
+            <p className="text-gray-100 font-titillium max-w-2xl mx-auto">
+              Carefully sourced from nature, minimally processed, and delivered fresh to your door. Each
+              product maintains its natural goodness and nutritional integrity.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className=" py-4">
+      <RecognizedBy />
       </div>
     </div>
   );

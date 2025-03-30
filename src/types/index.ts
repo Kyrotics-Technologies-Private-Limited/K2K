@@ -4,11 +4,7 @@ export interface Product {
     price: {
       amount: number;
       currency: "INR";
-      variants: {
-        weight: string;
-        price: number;
-        inStock: boolean;
-      }[];
+      variants: ProductVariant[];
     };
     description: string;
     // ingredients: string[];
@@ -46,4 +42,12 @@ export interface Product {
     availability: ("in_stock" | "low_stock")[];
     searchQuery: string;
     sortBy: SortOption;
+  }
+
+  export interface ProductVariant {
+    weight: string;
+    price: number;
+    inStock: boolean;
+    originalPrice?: number;
+    discount?: number;
   }
