@@ -20,6 +20,7 @@ import PrivacyPolicy from './pages/privacypolicy';
 import TermsOfService from './pages/TermsOfService';
 import ShippingPolicy from './pages/ShippingPolicy';
 import RefundPolicy from './pages/RefundPolicy'
+import Traceability from './pages/Traceability';
 // import ProductPage from "./pages/admin/ProductPage";
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
           <Route path="/register" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path='/our-story' element={<OurStory/>}/>
+          <Route path='/traceability' element={<Traceability/>}/>
           <Route path='/privacypolicy' element={<PrivacyPolicy/>}/>
           <Route path='/termsofservice' element={<TermsOfService/>}/>
           <Route path='/shipping' element={<ShippingPolicy/>}/>
