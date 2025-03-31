@@ -16,7 +16,7 @@ export const HealthBenefits: React.FC<HealthBenefitsProps> = ({ product }) => {
         className="w-full flex items-center justify-between "
       >
         <div className="text-left">
-          <h2 className="text-xl uppercase font-bold text-gray-800">Benefits</h2>
+          <h2 className="text-3xl uppercase font-bold font-cormorant text-gray-800">Benefits</h2>
         </div>
         {isOpen ? (
           <ChevronUp className="w-6 h-6 text-gray-500" />
@@ -33,7 +33,7 @@ export const HealthBenefits: React.FC<HealthBenefitsProps> = ({ product }) => {
             {product.benefits.map((benefit, index) => (
               <div key={index} className="flex items-start space-x-2">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-full border-2 border-green-700 flex items-center justify-center p-2">
+                  <div className="w-16 h-16 rounded-full border-2 border-green-700 flex items-center justify-center p-2">
                     <img
                       src={benefit.icon}
                       alt={benefit.title}
@@ -42,10 +42,10 @@ export const HealthBenefits: React.FC<HealthBenefitsProps> = ({ product }) => {
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-600">
+                  <h4 className="text-2xl font-bold font-cormorant text-gray-600">
                     {benefit.title}
                   </h4>
-                  <div className="h-0.5 bg-gradient-to-r from-green-800 to-white mt-1 mb-2"></div>
+                  <div className="h-0.5  mb-2"></div>
                   <p className="text-gray-800">
                     {benefit.description}
                   </p>

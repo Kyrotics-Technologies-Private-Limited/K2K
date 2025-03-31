@@ -62,13 +62,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <Link
       to={`/product/${product.id}`}
       onClick={handleProductClick}
-      className="group bg-white rounded-md shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md relative w-[240px]"
+      className="group bg-white rounded-md shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md relative w-full"
     >
-      <div className="aspect-[4/3] overflow-hidden relative">
+      <div className="aspect-[39/37] overflow-hidden relative">
         <img
           src={product.images.main}
           alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           loading="lazy"
         />
         <div className="absolute top-1.5 left-1.5 flex gap-0.5">
@@ -77,7 +77,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </span>
           {product.ratings >= 4.5 && (
             <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[#F8D7A8] text-[#A05E2B]">
-              Best
+              Best Seller
             </span>
           )}
         </div>
@@ -103,16 +103,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         )}
       </div>
       
-      <div className="p-2">
-        <h3 className="text-sm font-semibold text-[#2C3639] mb-0.5 line-clamp-1">{product.name}</h3>
-        <p className="text-gray-600 text-[10px] mb-1.5 line-clamp-2">{product.description}</p>
+      <div className="px-3 py-4">
+        <h3 className="text-sm font-semibold text-[#2C3639] mb-1 line-clamp-1">{product.name}</h3>
+        <p className="text-gray-600 text-[10px] mb-2 line-clamp-2">{product.description}</p>
         
-        <div className="flex items-center justify-between mb-1.5">
-          <div>
-            <span className="text-base font-bold text-[#4A5D23]">
-              ₹{basePrice.toLocaleString('en-IN')}
-            </span>
-            <span className="text-[10px] text-gray-500 ml-0.5">onwards</span>
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex flex-col">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-base font-bold text-black">
+                ₹{basePrice.toLocaleString('en-IN')}
+              </span>
+              <span className="text-xs line-through text-gray-500">
+                ₹{(basePrice * 1.2).toLocaleString('en-IN')}
+              </span>
+              <span className="text-xs text-green-800">
+                20% off
+              </span>
+            </div>
+            {product.stockStatus === 'out_of_stock' && (
+              <span className="text-[10px] text-red-500 font-medium">Out of Stock</span>
+            )}
           </div>
           
           <div className="flex items-center gap-0.5">
@@ -122,20 +132,31 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         <div className="flex gap-1">
-          <button
-            onClick={handleAddToCart}
-            className="flex-1 bg-white border border-[#4A5D23] text-[#4A5D23] py-1 rounded hover:bg-[#4A5D23] hover:text-white transition-colors text-[10px] flex items-center justify-center gap-0.5"
-          >
-            <ShoppingCart className="w-2.5 h-2.5" />
-            Add
-          </button>
-          <button
-            onClick={handleBuyNow}
-            className="flex-1 bg-[#4A5D23] text-white py-1 rounded hover:bg-[#3A4D13] transition-colors text-[10px] flex items-center justify-center gap-0.5"
-          >
-            <CreditCard className="w-2.5 h-2.5" />
-            Buy
-          </button>
+          {product.stockStatus === 'out_of_stock' ? (
+            <button
+              disabled
+              className="w-full bg-gray-100 text-gray-500 py-1 rounded text-[10px] flex items-center justify-center"
+            >
+              Currently Unavailable
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={handleAddToCart}
+                className="flex-1 bg-white border border-[#0d6b1e] text-green-800 py-1 rounded hover:bg-green-800 hover:text-white transition-colors text-[10px] flex items-center justify-center gap-0.5"
+              >
+                <ShoppingCart className="w-2.5 h-2.5" />
+                Add
+              </button>
+              <button
+                onClick={handleBuyNow}
+                className="flex-1 bg-[#0d6b1e] text-white py-1 rounded hover:bg-[#3A4D13] transition-colors text-[10px] flex items-center justify-center gap-0.5"
+              >
+                <CreditCard className="w-2.5 h-2.5" />
+                Buy
+              </button>
+            </>
+          )}
         </div>
       </div>
     </Link>

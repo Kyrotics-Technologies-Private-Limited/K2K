@@ -257,7 +257,7 @@ const ProductSection = () => {
   }, []);
 
   return (
-    <section className="pt-4 sm:pt-8 md:pt-12 pb-2 sm:pb-4 md:pb-5 bg-green-100 overflow-hidden">
+    <section className="pt-4 sm:pt-8 md:pt-12 pb-2 sm:pb-4 md:pb-5 bg-[rgba(255,255,255,0.75)] overflow-hidden">
       <div className="max-w-screen mx-auto px-4 sm:px-6 lg:px-8">
         <div
           className={`text-center mb-4 sm:mb-6 md:mb-10 ${
@@ -266,10 +266,10 @@ const ProductSection = () => {
               : "opacity-0"
           }`}
         >
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-green-brand">
             Featured Products
           </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-sm md:text-base text-gray-800/70 mx-auto mt-2">
             Discover our carefully curated selection of organic products,
             sourced directly from nature.
           </p>

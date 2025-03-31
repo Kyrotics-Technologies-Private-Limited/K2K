@@ -252,7 +252,7 @@ const GuaranteeCycle = () => {
   ];
 
   return (
-    <div className="w-full bg-gradient-to-b from-white via-green-50 to-green-100 p-4 pb-8 md:p-8 md:pb-16">
+    <div className="w-full bg-[rgba(255,255,255,0.75)] p-4 pb-8 md:p-8 md:pb-16">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 md:mb-12 mt-4 md:mt-8">
@@ -261,14 +261,14 @@ const GuaranteeCycle = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-xl md:text-3xl font-bold text-black">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-green-brand">
               OUR MISSION AGAINST ADULTERATED FOOD
             </h2>
           </motion.div>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.8 }}
-            className="text-gray-700 text-sm md:text-base max-w-lg mx-auto mt-2"
+            className="text-sm md:text-base text-gray-800/90 max-w-lg mx-auto mt-2"
           >
             Adulterated food causes Heart Failure, Cholesterol, Epidemic Dropsy,
             Colon Cancer and many chronic diseases
