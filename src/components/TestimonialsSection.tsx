@@ -95,6 +95,7 @@
 
 // export default TestimonialsSection;
 
+
 import { Star } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
@@ -108,7 +109,7 @@ const testimonials = [
     image:
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200",
     content:
-      "The organic protein powder blends perfectly into my morning smoothies. It's the cleanest plant-based protein I've found with no aftertaste.",
+      "The organic protein powder blends perfectly into my morning smoothies. It's the cleanest plant-based protein I've found.",
     rating: 5,
     product: "Vanilla Protein Powder"
   },
@@ -166,19 +167,19 @@ const testimonials = [
 
 const TestimonialsSection = () => {
   return (
-    <section className="py-16 bg-gradient-to-b from-green-100 to-white">
+    <section className="py-8 bg-[#fffbe8]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-green-brand">
           Customer Stories
         </h2>
-        <p className="text-gray-600 max-w-xl mx-auto mb-6">
+        <p className="text-sm md:text-base text-gray-800/90 max-w-lg mx-auto mt-2">
           Hear from those who've experienced our products
         </p>
 
         <div className="relative">
           <Swiper
             modules={[Autoplay, Pagination]}
-            autoplay={{ delay: 5000 }}
+            autoplay={{ delay: 3000 }}
             spaceBetween={30}
             slidesPerView={1}
             pagination={{
@@ -186,7 +187,7 @@ const TestimonialsSection = () => {
               el: ".testimonial-pagination",
               bulletClass:
                 "swiper-pagination-bullet !w-2.5 !h-2.5 !mx-1.5 !bg-gray-400/80 !opacity-100",
-              bulletActiveClass: "!bg-green-600 !w-3 !h-3",
+              bulletActiveClass: "!bg-yellow-200 !w-3 !h-3",
             }}
             breakpoints={{
               768: { slidesPerView: 2 },
@@ -194,43 +195,39 @@ const TestimonialsSection = () => {
             }}
             className="px-2 pb-12 pt-6"
           >
-            {testimonials.map(({ name, role, image, content, rating, product }) => (
+            {testimonials.map(({ name, image, content, rating, product }) => (
               <SwiperSlide key={name}>
                 <div
-                  className="bg-white border border-green-200 p-6 h-full flex flex-col backdrop-blur-sm bg-opacity-70 transition-all duration-300 hover:shadow-lg hover:border-green-300 hover:scale-[1.02] hover:bg-opacity-90 group"
+                  className="bg-[#fffbe8] border border-black p-4 h-full flex flex-col"
                   style={{
                     borderRadius: "16px 16px 50px 16px",
-                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
                   }}
                 >
-                  <div className="flex items-center mb-4">
+                  <div className="flex mb-4 justify-center">
                     <img
                       src={image}
                       alt={name}
-                      className="w-12 h-12 rounded-full object-cover mr-3 ring-2 ring-green-100 transition-all duration-300 group-hover:ring-green-300"
+                      className="w-16 h-16 rounded-full object-cover mr-4 ring-2 ring-gray-100"
                     />
                     <div>
-                      <h3 className="font-medium text-gray-800 group-hover:text-green-700 transition-colors duration-300">
+                      <h3 className="font-medium text-gray-800 text-lg">
                         {name}
                       </h3>
-                      <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
-                        {role}
-                      </p>
+                      <div className="flex mt-1">
+                        {[...Array(rating)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className="w-4 h-4 text-yellow-400 fill-current"
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex mb-3">
-                    {[...Array(rating)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className="w-4 h-4 text-yellow-400 fill-current transition-transform duration-300 group-hover:scale-110"
-                      />
-                    ))}
-                  </div>
-                  <p className="text-gray-700 text-sm flex-grow group-hover:text-gray-800 transition-colors duration-300 mb-4">
+                  <p className="text-sm md:text-base text-gray-800/70 flex-grow mb-4">
                     "{content}"
                   </p>
-                  <div className="mt-auto pt-3 border-t border-green-100 group-hover:border-green-200 transition-colors duration-300">
-                    <span className="inline-block px-3 py-1 text-xs font-medium bg-green-50 text-green-700 rounded-full group-hover:bg-green-100 group-hover:text-green-800 transition-colors duration-300">
+                  <div className="mt-auto pt-3 border-t border-gray-200">
+                    <span className="inline-block px-3 py-1 text-sm font-medium bg-[#fff6ca] text-gray-700 rounded-full">
                       {product}
                     </span>
                   </div>
