@@ -19,6 +19,7 @@ export default {
       },
       colors: {
         green: {
+          brand: '#0C6908', // Your custom green brand color
           50: '#f0fdf4',
           100: '#dcfce7',
           200: '#bbf7d0',

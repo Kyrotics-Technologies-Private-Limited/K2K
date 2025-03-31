@@ -96,18 +96,18 @@ import { CheckCircle, CreditCard, Leaf, Tractor, Sun, Droplets, ShieldCheck } fr
 
 const KishanParivar: React.FC = () => {
   return (
-    <div className="bg-gradient-to-b from-green-200 to-green-100 py-16 px-4 flex flex-col items-center justify-center">
+    <div className="bg-[rgba(255,255,255,0.75)] py-16 px-4 flex flex-col items-center justify-center">
       {/* New Heading Section */}
       <div className="text-center max-w-3xl mb-12 px-4">
-        <div className="inline-flex items-center justify-center mb-4">
+        {/* <div className="inline-flex items-center justify-center mb-4">
           <div className="w-12 h-1 bg-green-300 mr-3"></div>
           <Leaf className="text-green-600" size={20} />
           <div className="w-12 h-1 bg-green-300 ml-3"></div>
-        </div>
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">
-          The <span className="text-green-600">Kishan Parivar</span> Advantage
+        </div> */}
+        <h1 className="text-black text-2xl md:text-3xl lg:text-4xl font-semibold">
+          The <span className="text-green-brand">Kishan Parivar</span> Advantage
         </h1>
-        <p className="text-xl text-gray-600">
+        <p className="text-sm md:text-base text-gray-800/90 mx-auto mt-2">
           India's premier agricultural subscription program designed to empower farmers with financial tools, 
           insurance benefits, and exclusive rewards.
         </p>
@@ -117,7 +117,7 @@ const KishanParivar: React.FC = () => {
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden w-full max-w-6xl mx-4 lg:mx-10">
         <div className="flex flex-col md:flex-row">
           {/* Card Section - Left Side */}
-          <div className="w-full md:w-2/5 p-8 bg-gradient-to-br from-green-700 to-green-900 flex flex-col justify-between">
+          <div className="w-full md:w-2/5 p-8 bg-green-brand flex flex-col justify-between">
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-2">
                 <Leaf className="text-green-300" size={28} />
@@ -166,13 +166,13 @@ const KishanParivar: React.FC = () => {
           </div>
 
           {/* Features Section - Right Side */}
-          <div className="w-full md:w-3/5 p-8 md:p-10">
-            <div className="mb-2 flex items-center gap-2 text-green-600">
+          <div className="w-full md:w-3/5 p-8 md:p-10 bg-green-50">
+            <div className="mb-2 flex items-center gap-2 text-green-brand">
               <Droplets size={20} />
               <span className="text-sm font-medium">EXCLUSIVE OFFER</span>
             </div>
             <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              Elevate Your <span className="text-green-600">Farming Journey</span>
+              Elevate Your <span className="text-green-brand">Farming Journey</span>
             </h2>
             <p className="text-gray-600 mb-8 text-lg">
               Join India's most trusted agricultural community and unlock premium benefits designed to grow your success.
@@ -182,39 +182,39 @@ const KishanParivar: React.FC = () => {
             <ul className="space-y-5 mb-10">
               {[
                 {
-                  icon: <CheckCircle size={22} className="text-green-500" />,
+                  icon: <CheckCircle size={22} className="text-green-brand" />,
                   text: "Low-interest agricultural loans with flexible repayment",
                   highlight: false
                 },
                 {
-                  icon: <CheckCircle size={22} className="text-green-500" />,
+                  icon: <CheckCircle size={22} className="text-green-brand" />,
                   text: "Comprehensive crop insurance at special rates",
                   highlight: false
                 },
                 {
-                  icon: <CheckCircle size={22} className="text-green-500" />,
+                  icon: <CheckCircle size={22} className="text-green-brand" />,
                   text: "5% bonus reward points on all agri-input purchases",
                   highlight: true
                 },
                 {
-                  icon: <CheckCircle size={22} className="text-green-500" />,
+                  icon: <CheckCircle size={22} className="text-green-brand" />,
                   text: "Priority access to government subsidy programs",
                   highlight: false
                 },
                 {
-                  icon: <CheckCircle size={22} className="text-green-500" />,
+                  icon: <CheckCircle size={22} className="text-green-brand" />,
                   text: "Personalized harvest payment schedules",
                   highlight: false
                 },
                 {
-                  icon: <CheckCircle size={22} className="text-green-500" />,
+                  icon: <CheckCircle size={22} className="text-green-brand" />,
                   text: "Free agri-tech consultation sessions",
                   highlight: true
                 }
               ].map((item, index) => (
                 <li key={index} className="flex items-start gap-4">
                   {item.icon}
-                  <span className={`text-gray-700 ${item.highlight ? "font-semibold text-green-700" : ""}`}>
+                  <span className={`text-gray-700 ${item.highlight ? "font-semibold text-green-brand" : ""}`}>
                     {item.text}
                   </span>
                 </li>
@@ -225,11 +225,11 @@ const KishanParivar: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <a 
                 href="/kishanParivarPage" 
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg flex-1 text-center"
+                className="bg-green-brand text-white font-semibold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg flex-1 text-center"
               >
                 Apply Now - ₹499/year
               </a>
-              <button className="border-2 border-green-600 text-green-600 hover:bg-green-50 font-medium py-3 px-6 rounded-lg transition-colors flex-1 text-center">
+              <button className="border-2 border-green-brand text-green-brand hover:bg-green-50 font-medium py-3 px-6 rounded-lg transition-colors flex-1 text-center">
                 Learn More
               </button>
             </div>

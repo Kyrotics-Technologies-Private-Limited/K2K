@@ -1,4 +1,3 @@
-import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -25,7 +24,7 @@ const slides = [
 
 const Hero = () => {
   return (
-    <div className="h-[77vh] w-full max-w-full relative">
+    <div className="hero h-[86vh] w-full max-w-full relative">
       <Swiper
         modules={[Autoplay, Pagination]}
         autoplay={{
@@ -35,8 +34,8 @@ const Hero = () => {
         pagination={{
           clickable: true,
           el: '.custom-pagination',
-          bulletClass: 'swiper-pagination-bullet !w-3 !h-3 !mx-1.5 !bg-green-600/50 !opacity-100',
-          bulletActiveClass: '!bg-white !w-3.5 !h-3.5'
+          bulletClass: 'swiper-pagination-bullet !w-2.5 !h-2.5 !mx-1.5 !bg-gray-400/80 !opacity-100',
+          bulletActiveClass: '!bg-green-600/50 !w-3 !h-3'
         }}
         loop
         className="h-full w-full"

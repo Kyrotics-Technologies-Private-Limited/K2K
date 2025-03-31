@@ -31,7 +31,7 @@ const RecognizedBy: React.FC = () => {
     <section className="bg-white w-full overflow-hidden">
       <div className="flex items-center">
         <div className="flex-shrink-0 px-6 md:px-8">
-          <h2 className="text-base md:text-lg font-medium text-green-600 whitespace-nowrap">
+          <h2 className="text-lg md:text-xl font-semibold text-green-brand whitespace-nowrap">
             Recognized By
           </h2>
         </div>
@@ -46,7 +46,7 @@ const RecognizedBy: React.FC = () => {
               {allLogos.map((company, index) => (
                 <div
                   key={`${company.id}-${index}`}
-                  className="flex-shrink-0 mx-8 md:mx-12 grayscale hover:grayscale-0 transition-all duration-300"
+                  className="flex-shrink-0 mx-8 md:mx-12 transition-all duration-300"
                 >
                   <img
                     src={company.logo}

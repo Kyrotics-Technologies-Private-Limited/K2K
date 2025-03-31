@@ -171,144 +171,127 @@ import { Leaf, Mail, Instagram, Facebook, Twitter } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="relative bg-gradient-to-b from-green-800 to-green-900">
-      {/* Background image with overlay */}
-      <div className="absolute inset-0 z-0">
-        <div
-          className="absolute inset-0 bg-[url('/assets/images/WEB%20FOOTER%20IMAGE.png')] bg-cover bg-center bg-no-repeat opacity-30"
-          style={{
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-green-900/80 via-green-800/60 to-transparent" />
-      </div>
-
+    <footer className="relative bg-green-brand">
       {/* Content */}
-      <div className="relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Brand Section */}
-            <div className="md:col-span-1">
-              <div className="flex items-center mb-6">
-                <Leaf className="h-10 w-10 text-green-300" />
-                <span className="ml-3 text-2xl font-bold text-white">
-                  Kishan2Kitchen
-                </span>
-              </div>
-              <p className="text-green-100 mb-6 text-lg leading-relaxed">
-                Bringing nature's finest organic products to your doorstep.
-              </p>
-              <div className="flex space-x-4">
-                {[
-                  { icon: Instagram, name: "Instagram" },
-                  { icon: Facebook, name: "Facebook" },
-                  { icon: Twitter, name: "Twitter" },
-                ].map((social) => (
-                  <a
-                    key={social.name}
-                    href="#"
-                    className="text-green-200 hover:text-white transition-all transform hover:scale-110 hover:-translate-y-0.5"
-                    aria-label={social.name}
-                  >
-                    <social.icon className="h-6 w-6" />
-                  </a>
-                ))}
-              </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Brand Section */}
+          <div className="md:col-span-1">
+            <div className="flex items-center mb-6">
+              <Leaf className="h-10 w-10 text-green-300" />
+              <span className="ml-3 text-2xl font-bold text-white">
+                Kishan2Kitchen
+              </span>
             </div>
-
-            {/* Quick Links */}
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-6 pb-2 border-b border-green-700/50">
-                Quick Links
-              </h3>
-              <ul className="space-y-3">
-                {["Shop", "About Us", "Blog", "Contact"].map((item) => (
-                  <li key={item}>
-                    <a
-                      href="#"
-                      className="text-green-100 hover:text-white transition-all flex items-center group hover:pl-1"
-                    >
-                      <span className="w-2 h-2 bg-green-400 rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-all duration-300"></span>
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Categories */}
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-6 pb-2 border-b border-green-700/50">
-                Categories
-              </h3>
-              <ul className="space-y-3">
-                {["Honey", "Essential Oils", "Herbal Products", "Skincare"].map(
-                  (item) => (
-                    <li key={item}>
-                      <a
-                        href="#"
-                        className="text-green-100 hover:text-white transition-all flex items-center group hover:pl-1"
-                      >
-                        <span className="w-2 h-2 bg-green-400 rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-all duration-300"></span>
-                        {item}
-                      </a>
-                    </li>
-                  )
-                )}
-              </ul>
-            </div>
-
-            {/* Newsletter */}
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-6 pb-2 border-b border-green-700/50">
-                Stay Updated
-              </h3>
-              <p className="text-green-100 mb-6 text-base leading-relaxed">
-                Subscribe to our newsletter for the latest products and organic
-                living tips.
-              </p>
-              <div className="relative">
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  className="w-full px-5 py-3 pr-16 rounded-lg border border-green-600/50 bg-green-900/20 text-white placeholder-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all backdrop-blur-sm"
-                />
-                <button
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-green-600 hover:bg-green-500 text-white p-2 rounded-md transition-all flex items-center justify-center shadow-lg hover:shadow-green-500/20"
-                  aria-label="Subscribe"
+            <p className="text-green-100 mb-6 text-lg leading-relaxed">
+              Bringing nature's finest organic products to your doorstep.
+            </p>
+            <div className="flex space-x-4">
+              {[
+                { icon: Instagram, name: "Instagram" },
+                { icon: Facebook, name: "Facebook" },
+                { icon: Twitter, name: "Twitter" },
+              ].map((social) => (
+                <a
+                  key={social.name}
+                  href="#"
+                  className="text-green-200 hover:text-white transition-all transform hover:scale-110 hover:-translate-y-0.5"
+                  aria-label={social.name}
                 >
-                  <Mail className="h-5 w-5" />
-                </button>
-              </div>
-              <p className="mt-3 text-xs text-green-200/80">
-                We respect your privacy. Unsubscribe anytime.
-              </p>
+                  <social.icon className="h-6 w-6" />
+                </a>
+              ))}
             </div>
           </div>
 
-          <div className="border-t border-green-700/50 mt-12 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <p className="text-green-200/80 text-sm mb-4 md:mb-0">
-                © {new Date().getFullYear()} Kishan2Kitchen. All rights reserved.
-              </p>
-              <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-                {[
-                  "Privacy Policy",
-                  "Terms of Service",
-                  "Shipping Info",
-                  "Refund Policy",
-                ].map((item) => (
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-6 pb-2 border-b border-green-700/50">
+              Quick Links
+            </h3>
+            <ul className="space-y-3">
+              {["Shop", "About Us", "Blog", "Contact"].map((item) => (
+                <li key={item}>
                   <a
-                    key={item}
-                    href={`/${item.toLowerCase().replace(" ", "")}`}
-                    className="text-green-200/80 hover:text-white text-sm transition-all hover:underline hover:underline-offset-4"
+                    href="#"
+                    className="text-green-100 hover:text-white transition-all hover:underline hover:underline-offset-4"
                   >
                     {item}
                   </a>
-                ))}
-              </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Categories */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-6 pb-2 border-b border-green-700/50">
+              Categories
+            </h3>
+            <ul className="space-y-3">
+              {["Honey", "Essential Oils", "Herbal Products", "Skincare"].map(
+                (item) => (
+                  <li key={item}>
+                    <a
+                      href="#"
+                      className="text-green-100 hover:text-white transition-all hover:underline hover:underline-offset-4"
+                    >
+                      {item}
+                    </a>
+                  </li>
+                )
+              )}
+            </ul>
+          </div>
+
+          {/* Newsletter */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-6 pb-2 border-b border-green-700/50">
+              Stay Updated
+            </h3>
+            <p className="text-green-100 mb-6 text-base leading-relaxed">
+              Subscribe to our newsletter for the latest products and organic
+              living tips.
+            </p>
+            <div className="relative">
+              <input
+                type="email"
+                placeholder="Your email address"
+                className="w-full px-5 py-3 pr-16 rounded-lg border border-green-600/50 bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all"
+              />
+              <button
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-green-brand hover:bg-green-700 text-white p-2 rounded-md transition-all flex items-center justify-center shadow-lg hover:shadow-green-500/20"
+                aria-label="Subscribe"
+              >
+                <Mail className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="mt-3 text-xs text-green-200/80">
+              We respect your privacy. Unsubscribe anytime.
+            </p>
+          </div>
+        </div>
+
+        <div className="border-t border-green-700/50 mt-12 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <p className="text-green-200/80 text-sm mb-4 md:mb-0">
+              © {new Date().getFullYear()} Kishan2Kitchen. All rights reserved.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+              {[
+                "Privacy Policy",
+                "Terms of Service",
+                "Shipping Info",
+                "Refund Policy",
+              ].map((item) => (
+                <a
+                  key={item}
+                  href={`/${item.toLowerCase().replace(" ", "")}`}
+                  className="text-green-200/80 hover:text-white text-sm transition-all hover:underline hover:underline-offset-4"
+                >
+                  {item}
+                </a>
+              ))}
             </div>
           </div>
         </div>
