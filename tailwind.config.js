@@ -8,6 +8,8 @@ export default {
         'sans': ['"DM Sans"', 'sans-serif'],
         'playfair': ['"Playfair Display"', 'serif'],
         'titillium': ['"Titillium Web"', 'sans-serif'],
+        'merriweather': ['"Merriweather"', 'serif'],
+        'delius': ['"Delius"', 'serif'],
       }, animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
       },

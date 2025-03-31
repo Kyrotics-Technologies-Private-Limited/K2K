@@ -51,63 +51,84 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           </div>
 
           {state.items.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center">
+            <div className="flex-1 flex flex-col items-center justify-center gap-4">
               <p className="text-gray-500">Your cart is empty</p>
+              <button
+                onClick={() => {
+                  onClose();
+                  navigate('/All-products');
+                }}
+                className="bg-green-800 text-white px-6 py-2 rounded-lg hover:bg-[#3A4D13] transition-colors"
+              >
+                Continue Shopping
+              </button>
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto py-4">
-              {state.items.map(item => (
-                <div
-                  key={`${item.id}-${item.selectedVariant}`}
-                  className="px-6 py-4 border-b border-gray-200 last:border-0"
-                >
-                  <div className="flex gap-4">
-                    <img
-                      src={item.images.main}
-                      alt={item.name}
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-medium text-[#2C3639]">{item.name}</h3>
-                      <p className="text-sm text-gray-500">
-                        {item.price.variants[item.selectedVariant].weight}
-                      </p>
-                      <div className="mt-2 flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
+            <>
+              {/* Cart Banner */}
+              <div 
+                className="bg-green-50 border-b border-green-100 px-6 py-3 h-[130px]"
+                style={{
+                  backgroundImage: 'url("https://picsum.photos/200/300")'
+                }}
+              >
+              </div>
+
+              {/* Cart Items */}
+              <div className="flex-1 overflow-y-auto py-4">
+                {state.items.map(item => (
+                  <div
+                    key={`${item.id}-${item.selectedVariant}`}
+                    className="px-6 py-4 border-b border-gray-200 last:border-0"
+                  >
+                    <div className="flex gap-4">
+                      <img
+                        src={item.images.main}
+                        alt={item.name}
+                        className="w-20 h-20 object-cover rounded-lg"
+                      />
+                      <div className="flex-1">
+                        <h3 className="font-medium text-[#2C3639]">{item.name}</h3>
+                        <p className="text-sm text-gray-500">
+                          {item.price.variants[item.selectedVariant].weight}
+                        </p>
+                        <div className="mt-2 flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              className="p-1 hover:bg-gray-100 rounded"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </button>
+                            <span className="w-8 text-center">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="p-1 hover:bg-gray-100 rounded"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="p-1 hover:bg-gray-100 rounded"
+                            onClick={() => removeItem(item.id)}
+                            className="p-1 hover:bg-gray-100 rounded text-red-500"
                           >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                          <span className="w-8 text-center">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="p-1 hover:bg-gray-100 rounded"
-                          >
-                            <Plus className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          className="p-1 hover:bg-gray-100 rounded text-red-500"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium text-[#4A5D23]">
+                          ₹
+                          {(
+                            item.price.variants[item.selectedVariant].price * item.quantity
+                          ).toLocaleString('en-IN')}
+                        </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium text-[#4A5D23]">
-                        ₹
-                        {(
-                          item.price.variants[item.selectedVariant].price * item.quantity
-                        ).toLocaleString('en-IN')}
-                      </p>
-                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </>
           )}
 
           {state.items.length > 0 && (
