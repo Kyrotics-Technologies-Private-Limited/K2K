@@ -88,7 +88,7 @@ const AllProductPage = () => {
       {/* Health Issues Section */}
       <div className="pt-8">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-5xl font-bold  font-delius text-center mb-3">Health Concerns?</h2>
+          <h2 className="text-4xl font-bold tracking-wide font-lora italic  text-center mb-3">Health Concerns?</h2>
           <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
             Discover natural solutions for your everyday health challenges
           </p>
@@ -111,7 +111,7 @@ const AllProductPage = () => {
                       className: "w-8 h-8 text-[#9F97B8] transition-colors duration-500 group-hover:text-[#39445B]"
                     })}
                   </div>
-                  <h3 className="text-xl font-semibold text-[#FFD87D]  font-playfair mb-2 transition-transform duration-500 group-hover:-translate-y-1">
+                  <h3 className="text-xl font-semibold text-[#FFD87D]  font-lora italic mb-2 transition-transform duration-500 group-hover:-translate-y-1">
                     {issue.title}
                   </h3>
                   <p className="text-[#E9ECEF] text-sm transition-transform duration-500 group-hover:-translate-y-1">
