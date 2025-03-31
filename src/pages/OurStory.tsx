@@ -32,7 +32,7 @@ const AboutUs: React.FC = () => {
                 300+ Farmers attached with us
               </div>
             </div>
-            <p className="text-lg text-gray-700 mt-6 leading-relaxed flex items-center justify-center">
+            <p className="text-lg text-gray-700 mt-6 leading-relaxed flex items-center justify-center text-justify">
               At Kishan2Kitchen, we believe in a sustainable India, where rural
               farmers thrive. By providing competitive fair prices for their
               produce, we empower farmers and create a ripple of happiness.
@@ -74,14 +74,14 @@ const AboutUs: React.FC = () => {
             <p className="text-green-800 text-2xl font-semibold mt-4">
               100+ Micro-Entrepreneurs & Self-Help Groups
             </p>
-            <p className="text-lg text-gray-700 mt-6 leading-relaxed flex items-center">
+            <p className="text-lg text-gray-700 mt-6 leading-relaxed flex items-center text-justify">
               At Kishan2Kitchen, we are committed to empowering rural women by
               providing them with opportunities to sell their pure, homemade,
               and adulteration-free natural foods. Through skill development and
               sustainable practices, we help them achieve financial independence
               while preserving traditional food craftsmanship.
             </p>
-            <p className="text-lg text-gray-700 mt-4 leading-relaxed">
+            <p className="text-lg text-gray-700 mt-4 leading-relaxed text-justify">
               Every product you purchase directly supports these women, their
               families, and their communities. Experience the authentic taste of
               homemade goodness while contributing to a brighter, more
@@ -139,24 +139,23 @@ const AboutUs: React.FC = () => {
               variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
               className="text-lg text-gray-700 mt-6 leading-relaxed"
             >
-              At{" "}
-              <span className="font-semibold text-green-900">
-                Kishan2Kitchen
-              </span>
-              , we are committed to providing{" "}
-              <span className="font-bold text-green-800">
-                100% adulteration-free food
-              </span>
-              , handcrafted by skilled rural women across India. Every product
-              is made with <strong>love, purity, and tradition</strong>,
-              ensuring that you experience the{" "}
-              <strong>authentic flavors</strong> while reaping{" "}
-              <strong>long-term health benefits</strong>.
+              
+              
+              <p className="text-justify">
+                <span className="font-semibold text-green-900">
+                 At Kishan2Kitchen
+                </span>
+                ,we are committed to providing 100% adulteration-free food
+                handcrafted by skilled rural women across India. Every product
+                is made with love, purity, and tradition, ensuring that you
+                experience the authentic flavor while reaping long-term health
+                benefits.
+              </p>
             </motion.p>
 
             <motion.p
               variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
-              className="text-lg text-gray-700 mt-4 leading-relaxed"
+              className="text-lg text-gray-700 mt-4 leading-relaxed text-justify"
             >
               By choosing our products, you’re not only nourishing yourself but
               also <strong>empowering rural communities</strong> and{" "}
