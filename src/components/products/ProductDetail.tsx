@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ShoppingCart, ChevronRight, CreditCard, Star, Heart } from 'lucide-react';
+import { ChevronLeft, ShoppingCart, ChevronRight, CreditCard, Star, Heart, X, Info } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { ProductCard } from './ProductCard';
 import { useNavigate } from 'react-router-dom';
@@ -7,9 +7,10 @@ import { Product } from '../../types';
 import { ProductBadges } from './Productbadge';
 import { BenefitsBanner } from './InformationBanner';
 import { HealthBenefits } from './HealthBenefits';
+import RecognizedBy from '../RecognizedBy';
 
 interface ProductDetailProps {
-  product: Product | undefined; 
+  product: Product | undefined;
   relatedProducts: Product[];
 }
 
@@ -17,6 +18,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedPr
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [showPricePopup, setShowPricePopup] = useState(false);
   const { state, dispatch } = useCart();
   const navigate = useNavigate();
 
@@ -24,7 +26,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedPr
   const cartItem = state.items.find(
     item => item?.id === product?.id && item.selectedVariant === selectedVariant
   );
-  
+
   // Removed unused cartQuantity variable
 
   // Fixed: Added null check for product
@@ -60,165 +62,282 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedPr
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
-            {/* Image Gallery */}
-            <div className="space-y-4">
-              <div className="relative aspect-square rounded-lg overflow-hidden">
-                <img
-                  src={product.images.gallery[selectedImage]}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-                <button
-                  onClick={() => setSelectedImage(prev => Math.max(0, prev - 1))}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md"
-                  disabled={selectedImage === 0}
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => setSelectedImage(prev => 
-                    Math.min(product.images.gallery.length - 1, prev + 1)
-                  )}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md"
-                  disabled={selectedImage === product.images.gallery.length - 1}
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
 
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {product.images.gallery.map((image, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+          {/* Image Gallery */}
+          <div className="space-y-4">
+            <div className="relative aspect-square rounded-lg overflow-hidden">
+              <img
+                src={product.images.gallery[selectedImage]}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+              <button
+                onClick={() => setSelectedImage(prev => Math.max(0, prev - 1))}
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md"
+                disabled={selectedImage === 0}
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setSelectedImage(prev =>
+                  Math.min(product.images.gallery.length - 1, prev + 1)
+                )}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md"
+                disabled={selectedImage === product.images.gallery.length - 1}
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {product.images.gallery.map((image, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(index)}
+                  className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden ${selectedImage === index ? 'ring-2 ring-green-800' : ''
+                    }`}
+                >
+                  <img
+                    src={image}
+                    alt={`${product.name} thumbnail ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Product Info */}
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800">{product.name}</h1>
+              <div className="flex items-center mt-2 space-x-2">
+                <div className="flex items-center">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-5 h-5 ${i < Math.floor(product.ratings)
+                          ? 'fill-yellow-400 stroke-yellow-400'
+                          : 'stroke-gray-300'
+                        }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm text-gray-600">
+                  ({product.reviews} reviews)
+                </span>
+              </div>
+            </div>
+
+            <ProductBadges product={product} />
+
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Select Variant</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {product.price.variants.map((variant, index) => (
                   <button
                     key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden ${
-                      selectedImage === index ? 'ring-2 ring-green-700' : ''
-                    }`}
+                    onClick={() => setSelectedVariant(index)}
+                    className={`flex flex-col items-start p-3 rounded-lg w-full ${
+                      selectedVariant === index
+                        ? 'bg-green-800 text-white'
+                        : 'bg-gray-50 hover:bg-gray-100'
+                    } ${!variant.inStock || product.stockStatus === 'out_of_stock' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={!variant.inStock || product.stockStatus === 'out_of_stock'}
                   >
-                    <img
-                      src={image}
-                      alt={`${product.name} thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
+                    <div className="flex justify-between w-full items-start">
+                      <span className={`text-sm font-medium ${selectedVariant === index ? 'text-white' : 'text-gray-900'} mb-1`}>
+                        {variant.weight}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-start w-full">
+                      <div className="flex flex-wrap items-baseline gap-1 mb-1">
+                        <span className={`text-lg font-bold ${selectedVariant === index ? 'text-white' : 'text-gray-900'}`}>
+                          ₹{variant.price.toLocaleString('en-IN')}
+                        </span>
+                        {variant.originalPrice && (
+                          <span className={`text-xs line-through ${selectedVariant === index ? 'text-gray-200' : 'text-gray-500'}`}>
+                            ₹{variant.originalPrice.toLocaleString('en-IN')}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {variant.discount && (
+                          <span className={`text-xs ${selectedVariant === index ? 'text-white' : 'text-red-600'}`}>
+                            {variant.discount}% off
+                          </span>
+                        )}
+                        <span className={`text-xs ${selectedVariant === index ? 'text-gray-200' : 'text-gray-500'}`}>
+                          ₹{(() => {
+                            const weight = variant.weight.toLowerCase();
+                            let valueInLiters = 0;
+                            
+                            if (weight.includes('ml')) {
+                              valueInLiters = parseFloat(weight.replace(/[^0-9.]/g, '')) / 1000;
+                            } else if (weight.includes('l jar') || weight.includes('l dolchi') || weight.includes('l tin')) {
+                              valueInLiters = parseFloat(weight.replace(/[^0-9.]/g, ''));
+                            } else {
+                              return ''; // Return empty string if unit is not in liters
+                            }
+                            
+                            if (valueInLiters <= 0) return '';
+                            return Math.round(variant.price / valueInLiters).toLocaleString('en-IN');
+                          })()}/L
+                        </span>
+                      </div>
+                    </div>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Product Info */}
-            <div className="space-y-6">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-800">{product.name}</h1>
-                <div className="flex items-center mt-2 space-x-2">
-                  <div className="flex items-center">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-5 h-5 ${
-                          i < Math.floor(product.ratings)
-                            ? 'fill-yellow-400 stroke-yellow-400'
-                            : 'stroke-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm text-gray-600">
-                    ({product.reviews} reviews)
-                  </span>
-                </div>
-              </div>
-
-              <ProductBadges product={product} />
-
-              <div>
-                <h2 className="text-xl font-semibold mb-2">Select Variant</h2>
-                <div className="flex flex-wrap gap-3">
-                  {product.price.variants.map((variant, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedVariant(index)}
-                      className={`px-4 py-2 rounded-lg border ${
-                        selectedVariant === index
-                          ? 'border-green-700 bg-green-700 text-white'
-                          : 'border-gray-300 hover:border-green-700'
-                      } ${!variant.inStock ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      disabled={!variant.inStock}
-                    >
-                      {variant.weight}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-green-700">
+            <div>
+              <div className="flex items-baseline gap-2">
+                <div className="flex flex-row gap-4 relative">
+                  <span className="text-4xl font-bold text-black">
                     ₹{product.price.variants[selectedVariant].price.toLocaleString('en-IN')}
                   </span>
-                  {selectedVariant > 0 && (
-                    <span className="text-sm text-gray-500">
-                      per {product.price.variants[selectedVariant].weight}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <h2 className="text-xl font-semibold mb-2">Quantity</h2>
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
-                    className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center"
-                  >
-                    -
-                  </button>
-                  <span className="text-xl font-medium w-12 text-center">
-                    {quantity}
+                  <span className="text-lg font-bold text-gray-500 line-through pt-2">
+                    ₹{(product.price.variants[selectedVariant].price * 1.2).toLocaleString('en-IN')}
                   </span>
-                  <button
-                    onClick={() => setQuantity(prev => prev + 1)}
-                    className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center"
-                  >
-                    +
-                  </button>
+                  <span className="text-lg font-bold text-gray-500 pt-2">
+                    <p className='text-green-800'>Save 20%</p>
+                  </span>
+                  <div className="relative">
+                    {/* <button
+                        onClick={() => setShowPricePopup(true)}
+                        className="px-4 py-2 bg-green-800 text-white rounded-lg hover:bg-green-800 transition-colors"
+                      >
+                        Know Your Price!
+                      </button> */}
+
+                    <button
+                      onClick={() => setShowPricePopup(true)}
+                      className='flex items-center gap-2 pt-2 hover:text-green-800'
+
+                    >
+                      Know your price<Info />
+                    </button>
+                    {showPricePopup && (
+                      <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg p-4 w-64 z-50">
+                        <button
+                          onClick={() => setShowPricePopup(false)}
+                          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+
+                        <h2 className="text-lg font-bold text-gray-800 mb-3">Price Details</h2>
+
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center border-b pb-2">
+                            <span className="text-sm text-gray-600">Original Price</span>
+                            <span className="text-sm font-semibold text-gray-500 line-through">
+                              ₹{(product.price.variants[selectedVariant].price * 1.2).toLocaleString('en-IN')}
+                            </span>
+                          </div>
+
+                          <div className="flex justify-between items-center border-b pb-2">
+                            <span className="text-sm text-gray-600">Discount</span>
+                            <span className="text-sm font-semibold text-green-800">20% OFF</span>
+                          </div>
+
+                          <div className="flex justify-between items-center border-b pb-2">
+                            <span className="text-sm text-gray-600">Final Price</span>
+                            <span className="text-base font-bold text-green-800">
+                              ₹{product.price.variants[selectedVariant].price.toLocaleString('en-IN')}
+                            </span>
+                          </div>
+
+                          <div className="mt-2 text-xs text-gray-600">
+                            <p className="font-semibold mb-1">Why this price?</p>
+                            <ul className="list-disc list-inside space-y-1">
+                              <li>Direct sourcing from farmers</li>
+                              <li>Minimal processing costs</li>
+                              <li>No middlemen</li>
+                              <li>Bulk purchase discounts</li>
+                              <li>Special promotional offer</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
+            </div>
 
-              <div className="flex gap-4">
+            <div>
+              <h2 className="text-xl font-semibold mb-2">Quantity</h2>
+              <div className="flex items-center space-x-3">
                 <button
-                  onClick={handleAddToCart}
-                  className="flex-1 bg-white border-2 border-green-700 text-green-700 py-3 px-6 rounded-lg flex items-center justify-center gap-2 hover:bg-green-700 hover:text-white transition-all duration-300"
-                  disabled={!product.price.variants[selectedVariant].inStock}
+                  onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                  className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center"
                 >
-                  <ShoppingCart className="w-5 h-5" />
-                  Add to Cart
+                  -
                 </button>
+                <span className="text-xl font-medium w-12 text-center">
+                  {quantity}
+                </span>
                 <button
-                  onClick={handleBuyNow}
-                  className="flex-1 bg-green-700 text-white py-3 px-6 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
-                  disabled={!product.price.variants[selectedVariant].inStock}
+                  onClick={() => setQuantity(prev => prev + 1)}
+                  className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center"
                 >
-                  <CreditCard className="w-5 h-5" />
-                  Buy Now
-                </button>
-                <button 
-                  className="p-3 rounded-lg border border-gray-300 hover:border-green-700 transition-colors"
-                  aria-label="Add to wishlist"
-                >
-                  <Heart className="w-6 h-6" />
+                  +
                 </button>
               </div>
+            </div>
 
-              <div>
-                <h2 className="text-xl font-semibold mb-2">Description</h2>
-                <p className="text-gray-600">{product.description}</p>
-              </div>
+            <div className="flex gap-4">
+              {product.stockStatus === 'out_of_stock' ? (
+                <div className="flex flex-col gap-3 w-full">
+                  <div className="flex-1 bg-gray-100 rounded-lg p-4 text-center">
+                    <p className="text-gray-600 font-medium">Currently Out of Stock</p>
+                    <p className="text-sm text-gray-500 mt-1">Please check back later or contact us for availability</p>
+                  </div>
+                  <button
+                    className="w-full bg-white border-2 border-green-800 text-green-800 py-3 px-6 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 hover:text-white transition-all duration-300"
+                  >
+                    Notify Me When Available
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button
+                    onClick={handleAddToCart}
+                    className="flex-1 bg-white border-2 border-green-800 text-green-800 py-3 px-6 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 hover:text-white transition-all duration-300"
+                    disabled={!product.price.variants[selectedVariant].inStock}
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    Add to Cart
+                  </button>
+                  <button
+                    onClick={handleBuyNow}
+                    className="flex-1 bg-green-800 text-white py-3 px-6 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
+                    disabled={!product.price.variants[selectedVariant].inStock}
+                  >
+                    <CreditCard className="w-5 h-5" />
+                    Buy Now
+                  </button>
+                  <button
+                    className="p-3 rounded-lg border border-gray-300 hover:border-green-800 transition-colors"
+                    aria-label="Add to wishlist"
+                  >
+                    <Heart className="w-6 h-6" />
+                  </button>
+                </>
+              )}
+            </div>
 
-              {/* <div>
+            <div>
+              <h2 className="text-xl font-semibold mb-2">Description</h2>
+              <p className="text-gray-600">{product.description}</p>
+            </div>
+
+            {/* <div>
                 <h2 className="text-xl font-semibold mb-2">Ingredients</h2>
                 <ul className="list-disc list-inside text-gray-600">
                   {product.ingredients.map((ingredient, index) => (
@@ -226,25 +345,28 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedPr
                   ))}
                 </ul>
               </div> */}
-            </div>
           </div>
         </div>
 
-         {/* Benefits Banner */}
-         <BenefitsBanner product={product} />
 
-         {/* Health Benefits */}
-         <HealthBenefits product={product} />
+        {/* Benefits Banner */}
+        <BenefitsBanner product={product} />
+
+        {/* Health Benefits */}
+        <HealthBenefits product={product} />
 
         {/* Related Products */}
-        <div className="mt-8 ">
+        <div className="mt-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-3">Related Products</h2>
-          <div className="md:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-20 justify-items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {relatedProducts.slice(0, 4).map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>
+      </div>
+      <div className=" pt-4">
+        <RecognizedBy />
       </div>
     </div>
   );
