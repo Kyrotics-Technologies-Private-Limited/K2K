@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Menu, X, ShoppingCart, Search, Leaf } from "lucide-react";
+import { Menu, X, ShoppingCart, Search, User, ChevronDown } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { UserDetails } from "./UserDetails";
+import { Link } from "react-router-dom";
 
 interface NavbarProps {
   onCartClick: () => void;
@@ -10,13 +11,16 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [productsDropdownOpen, setProductsDropdownOpen] = useState(false);
   const { state } = useCart();
   const itemCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
 
+  const toggleProductsDropdown = () => {
+    setProductsDropdownOpen(!productsDropdownOpen);
+  };
+
   return (
-    <nav
-      className={`sticky top-0 w-full z-50 transition-all duration-300 bg-white shadow-sm`}
-    >
+    <nav className="sticky top-0 w-full z-50 bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo */}
@@ -24,7 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             <img
               src="/assets/images/K2K Logo.jpg"
               alt="Kishan2Kitchen Logo"
-              className="h-12 w-12 object-cover mr-1"
+              className="h-12 w-12 object-cover mr-1 rounded-md"
             />
             <span className="ml-2 text-xl font-semibold text-green-800">
               Kishan2Kitchen
@@ -34,40 +38,71 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center">
             <div className="flex space-x-8">
-              <a
-                href="/all-products"
-                className={`text-gray-700 hover:text-green-600 transition`}
-              >
-                All Products
-              </a>
-              <a
-                href="#"
-                className={`text-gray-700 hover:text-green-600 transition`}
-              >
+              {/* Products Dropdown */}
+              <div className="relative group">
+                <button
+                  onClick={toggleProductsDropdown}
+                  className="flex items-center text-gray-500 hover:text-black transition"
+                >
+                  All Products
+                  <ChevronDown
+                    className={`ml-1 h-4 w-4 transition-transform ${
+                      productsDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                {productsDropdownOpen && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <a
+                      href="/all-products"
+                      className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600"
+                    >
+                     Oil
+                    </a>
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600"
+                    >
+                      Ghee
+                    </a>
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600"
+                    >
+                      Honey
+                    </a>
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600"
+                    >
+                      Natural product
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              <a href="#" className="text-gray-500 hover:text-black transition">
                 Try Our Sample
               </a>
               <a
                 href="/kishanParivarPage"
-                className={`text-gray-700 hover:text-green-600 transition`}
+                className="text-gray-500 hover:text-black transition"
               >
                 Kishan Parivar
               </a>
               <a
                 href="/traceability"
-                className={`text-gray-700 hover:text-green-600 transition`}
+                className="text-gray-500 hover:text-black transition"
               >
                 Traceability
               </a>
               <a
                 href="/our-story"
-                className={`text-gray-700 hover:text-green-600 transition`}
+                className="text-gray-500 hover:text-black transition"
               >
                 Our Story
               </a>
-              <a
-                href="#"
-                className={`text-gray-700 hover:text-green-600 transition`}
-              >
+              <a href="#" className="text-gray-500 hover:text-black transition">
                 Blog
               </a>
             </div>
@@ -78,14 +113,19 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             <button className={`text-gray-700 hover:text-green-600 transition`}>
               <Search className="h-5 w-5" />
             </button>
-            <button onClick={onCartClick} className="relative p-2">
-              <ShoppingCart
-                className={`text-gray-700 hover:text-green-600 transition w-6 h-6`}
-              />
+
+            <Link to="/register">
+              <button className="text-gray-700 hover:text-green-600 transition p-2">
+                <User className="h-5 w-5" />
+              </button>
+            </Link>
+            <button
+              onClick={onCartClick}
+              className="relative p-2 hover:text-green-600 transition"
+            >
+              <ShoppingCart className="text-gray-700 w-6 h-6" />
               {itemCount > 0 && (
-                <span
-                  className={`bg-green-600 text-white absolute -top-1 -right-1 rounded-full h-4 w-4 flex items-center justify-center text-xs`}
-                >
+                <span className="absolute -top-1 -right-1 bg-green-600 text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
                   {itemCount}
                 </span>
               )}
@@ -95,9 +135,25 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
+            <div className="flex items-center space-x-4 px-3 py-2">
+              <button className="text-gray-700 hover:text-green-600 transition">
+                <Search className="h-5 w-5" />
+              </button>
+              <button
+                onClick={onCartClick}
+                className="text-gray-700 hover:text-green-600 transition relative"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-green-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                    {itemCount}
+                  </span>
+                )}
+              </button>
+            </div>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className={`text-gray-700 hover:text-green-600 transition`}
+              className="text-gray-700 hover:text-green-600 transition"
             >
               {isOpen ? (
                 <X className="h-6 w-6" />
@@ -111,44 +167,56 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white">
+        <div className="md:hidden bg-white">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <a
-              href="#"
-              className="block px-3 py-2 text-gray-700 hover:text-green-600 transition"
+              href="/"
+              className="block px-3 py-2 text-gray-500 hover:text-black transition"
             >
               Home
             </a>
-            <a
-              href="#"
-              className="block px-3 py-2 text-gray-700 hover:text-green-600 transition"
-            >
-              Shop
-            </a>
-            <a
-              href="#"
-              className="block px-3 py-2 text-gray-700 hover:text-green-600 transition"
-            >
-              About
-            </a>
-            <a
-              href="#"
-              className="block px-3 py-2 text-gray-700 hover:text-green-600 transition"
-            >
-              Contact
-            </a>
-            <div className="flex items-center space-x-4 px-3 py-2">
-              <button className="text-gray-700 hover:text-green-600 transition">
-                <Search className="h-5 w-5" />
+
+            {/* Mobile Products Dropdown */}
+            <div className="px-3 py-2">
+              <button
+                onClick={toggleProductsDropdown}
+                className="flex items-center text-gray-500 hover:text-black transition w-full"
+              >
+               All Products
+                
               </button>
-              <button className="text-gray-700 hover:text-green-600 transition relative">
-                <ShoppingCart className="h-5 w-5" />
-                <span className="absolute -top-2 -right-2 bg-green-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                  0
-                </span>
-              </button>
-              <UserDetails />
-            </div>
+              </div>
+
+            <a
+              href="#"
+              className="block px-3 py-2 text-gray-500 hover:text-black transition"
+            >
+              Try Our Sample
+            </a>
+            <a
+              href="/kishanParivarPage"
+              className="block px-3 py-2 text-gray-500 hover:text-black transition"
+            >
+              Kishan Parivar
+            </a>
+            <a
+              href="/traceability"
+              className="block px-3 py-2 text-gray-500 hover:text-black transition"
+            >
+              Traceability
+            </a>
+            <a
+              href="/our-story"
+              className="block px-3 py-2 text-gray-500 hover:text-black transition"
+            >
+              Our Story
+            </a>
+            <a
+              href="#"
+              className="block px-3 py-2 text-gray-500 hover:text-black transition"
+            >
+              Blog
+            </a>
           </div>
         </div>
       )}
