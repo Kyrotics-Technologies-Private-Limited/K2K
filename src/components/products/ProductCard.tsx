@@ -62,7 +62,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <Link
       to={`/product/${product.id}`}
       onClick={handleProductClick}
-      className="group bg-white rounded-md shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md relative w-full"
+      className="group bg-white border-0.5 border-grey-50 rounded-md shadow-md overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md relative w-full"
     >
       <div className="aspect-[39/37] overflow-hidden relative">
         <img

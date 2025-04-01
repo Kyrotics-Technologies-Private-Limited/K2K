@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Menu, X, ShoppingCart, Search, Leaf } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { UserDetails } from "./UserDetails";
 
 interface NavbarProps {
   onCartClick: () => void;
@@ -9,19 +10,8 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
-  // const [isScrolled, setIsScrolled] = useState(false);
   const { state } = useCart();
   const itemCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
-
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     const scrollPosition = window.scrollY;
-  //     setIsScrolled(scrollPosition > 0);
-  //   };
-
-  //   window.addEventListener('scroll', handleScroll);
-  //   return () => window.removeEventListener('scroll', handleScroll);
-  // }, []);
 
   return (
     <nav
@@ -32,9 +22,9 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
           {/* Logo */}
           <a href="/" className="flex-shrink-0 flex items-center">
             <img
-              src="/assets/images/K2K Logo.jpg" // Update this path to your logo image
+              src="/assets/images/K2K Logo.jpg"
               alt="Kishan2Kitchen Logo"
-              className="h-12 w-12 object-cover mr-1" // Added rounded-md for slightly rounded corners
+              className="h-12 w-12 object-cover mr-1"
             />
             <span className="ml-2 text-xl font-semibold text-green-800">
               Kishan2Kitchen
@@ -42,7 +32,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:justify-center flex-1">
+          <div className="hidden md:flex items-center">
             <div className="flex space-x-8">
               <a
                 href="/all-products"
@@ -83,8 +73,8 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             </div>
           </div>
 
-          {/* Right section - Search and Cart */}
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Right section - Search, Cart, and User */}
+          <div className="flex items-center space-x-4">
             <button className={`text-gray-700 hover:text-green-600 transition`}>
               <Search className="h-5 w-5" />
             </button>
@@ -100,6 +90,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                 </span>
               )}
             </button>
+            <UserDetails />
           </div>
 
           {/* Mobile menu button */}
@@ -156,6 +147,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                   0
                 </span>
               </button>
+              <UserDetails />
             </div>
           </div>
         </div>

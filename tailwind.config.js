@@ -12,6 +12,8 @@ export default {
         'delius': ['"Delius"', 'serif'],
         'dm-serif-display': ['"DM Serif Display"', 'serif'],
         'lora': ['"Lora"', 'serif'],
+        'Quando': ["Quando", 'serif'],
+        'lato': ["Lato", 'sans-serif']
       }, animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
       },

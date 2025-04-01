@@ -13,7 +13,7 @@ export interface Product {
     images: {
       main: string;
       gallery: string[];
-      
+      banner:string;
     };
     stockStatus: "in_stock" | "low_stock" | "out_of_stock";
     ratings: number;

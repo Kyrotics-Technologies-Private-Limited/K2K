@@ -4,15 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Optional: Apply fonts to default HTML elements */
-/* body {
-  font-family: 'Titillium Web', sans-serif;
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Quando', serif;
+  }
+
+  p, span, div, button, input, textarea, select, a, li {
+    font-family: 'Lato', sans-serif;
+  }
 }
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', serif;
-} */
-
 
 .animate-fadeIn {
   opacity: 0;
