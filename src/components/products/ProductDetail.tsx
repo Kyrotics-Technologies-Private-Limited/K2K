@@ -75,18 +75,18 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedPr
                 className="w-full h-full object-cover"
               />
               <button
-                onClick={() => setSelectedImage(prev => Math.max(0, prev - 1))}
-                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md"
-                disabled={selectedImage === 0}
+                onClick={() => setSelectedImage(prev => 
+                  prev === 0 ? product.images.gallery.length - 1 : prev - 1
+                )}
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
-                onClick={() => setSelectedImage(prev =>
-                  Math.min(product.images.gallery.length - 1, prev + 1)
+                onClick={() => setSelectedImage(prev => 
+                  prev === product.images.gallery.length - 1 ? 0 : prev + 1
                 )}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md"
-                disabled={selectedImage === product.images.gallery.length - 1}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -308,7 +308,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedPr
                 <>
                   <button
                     onClick={handleAddToCart}
-                    className="flex-1 bg-white border-2 border-green-800 text-green-800 py-3 px-6 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 hover:text-white transition-all duration-300"
+                    className="flex-1 bg-white border-2 border-green-800 text-green-800 py-3 px-6 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
                     disabled={!product.price.variants[selectedVariant].inStock}
                   >
                     <ShoppingCart className="w-5 h-5" />

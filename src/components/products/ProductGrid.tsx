@@ -26,7 +26,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
           .toLowerCase()
           .includes(filters.searchQuery.toLowerCase());
         const matchesCategory = activeCategory === 'All' || 
-          product.category === activeCategory;
+          product.category.toLowerCase() === activeCategory.toLowerCase();
         return matchesSearch && matchesCategory;
       })
       
@@ -35,20 +35,20 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
   return (
     <div className="bg-inherit">
       {/* Category Filters */}
-      <div className="flex flex-col md:flex-row justify-center items-center gap-4 py-6">
+      <div className="flex flex-col md:flex-row justify-center  items-center gap-4 py-6">
         {/* Category Filters */}
         <div className="flex flex-wrap gap-3 justify-center">
           {categories.map(category => (
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-6 py-2 rounded-full transition-all ${
+              className={`px-6 py-2 rounded-full border-2 border-green-700 transition-all ${
                 activeCategory === category
-                  ? 'bg-green-800 text-white'
+                  ? 'bg-[#0d6b1e] text-[#FFD87D] '
                   : 'bg-white hover:bg-gray-50'
               }`}
             >
-              {category}
+              {category.charAt(0).toUpperCase() + category.slice(1)}
             </button>
           ))}
         </div>

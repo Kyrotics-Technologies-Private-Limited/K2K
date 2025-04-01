@@ -88,7 +88,7 @@ const AllProductPage = () => {
       {/* Health Issues Section */}
       <div className="pt-8">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-4xl font-bold  font-playfair text-center mb-3">Health Concerns?</h2>
+          <h2 className="text-4xl font-bold tracking-wide font-lora italic  text-center mb-3">Health Concerns?</h2>
           <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
             Discover natural solutions for your everyday health challenges
           </p>
@@ -101,17 +101,17 @@ const AllProductPage = () => {
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                      style={{ backgroundImage: `url(${issue.bgImage})` }}>
-                  <div className="absolute inset-0 bg-green-800"></div>
+                  <div className="absolute inset-0 bg-[#0d6b1e]"></div>
                 </div>
 
                 {/* Content */}
                 <div className="relative p-6 h-[220px] flex flex-col items-center justify-center text-center z-10">
                   <div className="bg-white/95 rounded-full p-4 mb-4 transform transition-transform duration-500 group-hover:scale-110 group-hover:bg-white">
                     {React.cloneElement(issue.icon, {
-                      className: "w-8 h-8 text-green-700 transition-colors duration-500 group-hover:text-green-600"
+                      className: "w-8 h-8 text-[#9F97B8] transition-colors duration-500 group-hover:text-[#39445B]"
                     })}
                   </div>
-                  <h3 className="text-xl font-semibold text-[#FFC107]  font-playfair mb-2 transition-transform duration-500 group-hover:-translate-y-1">
+                  <h3 className="text-xl font-semibold text-[#FFD87D]  font-lora italic mb-2 transition-transform duration-500 group-hover:-translate-y-1">
                     {issue.title}
                   </h3>
                   <p className="text-[#E9ECEF] text-sm transition-transform duration-500 group-hover:-translate-y-1">
@@ -153,17 +153,11 @@ const AllProductPage = () => {
         <div 
           className="relative rounded-xl shadow-lg p-8 my-4 bg-cover bg-center h-[300px]"
           style={{
-            backgroundImage: 'url("/assets/bannerimg/banner.jpg")',
+            backgroundImage: 'url("/assets/honeyimg/honey.jpeg")',
           }}
         >
-          <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl"></div>
-          <div className="relative z-10 text-center">
-            <h1 className="text-2xl font-bold font-titillium text-white mb-4">DID YOU KNOW ?</h1>
-            <p className="text-gray-100 font-titillium max-w-2xl mx-auto">
-              Carefully sourced from nature, minimally processed, and delivered fresh to your door. Each
-              product maintains its natural goodness and nutritional integrity.
-            </p>
-          </div>
+          <div className="absolute inset-0  rounded-xl"></div>
+          
         </div>
       </div>
       <div className=" py-4">

@@ -102,7 +102,7 @@ export const CheckoutPage: React.FC = () => {
 
   return (
     <div className="bg-[#F5F5DC]">
-      <div className="bg-green-800 py-8"></div>
+     
       
       {/* Status message notification */}
       {statusMessage && (
@@ -113,7 +113,7 @@ export const CheckoutPage: React.FC = () => {
         </div>
       )}
       
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-10 flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-center">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Shipping Details Form */}
