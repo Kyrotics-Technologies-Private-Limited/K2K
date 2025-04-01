@@ -266,7 +266,7 @@ const ProductSection = () => {
               : "opacity-0"
           }`}
         >
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-green-brand">
+          <h2 className="featureProducts text-2xl md:text-3xl lg:text-4xl font-semibold text-green-brand">
             Featured Products
           </h2>
           <p className="text-sm md:text-base text-gray-800/70 mx-auto mt-2">

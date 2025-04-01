@@ -6,9 +6,10 @@ export default {
       fontFamily: {
         'cormorant': ['"Cormorant Garamond"', 'serif'],
         'sans': ['"DM Sans"', 'sans-serif'],
-        'playfair': ['"Playfair Display"', 'serif'],
+        'kelly-slab': ['"Kelly Slab"', 'sans-serif'], // Replaced "Winky Sans"
         'titillium': ['"Titillium Web"', 'sans-serif'],
-      }, animation: {
+      }, 
+      animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
       },
       keyframes: {

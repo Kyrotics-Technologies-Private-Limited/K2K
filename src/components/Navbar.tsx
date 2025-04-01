@@ -42,7 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:justify-center flex-1">
+          <div className="navbar hidden md:flex md:items-center md:justify-center flex-1">
             <div className="flex space-x-8">
               <a
                 href="/all-products"
