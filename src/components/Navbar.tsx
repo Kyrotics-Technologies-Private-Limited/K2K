@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Menu, X, ShoppingCart, Search, User, ChevronDown } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { UserDetails } from "./UserDetails";
 import { Link } from "react-router-dom";
 
 interface NavbarProps {
@@ -35,7 +36,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
           </a>
 
           {/* Desktop Navigation */}
-          <div className="navbar hidden md:flex md:items-center md:justify-center flex-1">
+          <div className="hidden md:flex items-center">
             <div className="flex space-x-8">
               {/* Products Dropdown */}
               <div className="relative group">
@@ -107,9 +108,9 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             </div>
           </div>
 
-          {/* Right section - Search and Cart */}
-          <div className="hidden md:flex items-center space-x-4">
-            <button className="text-gray-700 hover:text-green-brand transition">
+          {/* Right section - Search, Cart, and User */}
+          <div className="flex items-center space-x-4">
+            <button className={`text-gray-700 hover:text-green-600 transition`}>
               <Search className="h-5 w-5" />
             </button>
 
@@ -129,6 +130,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                 </span>
               )}
             </button>
+            <UserDetails />
           </div>
 
           {/* Mobile menu button */}

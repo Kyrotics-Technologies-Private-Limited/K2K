@@ -49,6 +49,7 @@ export const sampleProducts : Product[] = [
           'https://media.istockphoto.com/id/1413268611/photo/ghee-butter-oil.jpg?s=1024x1024&w=is&k=20&c=_zCH0sX7r980zx2Tndxtn_kQZ_HE0yglHKfJZaHC6p8=',
           'https://media.istockphoto.com/id/1413268632/photo/ghee-butter-oil.jpg?s=1024x1024&w=is&k=20&c=xu957dBzuNHTjAHu_5L0DMH9wA439oYdrPGv0IxyyHM='
         ],
+        banner:'url("/assets/bannerimg/GheeBanner.png")'
       },
       stockStatus: 'in_stock',
       ratings: 4.5,
@@ -142,6 +143,7 @@ export const sampleProducts : Product[] = [
           'https://images.unsplash.com/photo-1555211652-5c6222f971bc?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://plus.unsplash.com/premium_photo-1663851330303-2cfb17822dbb?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
         ],
+        banner:'url("/assets/bannerimg/HoneyBanner.png")'
       },
       stockStatus: 'out_of_stock',
       ratings: 4.8,
@@ -188,7 +190,7 @@ export const sampleProducts : Product[] = [
     },
     {
       id: '3',
-      name: 'Cold Pressed Groundnut Oil',
+      name: 'Musturd Oil',
       price: {
         amount: 750,
         currency: 'INR',
@@ -228,12 +230,13 @@ export const sampleProducts : Product[] = [
       origin: 'Gujarat',
       category: 'oils',
       images: {
-        main: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        main: 'https://media.istockphoto.com/id/951480312/photo/fresh-mustard-oil-on-a-rustic-background.jpg?s=2048x2048&w=is&k=20&c=e1T3k7WA7qAWx_dAz2TuRlqtem96qX6vBU3VP8To-UQ=',
         gallery: [
-          'https://images.unsplash.com/photo-1608571702346-bf078a741b19?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-          'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=1436&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-          'https://images.unsplash.com/photo-1588413333412-82148535db53?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-        ]
+          'https://media.istockphoto.com/id/937757428/photo/rape-field-outdoor.jpg?s=612x612&w=is&k=20&c=VB2RWsaOhwqouuqztYwnS5SNDeK3OHH38jBlqBshkYA=',
+          'https://media.istockphoto.com/id/500479042/photo/oil-of-mustard-in-a-small-jar.jpg?s=2048x2048&w=is&k=20&c=POUROiokDEiRuvx27AZrejK5OgWjEKE0rHVQavv7eCg=',
+          'https://media.istockphoto.com/id/1487006258/photo/mustard-oil-in-a-glass-jar-and-decanter-mustard-grains-on-a-burlap-napkin-flowers-and-leaves.jpg?s=2048x2048&w=is&k=20&c=XEOqZsinuc9zvlaKHXpTIP6Q74XEREfjRtPUbr6OdPU='
+        ],
+        banner:'url("/assets/bannerimg/GheeBanner.png")'
       },
       stockStatus: 'in_stock',
       ratings: 4.7,
@@ -327,6 +330,7 @@ export const sampleProducts : Product[] = [
           'https://plus.unsplash.com/premium_photo-1664273586802-2fd61b1e193a?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
           'https://images.unsplash.com/photo-1641878067318-1d1f79a77785?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
         ],
+        banner:'url("/assets/bannerimg/HoneyBanner.png")'
       },
       stockStatus: 'in_stock',
       ratings: 4.8,
