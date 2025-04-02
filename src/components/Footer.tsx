@@ -169,6 +169,7 @@
 
 import { Mail, Instagram, Facebook, Twitter, Linkedin, Youtube } from "lucide-react";
 import { FC } from "react";
+import { Link  } from "react-router-dom";
 
 interface SocialLink {
   icon: React.ComponentType<{ className?: string }>;
@@ -208,10 +209,10 @@ const Footer: FC = () => {
   const quickLinks = ["Shop", "About Us", "Blog", "Contact"];
   const categories = ["Honey", "Essential Oils", "Herbal Products", "Skincare"];
   const policyLinks = [
-    "Privacy Policy",
-    "Terms of Service",
-    "Shipping Info",
-    "Refund Policy",
+    { name: "Privacy Policy", path: "/privacypolicy" },
+    { name: "Terms of Service", path: "/termsofservice" },
+    { name: "Shipping Info", path: "/shippinginfo" },
+    { name: "Refund Policy", path: "/refundpolicy" },
   ];
 
   return (
@@ -231,8 +232,8 @@ const Footer: FC = () => {
               </span>
             </div>
             <p className="text-green-100 mb-4 text-xs sm:text-sm leading-relaxed">
-              Univillage Agro Pvt. Ltd., Uttar Narayan Pur, PO: BK Chungri, PS: Margram, 
-              District: Birbhum, West Bengal - 731202, India
+              Univillage Agro Pvt. Ltd., Uttar Narayan Pur, PO: BK Chungri, PS:
+              Margram, District: Birbhum, West Bengal - 731202, India
             </p>
             <p className="text-green-100 mb-4 text-sm sm:text-base leading-relaxed">
               Bringing nature's finest organic products to your doorstep.
@@ -329,13 +330,13 @@ const Footer: FC = () => {
             </p>
             <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6">
               {policyLinks.map((item) => (
-                <a
-                  key={item}
-                  href={`/${item.toLowerCase().replace(/\s+/g, '')}`}
+                <Link
+                  key={item.path}
+                  to={item.path}
                   className="text-green-200/80 hover:text-white text-xs sm:text-sm transition-all hover:underline hover:underline-offset-4"
                 >
-                  {item}
-                </a>
+                  {item.name}
+                </Link>
               ))}
             </div>
           </div>
