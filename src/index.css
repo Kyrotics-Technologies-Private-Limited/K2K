@@ -1,19 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Kelly+Slab&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quando&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Protest+Riot&display=swap');
 
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-.featureProducts {
-  font-family: "Kelly Slab", sans-serif;
-  font-weight: 600;
-  font-style: normal;
-  letter-spacing: 3px;
-}
-
-
-
 
 
 /* Optional: Apply fonts to default HTML elements */
@@ -22,8 +13,15 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Kelly Slab', sans-serif;
+  font-family: 'Quando', serif;
 }
+
+.logoFont {
+  font-family: "Protest Riot", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
 
 
 

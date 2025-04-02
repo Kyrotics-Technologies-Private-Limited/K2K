@@ -6,7 +6,7 @@ export default {
       fontFamily: {
         'cormorant': ['"Cormorant Garamond"', 'serif'],
         'sans': ['"DM Sans"', 'sans-serif'],
-        'kelly-slab': ['"Kelly Slab"', 'sans-serif'], // Replaced "Winky Sans"
+        'quando': ['"Quando"', 'serif'], // Replaced "Kelly Slab" with "Quando"
         'titillium': ['"Titillium Web"', 'sans-serif'],
       }, 
       animation: {
@@ -32,6 +32,9 @@ export default {
           800: '#0C6908',
           900: '#14532d',
         },
+        yellow: {
+          theme: '#fffbe8'
+        }
       },
     },
   },

@@ -55,7 +55,7 @@ const FeaturesSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative pb-10 overflow-hidden bg-[#fffbe8]"
+      className="relative pb-10 overflow-hidden bg-yellow-theme"
     >
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16 mt-8">
