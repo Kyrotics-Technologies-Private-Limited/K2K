@@ -92,7 +92,14 @@
 // export default KishanParivar;
 
 import React from "react";
-import { CheckCircle, CreditCard, Leaf, Tractor, Sun, Droplets, ShieldCheck } from "lucide-react";
+import {
+  CheckCircle,
+  CreditCard,
+  Tractor,
+  Sun,
+  Droplets,
+  ShieldCheck,
+} from "lucide-react";
 
 const KishanParivar: React.FC = () => {
   return (
@@ -108,22 +115,31 @@ const KishanParivar: React.FC = () => {
           The <span className="text-green-brand">Kishan Parivar</span> Advantage
         </h1>
         <p className="text-sm md:text-base text-gray-800/90 mx-auto mt-2">
-          India's premier agricultural subscription program designed to empower farmers with financial tools, 
-          insurance benefits, and exclusive rewards.
+          India's premier agricultural subscription program designed to empower
+          farmers with financial tools, insurance benefits, and exclusive
+          rewards.
         </p>
       </div>
 
       {/* Main Card Component */}
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden w-full max-w-6xl mx-4 lg:mx-10">
+      <div className="bg-white rounded-2xl border border-gray-300 shadow-xl overflow-hidden w-full max-w-6xl mx-4 lg:mx-10">
         <div className="flex flex-col md:flex-row">
           {/* Card Section - Left Side */}
           <div className="w-full md:w-2/5 p-8 bg-green-brand flex flex-col justify-between">
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-2">
-                <Leaf className="text-green-300" size={28} />
+                <img
+                  src="/assets/images/K2K Logo.png"
+                  alt="Kishan2Kitchen Logo"
+                  className="h-20 w-20 bg-white object-cover mr-1 rounded-md"
+                />
                 <div>
-                  <h3 className="text-2xl font-bold text-white">Kishan Parivar</h3>
-                  <p className="text-green-200 text-sm">Premium Farming Membership</p>
+                  <h3 className="text-2xl font-bold text-white">
+                    Kishan Parivar
+                  </h3>
+                  <p className="text-green-200 text-sm">
+                    Premium Farming Membership
+                  </p>
                 </div>
               </div>
               <div className="bg-green-800 p-2 rounded-lg">
@@ -136,22 +152,30 @@ const KishanParivar: React.FC = () => {
               {/* Decorative elements */}
               <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-green-700/20"></div>
               <div className="absolute -bottom-8 -left-8 w-28 h-28 rounded-full bg-green-500/20"></div>
-              
+
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <div className="flex justify-between items-center">
                   <Tractor className="text-green-200" size={24} />
                   <Sun className="text-yellow-300" size={24} />
                 </div>
-                
+
                 <div>
-                  <p className="text-green-100 text-lg tracking-wider mb-2">•••• •••• •••• 1234</p>
+                  <p className="text-green-100 text-lg tracking-wider mb-2">
+                    •••• •••• •••• 1234
+                  </p>
                   <div className="flex justify-between items-end">
                     <div>
-                      <p className="text-green-200 text-xs uppercase tracking-wider">Card Holder</p>
-                      <p className="text-white font-medium">Kishan Kumar Pandit</p>
+                      <p className="text-green-200 text-xs uppercase tracking-wider">
+                        Card Holder
+                      </p>
+                      <p className="text-white font-medium">
+                        Kishan Kumar Pandit
+                      </p>
                     </div>
                     <div>
-                      <p className="text-green-200 text-xs uppercase tracking-wider">Valid Thru</p>
+                      <p className="text-green-200 text-xs uppercase tracking-wider">
+                        Valid Thru
+                      </p>
                       <p className="text-white font-medium">03/30</p>
                     </div>
                   </div>
@@ -166,16 +190,18 @@ const KishanParivar: React.FC = () => {
           </div>
 
           {/* Features Section - Right Side */}
-          <div className="w-full md:w-3/5 p-8 md:p-10 bg-green-50">
+          <div className="w-full md:w-3/5 p-8 md:p-10 bg-white">
             <div className="mb-2 flex items-center gap-2 text-green-brand">
               <Droplets size={20} />
               <span className="text-sm font-medium">EXCLUSIVE OFFER</span>
             </div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              Elevate Your <span className="text-green-brand">Farming Journey</span>
+            <h2 className="text-base sm:text-lg md:text-2xl font-bold text-gray-800 mb-4">
+              Elevate Your{" "}
+              <span className="text-green-brand">Farming Journey</span>
             </h2>
             <p className="text-gray-600 mb-8 text-lg">
-              Join India's most trusted agricultural community and unlock premium benefits designed to grow your success.
+              Join India's most trusted agricultural community and unlock
+              premium benefits designed to grow your success.
             </p>
 
             {/* Enhanced Features List */}
@@ -184,37 +210,41 @@ const KishanParivar: React.FC = () => {
                 {
                   icon: <CheckCircle size={22} className="text-green-brand" />,
                   text: "Low-interest agricultural loans with flexible repayment",
-                  highlight: false
+                  highlight: false,
                 },
                 {
                   icon: <CheckCircle size={22} className="text-green-brand" />,
                   text: "Comprehensive crop insurance at special rates",
-                  highlight: false
+                  highlight: false,
                 },
                 {
                   icon: <CheckCircle size={22} className="text-green-brand" />,
                   text: "5% bonus reward points on all agri-input purchases",
-                  highlight: true
+                  highlight: true,
                 },
                 {
                   icon: <CheckCircle size={22} className="text-green-brand" />,
                   text: "Priority access to government subsidy programs",
-                  highlight: false
+                  highlight: false,
                 },
                 {
                   icon: <CheckCircle size={22} className="text-green-brand" />,
                   text: "Personalized harvest payment schedules",
-                  highlight: false
+                  highlight: false,
                 },
                 {
                   icon: <CheckCircle size={22} className="text-green-brand" />,
                   text: "Free agri-tech consultation sessions",
-                  highlight: true
-                }
+                  highlight: true,
+                },
               ].map((item, index) => (
                 <li key={index} className="flex items-start gap-4">
                   {item.icon}
-                  <span className={`text-gray-700 ${item.highlight ? "font-semibold text-green-brand" : ""}`}>
+                  <span
+                    className={`text-gray-700 ${
+                      item.highlight ? "font-semibold text-green-brand" : ""
+                    }`}
+                  >
                     {item.text}
                   </span>
                 </li>
@@ -223,8 +253,8 @@ const KishanParivar: React.FC = () => {
 
             {/* Enhanced CTA */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <a 
-                href="/kishanParivarPage" 
+              <a
+                href="/kishanParivarPage"
                 className="bg-green-brand text-white font-semibold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg flex-1 text-center"
               >
                 Apply Now - ₹499/year

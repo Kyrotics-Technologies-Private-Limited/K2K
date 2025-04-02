@@ -19,7 +19,7 @@ const KishanParivarPage = () => {
 
   return (
     <div className="min-h-screen">
-      <KishanParivarHero />
+      <KishanParivarHero scrollToTarget={scrollToTarget}/>
       <FeaturesKishanParivar scrollToTarget={scrollToTarget} />
       <TrialPackSection/>
       <KishanParivarForm targetRef={targetRef} />

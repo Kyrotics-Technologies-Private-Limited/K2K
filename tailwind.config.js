@@ -6,13 +6,10 @@ export default {
       fontFamily: {
         'cormorant': ['"Cormorant Garamond"', 'serif'],
         'sans': ['"DM Sans"', 'sans-serif'],
-        'playfair': ['"Playfair Display"', 'serif'],
+        'quando': ['"Quando"', 'serif'], // Replaced "Kelly Slab" with "Quando"
         'titillium': ['"Titillium Web"', 'sans-serif'],
-        'merriweather': ['"Merriweather"', 'serif'],
-        'delius': ['"Delius"', 'serif'],
-        'dm-serif-display': ['"DM Serif Display"', 'serif'],
-        'lora': ['"Lora"', 'serif'],
-      }, animation: {
+      }, 
+      animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
       },
       keyframes: {
@@ -35,6 +32,9 @@ export default {
           800: '#0C6908',
           900: '#14532d',
         },
+        yellow: {
+          theme: '#fffbe8'
+        }
       },
     },
   },
