@@ -43,8 +43,8 @@ function App() {
           <Route path='/traceability' element={<Traceability/>}/>
           <Route path='/privacypolicy' element={<PrivacyPolicy/>}/>
           <Route path='/termsofservice' element={<TermsOfService/>}/>
-          <Route path='/shipping' element={<ShippingPolicy/>}/>
-          <Route path='/refund' element={<RefundPolicy/>}/>
+          <Route path='/shippinginfo' element={<ShippingPolicy/>}/>
+          <Route path='/refundpolicy' element={<RefundPolicy/>}/>
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<OverviewPage />} />
