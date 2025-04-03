@@ -414,13 +414,13 @@ const AllProductPage = () => {
               </div>
               <div className="flex justify-center space-x-2 md:space-x-4">
                 <a
-                  href="#products"
+                  href="/traceability"
                   className="text-xs md:text-sm bg-white text-green-800 font-semibold py-2 px-4 md:px-6 rounded-full hover:bg-green-50 transition duration-300 ease-in-out"
                 >
-                  Explore Products
+                  Checkout Trecebility
                 </a>
                 <a
-                  href="#about"
+                  href="/our-story"
                   className="text-xs md:text-sm bg-transparent border-2 border-white text-white font-semibold py-2 px-4 md:px-6 rounded-full hover:bg-white hover:text-green-800 transition duration-300 ease-in-out"
                 >
                   Our Promise

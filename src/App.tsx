@@ -1,9 +1,9 @@
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import  AllProductPage  from './pages/AllProductPage';
 import ProductPage from './pages/ProductPage';
 import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import { CartDrawer } from './components/CartDrawer';
 import { useState } from 'react';
@@ -28,33 +28,35 @@ function App() {
 
   return (
     <BrowserRouter>
-      <CartProvider>
-        <AdvertisementBar/>
-        <Navbar onCartClick={() => setIsCartOpen(true)} />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/all-products" element={<AllProductPage />} />
-          <Route path="/product/:id" element={<ProductPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/kishanParivarPage" element={<KishanParivarPage />} />
-          <Route path="/register" element={<SignUp />} />
-          <Route path="/login" element={<Login />} />
-          <Route path='/our-story' element={<OurStory/>}/>
-          <Route path='/traceability' element={<Traceability/>}/>
-          <Route path='/privacypolicy' element={<PrivacyPolicy/>}/>
-          <Route path='/termsofservice' element={<TermsOfService/>}/>
-          <Route path='/shipping' element={<ShippingPolicy/>}/>
-          <Route path='/refund' element={<RefundPolicy/>}/>
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<OverviewPage />} />
-            <Route path="products" element={<ProductPage />} />
-          </Route>
-        </Routes>
+      <AuthProvider>
+        <CartProvider>
+          <AdvertisementBar/>
+          <Navbar onCartClick={() => setIsCartOpen(true)} />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/all-products" element={<AllProductPage />} />
+            <Route path="/product/:id" element={<ProductPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/kishanParivarPage" element={<KishanParivarPage />} />
+            <Route path="/register" element={<SignUp />} />
+            <Route path="/login" element={<Login />} />
+            <Route path='/our-story' element={<OurStory/>}/>
+            <Route path='/traceability' element={<Traceability/>}/>
+            <Route path='/privacypolicy' element={<PrivacyPolicy/>}/>
+            <Route path='/termsofservice' element={<TermsOfService/>}/>
+            <Route path='/shipping' element={<ShippingPolicy/>}/>
+            <Route path='/refund' element={<RefundPolicy/>}/>
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<OverviewPage />} />
+              <Route path="products" element={<ProductPage />} />
+            </Route>
+          </Routes>
 
-        <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-        <Footer />
-      </CartProvider>
+          <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+          <Footer />
+        </CartProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
