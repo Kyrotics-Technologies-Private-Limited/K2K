@@ -24,7 +24,7 @@ const slides = [
 
 const Hero = () => {
   return (
-    <div className="hero h-[86vh] w-full max-w-full relative">
+    <div className="hero w-screen max-w-full relative">
       <Swiper
         modules={[Autoplay, Pagination]}
         autoplay={{
@@ -35,7 +35,7 @@ const Hero = () => {
           clickable: true,
           el: '.custom-pagination',
           bulletClass: 'swiper-pagination-bullet !w-2.5 !h-2.5 !mx-1.5 !bg-gray-400/80 !opacity-100',
-          bulletActiveClass: '!bg-green-600/50 !w-3 !h-3'
+          bulletActiveClass: '!bg-green-600/50 !w-3 !h-3',
         }}
         loop
         className="h-full w-full"
@@ -43,17 +43,17 @@ const Hero = () => {
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>
             <a href={slide.link} className="block w-full h-full">
-              <img 
+              <img
                 src={slide.image}
                 alt={`Banner ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover sm:h-auto sm:w-full md:h-[80vh] lg:h-[76vh]"
                 loading="eager"
               />
             </a>
           </SwiperSlide>
         ))}
       </Swiper>
-      
+
       {/* Custom Pagination Container */}
       <div className="custom-pagination absolute bottom-8 left-0 right-0 z-10 flex justify-center" />
     </div>
@@ -61,3 +61,4 @@ const Hero = () => {
 };
 
 export default Hero;
+
