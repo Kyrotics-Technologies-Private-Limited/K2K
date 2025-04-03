@@ -3,6 +3,7 @@ import { Menu, X, ShoppingCart, Search, User, ChevronDown } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { UserDetails } from "./UserDetails";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 interface NavbarProps {
   onCartClick: () => void;
@@ -13,6 +14,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [productsDropdownOpen, setProductsDropdownOpen] = useState(false);
   const { state } = useCart();
+  const { isAuthenticated } = useAuth();
   const itemCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
 
   const toggleProductsDropdown = () => {
@@ -40,45 +42,38 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             <div className="flex space-x-8">
               {/* Products Dropdown */}
               <div className="relative group">
-                <button
-                  onClick={toggleProductsDropdown}
-                  className="flex items-center text-gray-500 hover:text-black transition"
-                >
-                  All Products
-                  <ChevronDown
-                    className={`ml-1 h-4 w-4 transition-transform ${
-                      productsDropdownOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-                {productsDropdownOpen && (
-                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                    <a
-                      href="/all-products"
-                      className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-brand"
-                    >
-                      Oil
-                    </a>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-brand"
-                    >
-                      Ghee
-                    </a>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-brand"
-                    >
-                      Honey
-                    </a>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-brand"
-                    >
-                      Natural product
-                    </a>
-                  </div>
-                )}
+                <div className="flex items-center">
+                  <Link to="/all-products" className="text-gray-500 hover:text-black transition">
+                    All Products
+                  </Link>
+                  <ChevronDown className="ml-1 h-4 w-4 transition-transform group-hover:rotate-180" />
+                </div>
+                <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <a
+                    href="/all-products"
+                    className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600"
+                  >
+                    Oil
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600"
+                  >
+                    Ghee
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600"
+                  >
+                    Honey
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600"
+                  >
+                    Natural product
+                  </a>
+                </div>
               </div>
 
               <a href="#" className="text-gray-500 hover:text-black transition">
@@ -114,11 +109,14 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               <Search className="h-5 w-5" />
             </button>
 
-            <Link to="/register">
-              <button className="text-gray-700 hover:text-green-brand transition p-2">
+            {true ? (
+              <UserDetails />
+            ) : (
+              <Link to="/register" className="text-gray-700 hover:text-green-600 transition p-2">
                 <User className="h-5 w-5" />
-              </button>
-            </Link>
+              </Link>
+            )}
+
             <button
               onClick={onCartClick}
               className="relative p-2 hover:text-green-brand transition"
@@ -130,7 +128,6 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                 </span>
               )}
             </button>
-            <UserDetails />
           </div>
 
           {/* Mobile menu button */}
@@ -178,12 +175,12 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
             {/* Mobile Products Dropdown */}
             <div className="px-3 py-2">
-              <button
-                onClick={toggleProductsDropdown}
-                className="flex items-center text-gray-500 hover:text-black transition w-full"
-              >
-                All Products
-              </button>
+              <div className="flex items-center">
+                <Link to="/all-products" className="text-gray-500 hover:text-black transition">
+                  All Products
+                </Link>
+                <ChevronDown className="ml-1 h-4 w-4 transition-transform group-hover:rotate-180" />
+              </div>
             </div>
 
             <a
