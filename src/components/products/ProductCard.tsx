@@ -143,16 +143,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <>
               <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-white border border-[#0d6b1e] text-green-800 py-1 rounded hover:bg-green-800 hover:text-white transition-colors text-[10px] flex items-center justify-center gap-0.5"
+                className="flex-1 bg-white border border-[#0d6b1e] text-green-800 py-1.5 rounded hover:bg-green-800 hover:text-white transition-colors text-xs flex items-center justify-center gap-0.5"
               >
-                <ShoppingCart className="w-2.5 h-2.5" />
+                <ShoppingCart className="w-4 h-4" />
                 Add
               </button>
               <button
                 onClick={handleBuyNow}
-                className="flex-1 bg-[#0d6b1e] text-white py-1 rounded hover:bg-[#3A4D13] transition-colors text-[10px] flex items-center justify-center gap-0.5"
+                className="flex-1 bg-[#0d6b1e] text-white py-1.5 rounded hover:bg-[#3A4D13] transition-colors text-xs flex items-center justify-center gap-0.5"
               >
-                <CreditCard className="w-2.5 h-2.5" />
+                <CreditCard className="w-4 h-4" />
                 Buy
               </button>
             </>

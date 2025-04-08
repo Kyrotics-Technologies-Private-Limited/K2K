@@ -171,9 +171,9 @@
 
 
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ProductGrid } from "../components/products/ProductGrid";
-import { sampleProducts } from "../mockData/SampleProduct";
+// import { sampleProducts } from "../mockData/SampleProduct";
 import {
   Brain,
   Heart,
@@ -187,8 +187,33 @@ import {
   Shield,
 } from "lucide-react";
 import RecognizedBy from "../components/RecognizedBy";
+import { productApi } from "../services/api";
+import { Product } from "../types";
 
 const AllProductPage = () => {
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await productApi.getAllProducts();
+        setProducts(data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        setError("Failed to load products. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   const healthIssues = [
     {
       title: "Mental Fatigue",
@@ -430,9 +455,20 @@ const AllProductPage = () => {
           </div>
         </div>
       </div>
-      {/* Natural Solutions Section */}
       <div className="max-w-7xl mx-auto px-4">
-        <ProductGrid products={sampleProducts} />
+        {loading ? (<ProductGrid products={products} />) : error ?  (
+          <div className="text-center py-12">
+            <p className="text-red-600">{error}</p>
+            <button
+              className="mt-4 px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800"
+              onClick={() => window.location.reload()}
+            >
+              Try Again
+            </button>
+          </div>
+        ) : (
+          <ProductGrid products={products} />
+        )}
       </div>
 
       {/* Bottom Banner Section */}
