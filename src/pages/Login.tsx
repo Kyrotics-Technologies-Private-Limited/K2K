@@ -1,4 +1,4 @@
-import { useState } from "react";
+/*import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -114,6 +114,187 @@ const Login = () => {
         </div>
       </div>
      
+    </div>
+  );
+};
+
+export default Login;*/
+
+
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
+
+const Login: React.FC = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+  const { login, forgotPassword, user } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    try {
+      await login(email, password);
+      // The useEffect will handle the redirect when user state updates
+    } catch (error) {
+      console.error("Login failed:", error);
+      setError("Invalid email or password. Please try again.");
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (!email) {
+      setError("Please enter your email address");
+      return;
+    }
+
+    try {
+      await forgotPassword(email);
+      setResetEmailSent(true);
+    } catch (error) {
+      console.error("Password reset failed:", error);
+      setError("Failed to send reset email. Please try again.");
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-green-100 from-green-100 via-green-300 to-green-100 animate-gradient-x flex items-center justify-center bg-cover bg-center">
+      <div className="shadow-xl rounded-2xl p-8 max-w-md w-full bg-white">
+        {showForgotPassword ? (
+          <>
+            <h2 className="text-2xl font-bold mb-6 text-center">
+              Reset Password
+            </h2>
+            {resetEmailSent ? (
+              <div className="text-center">
+                <p className="text-green-600 mb-4">
+                  Password reset link sent to {email}
+                </p>
+                <button
+                  onClick={() => {
+                    setShowForgotPassword(false);
+                    setResetEmailSent(false);
+                  }}
+                  className="text-green-600 hover:underline"
+                >
+                  Back to Login
+                </button>
+              </div>
+            ) : (
+              <>
+                <p className="mb-4 text-gray-600">
+                  Enter your email address and we'll send you a link to reset
+                  your password.
+                </p>
+                <form onSubmit={handleForgotPassword}>
+                  <div className="mb-4">
+                    <label
+                      className="block text-gray-700 mb-2"
+                      htmlFor="forgot-email"
+                    >
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="forgot-email"
+                      className="w-full px-3 py-2 border rounded"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  {error && (
+                    <div className="mb-4 text-red-500 text-sm">{error}</div>
+                  )}
+                  <button
+                    type="submit"
+                    className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-blue-700 mb-4"
+                  >
+                    Send Reset Link
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(false)}
+                    className="w-full text-green-600 hover:underline"
+                  >
+                    Back to Login
+                  </button>
+                </form>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <h2 className="text-2xl font-bold mb-6 text-center text-green-700">Login</h2>
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded text-sm">
+                {error}
+              </div>
+            )}
+            <form onSubmit={handleLogin}>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2" htmlFor="email">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  className="w-full px-3 py-2 border rounded"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-6">
+                <label className="block text-gray-700 mb-2" htmlFor="password">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  className="w-full px-3 py-2 border rounded"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
+              >
+                Login
+              </button>
+            </form>
+            <div className="mt-4 text-center">
+              <button
+                onClick={() => setShowForgotPassword(true)}
+                className="text-green-600 hover:underline text-sm"
+              >
+                Forgot your password?
+              </button>
+            </div>
+            <p className="mt-4 text-center">
+              Don't have an account?
+              <Link to="/register" className="text-green-600 hover:underline">
+                Register
+              </Link>
+            </p>
+          </>
+        )}
+      </div>
     </div>
   );
 };
