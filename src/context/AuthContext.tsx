@@ -42,7 +42,6 @@ export const useAuth = () => {
   return context;
 }; */
 
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -70,7 +69,18 @@ interface AuthContextType {
   resetPassword: (oobCode: string, newPassword: string) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+// Initialize with default values to avoid the "must be used within an AuthProvider" error
+const defaultContext: AuthContextType = {
+  user: null,
+  loading: true,
+  register: async () => {},
+  login: async () => {},
+  logout: async () => {},
+  forgotPassword: async () => {},
+  resetPassword: async () => {},
+};
+
+const AuthContext = createContext<AuthContextType>(defaultContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -93,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     return unsubscribe;
-  }, []); 
+  }, []);
 
   const register = async (email: string, password: string) => {
     try {
@@ -159,20 +169,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const contextValue: AuthContextType = {
+    user,
+    loading,
+    register,
+    login,
+    logout,
+    forgotPassword,
+    resetPassword,
+  };
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        register,
-        login,
-        logout,
-        forgotPassword,
-        resetPassword,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
