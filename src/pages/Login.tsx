@@ -122,113 +122,125 @@ export default Login;*/
 
 
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
+import {
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+import { auth } from "../firebase";
+import axios from "axios";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
-  const { login, forgotPassword, user } = useAuth();
-  const navigate = useNavigate();
 
-  // Redirect if already logged in
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, [user, navigate]);
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setMessage("");
     try {
-      await login(email, password);
-      // The useEffect will handle the redirect when user state updates
-    } catch (error) {
-      console.error("Login failed:", error);
-      setError("Invalid email or password. Please try again.");
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const token = await userCredential.user.getIdToken();
+      console.log("Bearer Token:", token);
+
+      // Send token to backend
+      const response = await axios.post(
+        "http://localhost:5566/api/users/login",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setMessage(response.data.message);
+      setTimeout(() => navigate("/"), 1500); // Redirect after 1.5s
+    } catch (err: any) {
+      console.error("Login failed:", err);
+      setError(err.response?.data?.error || "Login failed. Please try again.");
     }
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setMessage("");
     if (!email) {
-      setError("Please enter your email address");
+      setError("Please enter your email address.");
       return;
     }
 
     try {
-      await forgotPassword(email);
+      await sendPasswordResetEmail(auth, email);
       setResetEmailSent(true);
-    } catch (error) {
-      console.error("Password reset failed:", error);
+    } catch (err) {
       setError("Failed to send reset email. Please try again.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-green-100 from-green-100 via-green-300 to-green-100 animate-gradient-x flex items-center justify-center bg-cover bg-center">
+    <div className="min-h-screen bg-green-100 flex items-center justify-center">
       <div className="shadow-xl rounded-2xl p-8 max-w-md w-full bg-white">
         {showForgotPassword ? (
           <>
-            <h2 className="text-2xl font-bold mb-6 text-center">
+            <h2 className="text-2xl font-bold text-center mb-4">
               Reset Password
             </h2>
             {resetEmailSent ? (
               <div className="text-center">
                 <p className="text-green-600 mb-4">
-                  Password reset link sent to {email}
+                  Password reset email sent to {email}
                 </p>
                 <button
+                  className="text-green-600 hover:underline"
                   onClick={() => {
                     setShowForgotPassword(false);
                     setResetEmailSent(false);
                   }}
-                  className="text-green-600 hover:underline"
                 >
                   Back to Login
                 </button>
               </div>
             ) : (
               <>
-                <p className="mb-4 text-gray-600">
-                  Enter your email address and we'll send you a link to reset
-                  your password.
+                <p className="text-gray-600 mb-4">
+                  Enter your email address and we’ll send you a reset link.
                 </p>
                 <form onSubmit={handleForgotPassword}>
                   <div className="mb-4">
-                    <label
-                      className="block text-gray-700 mb-2"
-                      htmlFor="forgot-email"
-                    >
-                      Email
-                    </label>
+                    <label className="block text-gray-700 mb-1">Email</label>
                     <input
                       type="email"
-                      id="forgot-email"
-                      className="w-full px-3 py-2 border rounded"
+                      className="w-full border border-gray-300 rounded-lg p-2"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
                   {error && (
-                    <div className="mb-4 text-red-500 text-sm">{error}</div>
+                    <div className="text-sm text-red-500 mb-2">{error}</div>
                   )}
                   <button
                     type="submit"
-                    className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-blue-700 mb-4"
+                    className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
                   >
                     Send Reset Link
                   </button>
                   <button
                     type="button"
+                    className="w-full mt-3 text-green-600 hover:underline"
                     onClick={() => setShowForgotPassword(false)}
-                    className="w-full text-green-600 hover:underline"
                   >
                     Back to Login
                   </button>
@@ -238,34 +250,35 @@ const Login: React.FC = () => {
           </>
         ) : (
           <>
-            <h2 className="text-2xl font-bold mb-6 text-center text-green-700">Login</h2>
+            <h2 className="text-2xl font-bold text-center text-green-700 mb-4">
+              Login
+            </h2>
             {error && (
-              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded text-sm">
+              <div className="mb-3 p-3 bg-red-100 text-red-700 rounded text-sm">
                 {error}
+              </div>
+            )}
+            {message && (
+              <div className="mb-3 p-3 bg-green-100 text-green-700 rounded text-sm">
+                {message}
               </div>
             )}
             <form onSubmit={handleLogin}>
               <div className="mb-4">
-                <label className="block text-gray-700 mb-2" htmlFor="email">
-                  Email
-                </label>
+                <label className="block text-gray-700 mb-1">Email</label>
                 <input
                   type="email"
-                  id="email"
-                  className="w-full px-3 py-2 border rounded"
+                  className="w-full border border-gray-300 rounded-lg p-2"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
               <div className="mb-6">
-                <label className="block text-gray-700 mb-2" htmlFor="password">
-                  Password
-                </label>
+                <label className="block text-gray-700 mb-1">Password</label>
                 <input
                   type="password"
-                  id="password"
-                  className="w-full px-3 py-2 border rounded"
+                  className="w-full border border-gray-300 rounded-lg p-2"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -273,7 +286,7 @@ const Login: React.FC = () => {
               </div>
               <button
                 type="submit"
-                className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
+                className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
               >
                 Login
               </button>
@@ -286,8 +299,8 @@ const Login: React.FC = () => {
                 Forgot your password?
               </button>
             </div>
-            <p className="mt-4 text-center">
-              Don't have an account?
+            <p className="mt-4 text-center text-sm text-gray-600">
+              Don't have an account?{" "}
               <Link to="/register" className="text-green-600 hover:underline">
                 Register
               </Link>
@@ -300,3 +313,4 @@ const Login: React.FC = () => {
 };
 
 export default Login;
+
