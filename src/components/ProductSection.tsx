@@ -14,7 +14,7 @@ const ProductSection = () => {
   }, []);
 
   return (
-    <section className="pt-4 sm:pt-8 md:pt-12 pb-2 sm:pb-4 md:pb-5 bg-[rgba(255,255,255,0.75)] overflow-hidden w-full">
+    <section className="pt-4 sm:pt-8 md:pt-12 pb-2 sm:pb-4 md:pb-5 bg-[rgba(255,255,255,0.75)] overflow-hidden w-full max-w-7xl m-auto">
       <div className="w-full">
         <div
           className={`text-center mb-4 sm:mb-6 md:mb-10 px-4 sm:px-6 lg:px-8 ${
