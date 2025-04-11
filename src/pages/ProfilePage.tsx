@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from "react";
 import {
   FaUser,
-  FaStar,
   FaLinkedin,
   FaInstagram,
   FaGlobe,
   FaCheckCircle,
-  FaRegStar,
   FaCalendarAlt,
   FaTimes,
   FaEnvelope,
 } from "react-icons/fa";
-import { FiEdit, FiDownload, FiActivity } from "react-icons/fi";
-import { IoMdNotifications } from "react-icons/io";
 import { MdLocationOn } from "react-icons/md";
 import { db, storage } from "../firebase";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
+import { FileEdit } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 interface UserProfile {
   id: string;
@@ -37,72 +40,11 @@ interface UserProfile {
   };
 }
 
-const fetchUserData = async (userId: string): Promise<UserProfile> => {
-  try {
-    const userRef = doc(db, "users", userId);
-    const docSnap = await getDoc(userRef);
-
-    if (docSnap.exists()) {
-      return {
-        id: docSnap.id,
-        ...docSnap.data(),
-      } as UserProfile;
-    } else {
-      // Create a new user document if it doesn't exist
-      const newUser: UserProfile = {
-        id: userId,
-        name: "",
-        email: "",
-        role: "",
-        location: "",
-        joinDate: new Date().toLocaleDateString("en-US", {
-          month: "long",
-          year: "numeric",
-        }),
-        isVerified: false,
-        description: "",
-        rating: 0,
-        reviews: 0,
-        socialLinks: {
-          linkedIn: "",
-          instagram: "",
-          website: "",
-        },
-      };
-
-      await setDoc(userRef, newUser);
-      return newUser;
-    }
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    throw error;
-  }
-};
-
-const RatingStars: React.FC<{ rating: number }> = ({ rating }) => {
-  const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 >= 0.5;
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-
-  return (
-    <div className="flex items-center">
-      {[...Array(fullStars)].map((_, i) => (
-        <FaStar key={`full-${i}`} className="text-yellow-400 text-sm" />
-      ))}
-      {hasHalfStar && (
-        <FaStar key="half" className="text-yellow-400 opacity-50 text-sm" />
-      )}
-      {[...Array(emptyStars)].map((_, i) => (
-        <FaRegStar key={`empty-${i}`} className="text-yellow-400 text-sm" />
-      ))}
-      <span className="ml-1 text-gray-600 text-sm">{rating.toFixed(1)}</span>
-    </div>
-  );
-};
-
 const UserProfilePage: React.FC = () => {
+  const { user: authUser, loading: authLoading } = useAuth();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -119,16 +61,74 @@ const UserProfilePage: React.FC = () => {
     website: "",
   });
 
+  const fetchUserData = async (uid: string): Promise<UserProfile> => {
+    try {
+      const userRef = doc(db, "users", uid);
+      const docSnap = await getDoc(userRef);
+
+      if (docSnap.exists()) {
+        return {
+          id: docSnap.id,
+          ...docSnap.data(),
+        } as UserProfile;
+      } else {
+        // Create a new user document if it doesn't exist
+        const newUser: UserProfile = {
+          id: uid,
+          name: authUser?.displayName || "",
+          email: authUser?.email || "",
+          role: "",
+          location: "",
+          joinDate: new Date().toLocaleDateString("en-US", {
+            month: "long",
+            year: "numeric",
+          }),
+          isVerified: false,
+          description: "",
+          rating: 0,
+          reviews: 0,
+          socialLinks: {
+            linkedIn: "",
+            instagram: "",
+            website: "",
+          },
+        };
+
+        await setDoc(userRef, newUser);
+        return newUser;
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      throw error;
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      // Validate file type and size
+      if (!file.type.startsWith("image/")) {
+        setError("Please upload an image file (JPEG, PNG)");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB limit
+        setError("File size should be less than 5MB");
+        return;
+      }
+      setSelectedFile(file);
+      setError(null);
     }
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !user) return;
+    if (!selectedFile || !user) {
+      setError("No file selected or user not found");
+      return;
+    }
 
     setUploading(true);
+    setError(null);
 
     try {
       // Create a reference to the storage location
@@ -151,6 +151,7 @@ const UserProfilePage: React.FC = () => {
       setShowUploadModal(false);
     } catch (error) {
       console.error("Error uploading profile picture:", error);
+      setError("Failed to upload profile picture");
     } finally {
       setUploading(false);
       setSelectedFile(null);
@@ -161,14 +162,23 @@ const UserProfilePage: React.FC = () => {
     if (!user) return;
 
     try {
+      // Delete the file from storage
+      if (user.profilePicture) {
+        const storageRef = ref(storage, `profilePictures/${user.id}`);
+        await deleteObject(storageRef);
+      }
+
+      // Update the user document
       const userRef = doc(db, "users", user.id);
       await updateDoc(userRef, {
         profilePicture: null,
       });
 
+      // Update local state
       setProfilePicture(null);
     } catch (error) {
       console.error("Error removing profile picture:", error);
+      setError("Failed to remove profile picture");
     }
   };
 
@@ -220,15 +230,16 @@ const UserProfilePage: React.FC = () => {
       setEditMode(false);
     } catch (error) {
       console.error("Error saving profile:", error);
+      setError("Failed to save profile");
     }
   };
 
   useEffect(() => {
     const loadData = async () => {
+      if (authLoading || !authUser?.uid) return;
+
       try {
-        // You would typically get the user ID from your auth system
-        const userId = "user123"; // Replace with actual user ID from auth
-        const userData = await fetchUserData(userId);
+        const userData = await fetchUserData(authUser.uid);
         setUser(userData);
 
         // Set form data from Firestore
@@ -249,15 +260,16 @@ const UserProfilePage: React.FC = () => {
         }
       } catch (error) {
         console.error("Error loading user data:", error);
+        setError("Failed to load user data");
       } finally {
         setLoading(false);
       }
     };
 
     loadData();
-  }, []);
+  }, [authUser, authLoading]);
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
@@ -265,25 +277,38 @@ const UserProfilePage: React.FC = () => {
     );
   }
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <p className="text-gray-700">No user data available</p>
+        {error && <p className="text-red-500 mt-2">{error}</p>}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="bg-green shadow bg-transparent">
+      <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <h1 className="text-xl font-semibold text-gray-800">
-            WELCOME TO your Profile!!!
+            {user.name ? `${user.name}'s Profile` : "Your Profile"}
           </h1>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-md">
+            {error}
+          </div>
+        )}
+
         {/* Profile Card */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
           {/* Profile Header */}
-          <div className="bg-green-brand h-32 relative"></div>
+          <div className="bg-green-600 h-32 relative"></div>
 
           <div className="md:flex">
             {/* Profile Picture Section */}
@@ -327,7 +352,7 @@ const UserProfilePage: React.FC = () => {
                       onClick={() => setShowUploadModal(true)}
                       className="w-full px-4 py-2 mt-4 text-sm font-medium text-green-600 bg-white border border-green-600 rounded-md hover:bg-blue-50 transition-colors flex items-center justify-center"
                     >
-                      <FiEdit className="mr-2" />
+                      <FileEdit className="mr-2" />
                       {profilePicture ? "Change Photo" : "Add Photo"}
                     </button>
                   )}
@@ -420,6 +445,7 @@ const UserProfilePage: React.FC = () => {
                         onChange={handleInputChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         placeholder="Enter your full name"
+                        required
                       />
                     </div>
                   ) : (
@@ -427,9 +453,11 @@ const UserProfilePage: React.FC = () => {
                       <h1 className="text-2xl font-bold text-gray-900">
                         {user.name || "Your Name"}
                       </h1>
-                      <p className="text-blue-600 font-medium mt-1">
-                        {user.role || "Your Profession"}
-                      </p>
+                      {user.role && (
+                        <p className="text-blue-600 font-medium mt-1">
+                          {user.role}
+                        </p>
+                      )}
                     </>
                   )}
                 </div>
@@ -438,7 +466,7 @@ const UserProfilePage: React.FC = () => {
                     onClick={() => setEditMode(true)}
                     className="flex items-center text-green-600 hover:text-green-800 bg-blue-50 px-4 py-2 rounded-md transition-colors"
                   >
-                    <FiEdit className="mr-2" />
+                    <FileEdit className="mr-2" />
                     <span>Edit Profile</span>
                   </button>
                 )}
@@ -460,6 +488,7 @@ const UserProfilePage: React.FC = () => {
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     placeholder="your.email@example.com"
+                    required
                   />
                 </div>
               ) : null}
@@ -597,7 +626,6 @@ const UserProfilePage: React.FC = () => {
                   <button
                     onClick={() => {
                       setEditMode(false);
-                      // Reset form data to current user data
                       setFormData({
                         name: user.name,
                         email: user.email || "",
@@ -640,12 +668,19 @@ const UserProfilePage: React.FC = () => {
                 onClick={() => {
                   setShowUploadModal(false);
                   setSelectedFile(null);
+                  setError(null);
                 }}
                 className="text-gray-400 hover:text-gray-500"
               >
                 <FaTimes />
               </button>
             </div>
+
+            {error && (
+              <div className="mb-4 p-2 bg-red-100 text-red-700 rounded-md text-sm">
+                {error}
+              </div>
+            )}
 
             <div className="mb-6">
               {selectedFile ? (
@@ -693,6 +728,7 @@ const UserProfilePage: React.FC = () => {
                 onClick={() => {
                   setShowUploadModal(false);
                   setSelectedFile(null);
+                  setError(null);
                 }}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                 disabled={uploading}

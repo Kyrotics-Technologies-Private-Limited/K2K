@@ -1,102 +1,105 @@
 import React, { useState, useEffect, useRef } from "react";
 import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css"; // Ensure this CSS is loaded
+import "react-phone-input-2/lib/style.css";
 import { Button, TextField, Paper, Typography } from "@mui/material";
 import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
-  ConfirmationResult, // Type for the confirmation result object
-  Auth, // Type for the auth instance
+  ConfirmationResult,
+  Auth,
 } from "firebase/auth";
-import { auth } from "../firebase"; // Make sure this path points to your initialized Firebase auth instance
+import { auth } from "../firebase";
 
 const PhoneAuth: React.FC = () => {
+  // Added name state
+  const [name, setName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [otp, setOtp] = useState<string>("");
   const [confirmationResult, setConfirmationResult] =
     useState<ConfirmationResult | null>(null);
   const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
-  const recaptchaWrapperRef = useRef<HTMLDivElement>(null); // Ref for the container div
+  const recaptchaWrapperRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [cooldown, setCooldown] = useState<boolean>(false);
   const [cooldownTime, setCooldownTime] = useState<number>(0);
-  const [error, setError] = useState<string>(""); // Optional: State for displaying errors in UI
+  const [error, setError] = useState<string>("");
+  // Added verification success state
+  const [isVerified, setIsVerified] = useState<boolean>(false);
 
-  // --- Step 1: Initialize reCAPTCHA on Mount ---
   useEffect(() => {
-    // Ensure auth is loaded and the container div exists
     if (!auth || !recaptchaWrapperRef.current) {
       console.error(
         "Firebase auth not initialized or reCAPTCHA container not found"
       );
-      setError("Initialization failed. Please refresh."); // Set UI error
+      setError("Initialization failed. Please refresh.");
       return;
     }
 
-    // Initialize reCAPTCHA verifier only once
-    // Ensure previous instance is cleared if component remounts unexpectedly (though unlikely with [])
     if (recaptchaVerifierRef.current) {
       recaptchaVerifierRef.current.clear();
     }
 
     try {
-      // Use the ref to the div element
       recaptchaVerifierRef.current = new RecaptchaVerifier(
-        auth as Auth, // Cast auth to Auth type if needed by your setup
-        recaptchaWrapperRef.current, // Pass the DOM element ref directly
+        auth as Auth,
+        recaptchaWrapperRef.current,
         {
           size: "invisible",
-          callback: (response: any) => {
-            // reCAPTCHA solved, allow signInWithPhoneNumber.
-            // Usually automatically triggered for invisible reCAPTCHA on sign-in attempt.
+          callback: (response: string | null) => {
             console.log("reCAPTCHA verified", response);
           },
           "expired-callback": () => {
-            // Response expired. User needs to trigger action again (e.g., click Send OTP again).
-            // Firebase handles needing a new token internally when you call signInWithPhoneNumber again.
             console.log("reCAPTCHA expired. Please try sending OTP again.");
-            setError("reCAPTCHA expired. Please try sending OTP again."); // Set UI error
-            // No need to manually clear/re-initialize here typically.
+            setError("reCAPTCHA expired. Please try sending OTP again.");
           },
         }
       );
 
-      // Render the reCAPTCHA (necessary for invisible type)
       recaptchaVerifierRef.current
         .render()
         .then((widgetId: number) => {
           console.log("reCAPTCHA rendered with widget ID:", widgetId);
-          // You might store widgetId if you need to programmatically interact later, but often not needed.
         })
         .catch((err) => {
           console.error("reCAPTCHA render failed:", err);
-          setError("Could not render reCAPTCHA. Check configuration."); // Set UI error
+          setError("Could not render reCAPTCHA. Check configuration.");
         });
 
       console.log("reCAPTCHA initialized successfully");
-      setError(""); // Clear any previous init error
+      setError("");
     } catch (initError) {
       console.error("reCAPTCHA initialization failed:", initError);
-      setError("reCAPTCHA setup failed. Please refresh."); // Set UI error
+      setError("reCAPTCHA setup failed. Please refresh.");
     }
 
-    // Cleanup function to clear reCAPTCHA on component unmount
     return () => {
       if (recaptchaVerifierRef.current) {
         recaptchaVerifierRef.current.clear();
-        recaptchaVerifierRef.current = null; // Help garbage collection
+        recaptchaVerifierRef.current = null;
         console.log("reCAPTCHA cleared on unmount");
       }
     };
-  }, []); // Empty dependency array: Run only once on mount
+  }, []);
 
-  // --- Step 2: Send OTP ---
+  const validateName = (): boolean => {
+    if (!name.trim()) {
+      setError("Please enter your name");
+      return false;
+    }
+    return true;
+  };
+
   const sendOtp = async () => {
-    setError(""); // Clear previous errors
+    setError("");
+
+    // Validate name first
+    if (!validateName()) {
+      return;
+    }
+
     if (!recaptchaVerifierRef.current) {
       console.error("reCAPTCHA verifier not ready");
-      setError("reCAPTCHA not ready. Please wait or refresh."); // Set UI error
-      // alert("reCAPTCHA verifier not ready. Please try again shortly.");
+      setError("reCAPTCHA not ready. Please wait or refresh.");
       return;
     }
 
@@ -107,19 +110,15 @@ const PhoneAuth: React.FC = () => {
       return;
     }
 
-    // Check if phone number is valid (basic check)
     if (!phone || phone.trim().length < 10) {
-      // Basic length check
       console.error("Phone number is invalid:", phone);
-      setError("Please enter a valid phone number with country code."); // Set UI error
-      // alert("Please enter a valid phone number");
+      setError("Please enter a valid phone number with country code.");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Ensure phone number has '+' prefix for Firebase
       let formattedPhone = phone;
       if (!formattedPhone.startsWith("+")) {
         formattedPhone = "+" + formattedPhone;
@@ -127,48 +126,38 @@ const PhoneAuth: React.FC = () => {
 
       console.log("Sending OTP to:", formattedPhone);
 
-      // Pass the initialized RecaptchaVerifier instance
       const confirmation = await signInWithPhoneNumber(
-        auth as Auth, // Cast if needed
+        auth as Auth,
         formattedPhone,
-        recaptchaVerifierRef.current // Pass the verifier instance
+        recaptchaVerifierRef.current
       );
 
-      setConfirmationResult(confirmation); // Store confirmation result to use for verification
+      setConfirmationResult(confirmation);
       console.log("OTP sent successfully");
-      setOtp(""); // Clear any previous OTP input
-      startCooldown(); // Start cooldown timer after successful send
+      setOtp("");
+      startCooldown();
     } catch (error: any) {
-      // Catch specific Firebase errors if needed
       console.error("Error sending OTP:", error);
 
-      // Provide specific feedback based on error code
       let errorMessage = `Error sending OTP: ${error.message || String(error)}`;
       if (error.code === "auth/invalid-phone-number") {
         errorMessage =
           "Invalid phone number format. Please include the country code (e.g., +91).";
       } else if (error.code === "auth/too-many-requests") {
         errorMessage = "Too many requests. Please wait before trying again.";
-        startCooldown(120); // Longer cooldown for rate limits
+        startCooldown(120);
       } else if (error.message?.includes("reCAPTCHA")) {
-        // Handle potential reCAPTCHA errors explicitly if they occur
         errorMessage = "reCAPTCHA check failed. Please try again.";
       } else {
-        // Default cooldown for other errors
         startCooldown(30);
       }
 
-      setError(errorMessage); // Set UI error
-      // alert(errorMessage); // Or use alert
-
-      // No need to manually reset reCAPTCHA here in most cases.
-      // If user tries again, signInWithPhoneNumber will re-trigger reCAPTCHA if needed.
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // --- Cooldown Timer Logic ---
   const startCooldown = (seconds = 60) => {
     setCooldown(true);
     setCooldownTime(seconds);
@@ -185,7 +174,6 @@ const PhoneAuth: React.FC = () => {
     }, 1000);
   };
 
-  // --- Step 3: Verify OTP ---
   const verifyOtp = async () => {
     setError("");
     if (!confirmationResult) {
@@ -203,14 +191,16 @@ const PhoneAuth: React.FC = () => {
     try {
       const result = await confirmationResult.confirm(otp);
       console.log("Phone number verified! User:", result.user);
-      alert("Phone verified successfully!");
+      setIsVerified(true); // Set verification success state
 
-      // TODO: Handle success
-      // You can redirect, set user in context, etc. here
+      // You can add additional user data to Firebase here if needed
+      // For example, updating the user's display name with the provided name
+      // await updateProfile(result.user, { displayName: name });
+
+      console.log(`User ${name} verified successfully with phone ${phone}`);
     } catch (error: any) {
       console.error("OTP verification failed:", error);
 
-      // Custom logic starts here
       let errorMessage = "OTP verification failed. Please try again.";
       if (error.code === "auth/invalid-verification-code") {
         errorMessage = "Invalid OTP. Please enter the correct 6-digit code.";
@@ -231,7 +221,16 @@ const PhoneAuth: React.FC = () => {
     }
   };
 
-  // --- Render Component ---
+  // Reset form function
+  const resetForm = () => {
+    setName("");
+    setPhone("");
+    setOtp("");
+    setConfirmationResult(null);
+    setIsVerified(false);
+    setError("");
+  };
+
   return (
     <Paper elevation={3} className="p-6 sm:p-10 max-w-md w-full">
       <Typography
@@ -256,10 +255,9 @@ const PhoneAuth: React.FC = () => {
           },
         }}
       >
-        Enter Your Phone Number
+        {isVerified ? "Verification Complete" : "Enter Your Details"}
       </Typography>
 
-      {/* Display Errors */}
       {error && (
         <Typography
           color="error"
@@ -270,9 +268,39 @@ const PhoneAuth: React.FC = () => {
         </Typography>
       )}
 
-      {!confirmationResult ? (
-        // Stage 1: Enter Phone Number
+      {isVerified ? (
+        // Success screen after verification
         <>
+          <Typography align="center" sx={{ mb: 3 }}>
+            Thank you, {name}! Your phone number has been verified successfully.
+          </Typography>
+          <Button
+            onClick={resetForm}
+            fullWidth
+            variant="contained"
+            sx={{ height: "48px", bgcolor: "green" }}
+          >
+            Start Over
+          </Button>
+        </>
+      ) : !confirmationResult ? (
+        // Stage 1: Enter Name and Phone Number
+        <>
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Your Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            margin="normal"
+            disabled={isLoading}
+            autoFocus
+            sx={{ mb: 3 }}
+            inputProps={{
+              maxLength: 50,
+            }}
+          />
+
           <PhoneInput
             country={"in"}
             value={phone}
@@ -285,11 +313,6 @@ const PhoneAuth: React.FC = () => {
               border: "1px solid #ced4da",
               transition: "border-color 0.3s ease, box-shadow 0.3s ease",
               paddingLeft: "60px",
-              "&:focus": {
-                borderColor: "#1976d2",
-                boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.2)",
-                outline: "none",
-              },
             }}
             buttonStyle={{
               backgroundColor: "#f8f9fa",
@@ -297,9 +320,6 @@ const PhoneAuth: React.FC = () => {
               borderRadius: "8px 0 0 8px",
               borderRight: "none",
               padding: "0 10px 0 15px",
-              "&:hover": {
-                backgroundColor: "#e9ecef",
-              },
             }}
             dropdownStyle={{
               borderRadius: "8px",
@@ -310,7 +330,6 @@ const PhoneAuth: React.FC = () => {
               name: "phone",
               id: "phone-input",
               required: true,
-              autoFocus: true,
               disabled: isLoading,
               "aria-label": "Phone number input",
               "aria-required": "true",
@@ -327,8 +346,8 @@ const PhoneAuth: React.FC = () => {
             onClick={sendOtp}
             fullWidth
             variant="contained"
-            disabled={!phone || isLoading || cooldown} // Disable conditions
-            sx={{ marginTop: "8px", height: "48px", bgcolor: "green" }} // Consistent button height
+            disabled={!name || !phone || isLoading || cooldown}
+            sx={{ marginTop: "8px", height: "48px", bgcolor: "green" }}
           >
             {isLoading
               ? "Sending..."
@@ -340,8 +359,11 @@ const PhoneAuth: React.FC = () => {
       ) : (
         // Stage 2: Enter OTP
         <>
+          <Typography align="center" sx={{ mb: 1 }}>
+            Hi {name},
+          </Typography>
           <Typography align="center" sx={{ mb: 2 }}>
-            Enter the OTP sent to +{phone} {/* Show formatted number */}
+            Enter the OTP sent to +{phone}
           </Typography>
           <TextField
             fullWidth
@@ -352,11 +374,11 @@ const PhoneAuth: React.FC = () => {
             inputProps={{
               inputMode: "numeric",
               pattern: "[0-9]*",
-              maxLength: 6, // Enforce 6 digits
-              autoComplete: "one-time-code", // Helps browsers/OS autofill OTP
+              maxLength: 6,
+              autoComplete: "one-time-code",
             }}
-            disabled={isLoading} // Disable while loading
-            autoFocus // Focus on OTP field when it appears
+            disabled={isLoading}
+            autoFocus
           />
 
           <Button
@@ -364,7 +386,7 @@ const PhoneAuth: React.FC = () => {
             fullWidth
             variant="contained"
             onClick={verifyOtp}
-            disabled={!otp || otp.length !== 6 || isLoading} // Disable conditions
+            disabled={!otp || otp.length !== 6 || isLoading}
           >
             {isLoading ? "Verifying..." : "Verify OTP"}
           </Button>
@@ -372,21 +394,19 @@ const PhoneAuth: React.FC = () => {
           <Button
             sx={{ marginTop: "8px" }}
             fullWidth
-            variant="text" // Less prominent button for changing number
+            variant="text"
             onClick={() => {
-              setConfirmationResult(null); // Go back to phone input stage
+              setConfirmationResult(null);
               setOtp("");
-              setError(""); // Clear errors when going back
+              setError("");
             }}
             disabled={isLoading}
           >
-            Change Phone Number
+            Change Details
           </Button>
         </>
       )}
 
-      {/* Invisible reCAPTCHA container - MUST be in the DOM */}
-      {/* Assign the ref here */}
       <div
         ref={recaptchaWrapperRef}
         id="recaptcha-container-wrapper"

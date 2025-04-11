@@ -7,6 +7,7 @@ import PhoneAuth from "../components/PhoneAuth"; // ✅ make sure the path is co
 
 interface NavbarProps {
   onCartClick: () => void;
+  onClose: () => void;
   className?: string;
 }
 
@@ -264,7 +265,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
           onClick={(e) => {
             if (
               dropdownRef.current &&
-              !dropdownRef.current.contains(e.target)
+              !dropdownRef.current.contains(e.target as Node)
             ) {
               setUserDropdownOpen(false);
             }
@@ -290,7 +291,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
             {/* PhoneAuth Component */}
             <div className="w-full ">
-              <PhoneAuth onClose={() => setUserDropdownOpen(false)} />
+              <PhoneAuth  />
             </div>
           </div>
         </div>
