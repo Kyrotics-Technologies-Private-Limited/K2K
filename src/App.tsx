@@ -24,7 +24,7 @@ import Traceability from "./pages/Traceability";
 import ForgotPasswordPage from "./pages/ForgotPassword";
 import ResetPasswordPage from "./pages/ResetPassword";
 import UserProfilePage from "./pages/ProfilePage";
-import PhoneAuth from "./components/PhoneAuth";
+//import PhoneAuth from "./components/PhoneAuth";
 // import ProductPage from "./pages/admin/ProductPage";
 
 function App() {
@@ -44,17 +44,16 @@ function App() {
             <Route path="/kishanParivarPage" element={<KishanParivarPage />} />
             <Route path="/register" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/our-story" element={<OurStory />} />
-            <Route path="/traceability" element={<Traceability />} />
-            <Route path="/privacypolicy" element={<PrivacyPolicy />} />
-            <Route path="/termsofservice" element={<TermsOfService />} />
-            <Route path="/shipping" element={<ShippingPolicy />} />
-            <Route path="/refund" element={<RefundPolicy />} />
-            <Route path="/profile" element={<UserProfilePage />} />
-            <Route path="/phone" element={<PhoneAuth />}></Route>
-
+            <Route path='/forgot-password' element={<ForgotPasswordPage/>}/>
+            <Route path='/reset-password' element={<ResetPasswordPage/>}/>
+            <Route path='/our-story' element={<OurStory/>}/>
+            <Route path='/traceability' element={<Traceability/>}/>
+            <Route path='/privacypolicy' element={<PrivacyPolicy/>}/>
+            <Route path='/termsofservice' element={<TermsOfService/>}/>
+            <Route path='/shipping' element={<ShippingPolicy/>}/>
+            <Route path='/refund' element={<RefundPolicy/>}/>
+            <Route path='/profile' element={<UserProfilePage/>}/>
+           
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<OverviewPage />} />

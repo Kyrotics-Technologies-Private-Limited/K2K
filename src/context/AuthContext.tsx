@@ -51,66 +51,97 @@ import {
   onAuthStateChanged,
   sendPasswordResetEmail,
   confirmPasswordReset,
+  User as FirebaseUser,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../firebase";
 
 interface User {
   email: string;
   uid: string;
+  displayName?: string;
+  photoURL?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  register: (email: string, password: string) => Promise<void>;
+  error: string | null;
+  register: (
+    email: string,
+    password: string,
+    displayName?: string
+  ) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (oobCode: string, newPassword: string) => Promise<void>;
+  updateUserProfile: (updates: {
+    displayName?: string;
+    photoURL?: string;
+  }) => Promise<void>;
 }
 
-// Initialize with default values to avoid the "must be used within an AuthProvider" error
-const defaultContext: AuthContextType = {
-  user: null,
-  loading: true,
-  register: async () => {},
-  login: async () => {},
-  logout: async () => {},
-  forgotPassword: async () => {},
-  resetPassword: async () => {},
-};
-
-const AuthContext = createContext<AuthContextType>(defaultContext);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+  const handleAuthStateChange = async (firebaseUser: FirebaseUser | null) => {
+    try {
       if (firebaseUser) {
         setUser({
           email: firebaseUser.email || "",
           uid: firebaseUser.uid,
+          displayName: firebaseUser.displayName || undefined,
+          photoURL: firebaseUser.photoURL || undefined,
         });
       } else {
         setUser(null);
       }
+    } catch (err) {
+      setError("Failed to process authentication state");
+      console.error("Auth state change error:", err);
+    } finally {
       setLoading(false);
-    });
+    }
+  };
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, handleAuthStateChange);
     return unsubscribe;
   }, []);
 
-  const register = async (email: string, password: string) => {
+  const register = async (
+    email: string,
+    password: string,
+    displayName?: string
+  ) => {
     try {
       setLoading(true);
-      await createUserWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      console.error("Registration error:", error);
+      setError(null);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      if (displayName) {
+        await updateProfile(userCredential.user, { displayName });
+        setUser((prev) => (prev ? { ...prev, displayName } : null));
+      }
+
+      // You might want to create a user document in Firestore here
+      // await createUserDocument(userCredential.user);
+
+      navigate("/dashboard");
+    } catch (error: any) {
+      setError(error.message || "Registration failed");
       throw error;
     } finally {
       setLoading(false);
@@ -120,9 +151,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
+      setError(null);
       await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      console.error("Login error:", error);
+      navigate("/dashboard");
+    } catch (error: any) {
+      setError(error.message || "Login failed");
       throw error;
     } finally {
       setLoading(false);
@@ -132,9 +165,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const logout = async () => {
     try {
       setLoading(true);
+      setError(null);
       await signOut(auth);
-    } catch (error) {
-      console.error("Logout error:", error);
+      navigate("/login");
+    } catch (error: any) {
+      setError(error.message || "Logout failed");
       throw error;
     } finally {
       setLoading(false);
@@ -144,11 +179,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const forgotPassword = async (email: string) => {
     try {
       setLoading(true);
+      setError(null);
       await sendPasswordResetEmail(auth, email);
-      // You might want to navigate to a confirmation page or show a success message
-      navigate("/login");
-    } catch (error) {
-      console.error("Forgot password error:", error);
+      navigate("/password-reset-sent");
+    } catch (error: any) {
+      setError(error.message || "Password reset failed");
       throw error;
     } finally {
       setLoading(false);
@@ -158,11 +193,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const resetPassword = async (oobCode: string, newPassword: string) => {
     try {
       setLoading(true);
+      setError(null);
       await confirmPasswordReset(auth, oobCode, newPassword);
-      // Password reset successful, you can navigate to login or show success message
-      navigate("/login");
-    } catch (error) {
-      console.error("Reset password error:", error);
+      navigate("/login?reset=success");
+    } catch (error: any) {
+      setError(error.message || "Password reset failed");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateUserProfile = async (updates: {
+    displayName?: string;
+    photoURL?: string;
+  }) => {
+    try {
+      if (!auth.currentUser) throw new Error("No authenticated user");
+
+      setLoading(true);
+      setError(null);
+      await updateProfile(auth.currentUser, updates);
+
+      setUser((prev) => (prev ? { ...prev, ...updates } : null));
+    } catch (error: any) {
+      setError(error.message || "Profile update failed");
       throw error;
     } finally {
       setLoading(false);
@@ -172,11 +227,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const contextValue: AuthContextType = {
     user,
     loading,
+    error,
     register,
     login,
     logout,
     forgotPassword,
     resetPassword,
+    updateUserProfile,
   };
 
   return (
@@ -186,7 +243,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
