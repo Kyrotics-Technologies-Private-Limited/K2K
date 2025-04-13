@@ -8,32 +8,26 @@ import {
   ConfirmationResult,
   Auth,
 } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase"; // Make sure this is correctly configured
+import { doc, setDoc } from "firebase/firestore";
 
 const PhoneAuth: React.FC = () => {
-  // Added name state
-  const [name, setName] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
-  const [otp, setOtp] = useState<string>("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
   const [confirmationResult, setConfirmationResult] =
     useState<ConfirmationResult | null>(null);
   const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
   const recaptchaWrapperRef = useRef<HTMLDivElement>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [cooldown, setCooldown] = useState<boolean>(false);
-  const [cooldownTime, setCooldownTime] = useState<number>(0);
-  const [error, setError] = useState<string>("");
-  // Added verification success state
-  const [isVerified, setIsVerified] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [cooldown, setCooldown] = useState(false);
+  const [cooldownTime, setCooldownTime] = useState(0);
+  const [error, setError] = useState("");
+  const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
-    if (!auth || !recaptchaWrapperRef.current) {
-      console.error(
-        "Firebase auth not initialized or reCAPTCHA container not found"
-      );
-      setError("Initialization failed. Please refresh.");
-      return;
-    }
+    if (!auth || !recaptchaWrapperRef.current) return;
 
     if (recaptchaVerifierRef.current) {
       recaptchaVerifierRef.current.clear();
@@ -45,45 +39,33 @@ const PhoneAuth: React.FC = () => {
         recaptchaWrapperRef.current,
         {
           size: "invisible",
-          callback: (response: string | null) => {
-            console.log("reCAPTCHA verified", response);
-          },
+          callback: () => {},
           "expired-callback": () => {
-            console.log("reCAPTCHA expired. Please try sending OTP again.");
-            setError("reCAPTCHA expired. Please try sending OTP again.");
+            setError("reCAPTCHA expired. Please try again.");
           },
         }
       );
-
-      recaptchaVerifierRef.current
-        .render()
-        .then((widgetId: number) => {
-          console.log("reCAPTCHA rendered with widget ID:", widgetId);
-        })
-        .catch((err) => {
-          console.error("reCAPTCHA render failed:", err);
-          setError("Could not render reCAPTCHA. Check configuration.");
-        });
-
-      console.log("reCAPTCHA initialized successfully");
-      setError("");
-    } catch (initError) {
-      console.error("reCAPTCHA initialization failed:", initError);
-      setError("reCAPTCHA setup failed. Please refresh.");
+      recaptchaVerifierRef.current.render();
+    } catch (err) {
+      console.error("reCAPTCHA init failed:", err);
+      setError("reCAPTCHA initialization failed. Please refresh the page.");
     }
 
     return () => {
       if (recaptchaVerifierRef.current) {
         recaptchaVerifierRef.current.clear();
         recaptchaVerifierRef.current = null;
-        console.log("reCAPTCHA cleared on unmount");
       }
     };
   }, []);
 
-  const validateName = (): boolean => {
-    if (!name.trim()) {
-      setError("Please enter your name");
+  const validateEmail = () => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      setError("Please enter your email");
+      return false;
+    } else if (!regex.test(email)) {
+      setError("Invalid email address");
       return false;
     }
     return true;
@@ -92,67 +74,102 @@ const PhoneAuth: React.FC = () => {
   const sendOtp = async () => {
     setError("");
 
-    // Validate name first
-    if (!validateName()) {
+    if (!name.trim()) {
+      setError("Please enter your name");
       return;
     }
+
+    if (!validateEmail()) return;
 
     if (!recaptchaVerifierRef.current) {
-      console.error("reCAPTCHA verifier not ready");
-      setError("reCAPTCHA not ready. Please wait or refresh.");
+      setError("reCAPTCHA not ready. Please refresh.");
       return;
     }
 
-    if (cooldown) {
-      alert(
-        `Please wait ${cooldownTime} seconds before requesting another OTP`
-      );
-      return;
-    }
+    if (cooldown) return;
 
     if (!phone || phone.trim().length < 10) {
-      console.error("Phone number is invalid:", phone);
-      setError("Please enter a valid phone number with country code.");
+      setError("Please enter a valid phone number");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      let formattedPhone = phone;
-      if (!formattedPhone.startsWith("+")) {
-        formattedPhone = "+" + formattedPhone;
-      }
-
-      console.log("Sending OTP to:", formattedPhone);
-
+      const fullPhone = phone.startsWith("+") ? phone : `+${phone}`;
       const confirmation = await signInWithPhoneNumber(
-        auth as Auth,
-        formattedPhone,
+        auth,
+        fullPhone,
         recaptchaVerifierRef.current
       );
-
       setConfirmationResult(confirmation);
-      console.log("OTP sent successfully");
-      setOtp("");
       startCooldown();
-    } catch (error: any) {
-      console.error("Error sending OTP:", error);
-
-      let errorMessage = `Error sending OTP: ${error.message || String(error)}`;
-      if (error.code === "auth/invalid-phone-number") {
-        errorMessage =
-          "Invalid phone number format. Please include the country code (e.g., +91).";
-      } else if (error.code === "auth/too-many-requests") {
-        errorMessage = "Too many requests. Please wait before trying again.";
+    } catch (err: any) {
+      let msg = "Error sending OTP";
+      if (err.code === "auth/invalid-phone-number") {
+        msg = "Invalid phone number format.";
+      } else if (err.code === "auth/too-many-requests") {
+        msg = "Too many requests. Please wait before retrying.";
         startCooldown(120);
-      } else if (error.message?.includes("reCAPTCHA")) {
-        errorMessage = "reCAPTCHA check failed. Please try again.";
+      } else if (err.message?.includes("reCAPTCHA")) {
+        msg = "reCAPTCHA check failed. Please refresh the page.";
+        setError(msg); // Update error message
+        recaptchaVerifierRef.current?.clear(); // Reset reCAPTCHA
+        recaptchaVerifierRef.current?.render(); // Re-render reCAPTCHA
       } else {
         startCooldown(30);
       }
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-      setError(errorMessage);
+  const verifyOtp = async () => {
+    setError("");
+
+    if (!confirmationResult) {
+      setError("Request OTP first.");
+      return;
+    }
+
+    if (!otp || otp.trim().length !== 6) {
+      setError("Please enter 6-digit OTP");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const result = await confirmationResult.confirm(otp);
+      const user = result.user;
+
+      const fullPhone = phone.startsWith("+") ? phone : `+${phone}`;
+      await setDoc(
+        doc(db, "users", fullPhone),
+        {
+          name,
+          email,
+          phone: fullPhone,
+          uid: user.uid,
+          verifiedAt: new Date(),
+        },
+        { merge: true }
+      );
+
+      setIsVerified(true);
+    } catch (err: any) {
+      let msg = "Verification failed";
+      if (err.code === "auth/invalid-verification-code") {
+        msg = "Invalid OTP code";
+      } else if (err.code === "auth/code-expired") {
+        msg = "OTP expired. Request a new one.";
+        setConfirmationResult(null);
+      } else if (err.code === "auth/too-many-requests") {
+        msg = "Too many attempts. Try again later.";
+        startCooldown(120);
+      }
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -161,69 +178,21 @@ const PhoneAuth: React.FC = () => {
   const startCooldown = (seconds = 60) => {
     setCooldown(true);
     setCooldownTime(seconds);
-
-    const intervalId = setInterval(() => {
-      setCooldownTime((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(intervalId);
+    const interval = setInterval(() => {
+      setCooldownTime((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
           setCooldown(false);
           return 0;
         }
-        return prevTime - 1;
+        return prev - 1;
       });
     }, 1000);
   };
 
-  const verifyOtp = async () => {
-    setError("");
-    if (!confirmationResult) {
-      setError("Please request an OTP first.");
-      return;
-    }
-
-    if (!otp || otp.trim().length !== 6) {
-      setError("Please enter the 6-digit OTP.");
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const result = await confirmationResult.confirm(otp);
-      console.log("Phone number verified! User:", result.user);
-      setIsVerified(true); // Set verification success state
-
-      // You can add additional user data to Firebase here if needed
-      // For example, updating the user's display name with the provided name
-      // await updateProfile(result.user, { displayName: name });
-
-      console.log(`User ${name} verified successfully with phone ${phone}`);
-    } catch (error: any) {
-      console.error("OTP verification failed:", error);
-
-      let errorMessage = "OTP verification failed. Please try again.";
-      if (error.code === "auth/invalid-verification-code") {
-        errorMessage = "Invalid OTP. Please enter the correct 6-digit code.";
-      } else if (error.code === "auth/code-expired") {
-        errorMessage = "OTP expired. Please request a new one.";
-        setConfirmationResult(null);
-        setOtp("");
-      } else if (error.code === "auth/missing-verification-code") {
-        errorMessage = "Verification code missing. Try again.";
-      } else if (error.code === "auth/too-many-requests") {
-        errorMessage = "Too many attempts. Please try again later.";
-        startCooldown(120);
-      }
-
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Reset form function
   const resetForm = () => {
     setName("");
+    setEmail("");
     setPhone("");
     setOtp("");
     setConfirmationResult(null);
@@ -235,44 +204,22 @@ const PhoneAuth: React.FC = () => {
     <Paper elevation={3} className="p-6 sm:p-10 max-w-md w-full">
       <Typography
         variant="h4"
-        component="h1"
-        gutterBottom
         align="center"
-        sx={{
-          fontWeight: 600,
-          letterSpacing: 0.3,
-          color: "green",
-          mb: 3,
-          position: "relative",
-          "&:after": {
-            content: '""',
-            display: "block",
-            width: "40px",
-            height: "2px",
-            backgroundColor: "primary.main",
-            margin: "16px auto 0",
-            borderRadius: "2px",
-          },
-        }}
+        sx={{ fontWeight: 600, color: "green", mb: 3 }}
       >
-        {isVerified ? "Verification Complete" : "Enter Your Details"}
+        {isVerified ? "Verification Complete" : "Phone Verification"}
       </Typography>
 
       {error && (
-        <Typography
-          color="error"
-          align="center"
-          style={{ marginBottom: "1rem" }}
-        >
+        <Typography color="error" align="center" sx={{ mb: 2 }}>
           {error}
         </Typography>
       )}
 
       {isVerified ? (
-        // Success screen after verification
         <>
           <Typography align="center" sx={{ mb: 3 }}>
-            Thank you, {name}! Your phone number has been verified successfully.
+            Thank you, {name}! Your phone number has been verified.
           </Typography>
           <Button
             onClick={resetForm}
@@ -284,23 +231,23 @@ const PhoneAuth: React.FC = () => {
           </Button>
         </>
       ) : !confirmationResult ? (
-        // Stage 1: Enter Name and Phone Number
         <>
           <TextField
             fullWidth
-            variant="outlined"
-            label="Your Name"
+            label="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             margin="normal"
             disabled={isLoading}
-            autoFocus
-            sx={{ mb: 3 }}
-            inputProps={{
-              maxLength: 50,
-            }}
           />
-
+          <TextField
+            fullWidth
+            label="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            margin="normal"
+            disabled={isLoading}
+          />
           <PhoneInput
             country={"in"}
             value={phone}
@@ -310,44 +257,26 @@ const PhoneAuth: React.FC = () => {
               height: "56px",
               fontSize: "16px",
               borderRadius: "8px",
-              border: "1px solid #ced4da",
-              transition: "border-color 0.3s ease, box-shadow 0.3s ease",
+              border: "1px solid #ccc",
               paddingLeft: "60px",
             }}
             buttonStyle={{
-              backgroundColor: "#f8f9fa",
-              border: "1px solid #ced4da",
               borderRadius: "8px 0 0 8px",
-              borderRight: "none",
-              padding: "0 10px 0 15px",
+              border: "1px solid #ccc",
             }}
-            dropdownStyle={{
-              borderRadius: "8px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-              border: "1px solid #e0e0e0",
-            }}
+            containerStyle={{ marginBottom: "16px" }}
             inputProps={{
               name: "phone",
-              id: "phone-input",
               required: true,
               disabled: isLoading,
-              "aria-label": "Phone number input",
-              "aria-required": "true",
             }}
-            containerStyle={{
-              marginBottom: "24px",
-              fontFamily: "'Roboto', sans-serif",
-            }}
-            dropdownClass="phone-input-dropdown"
-            searchClass="phone-input-search"
           />
-
           <Button
             onClick={sendOtp}
             fullWidth
             variant="contained"
-            disabled={!name || !phone || isLoading || cooldown}
-            sx={{ marginTop: "8px", height: "48px", bgcolor: "green" }}
+            disabled={!name || !email || !phone || isLoading || cooldown}
+            sx={{ mt: 2, height: "48px", bgcolor: "green" }}
           >
             {isLoading
               ? "Sending..."
@@ -357,49 +286,36 @@ const PhoneAuth: React.FC = () => {
           </Button>
         </>
       ) : (
-        // Stage 2: Enter OTP
         <>
           <Typography align="center" sx={{ mb: 1 }}>
-            Hi {name},
-          </Typography>
-          <Typography align="center" sx={{ mb: 2 }}>
-            Enter the OTP sent to +{phone}
+            Enter OTP sent to +{phone}
           </Typography>
           <TextField
             fullWidth
-            variant="outlined"
-            label="Enter 6-Digit OTP"
+            label="6-digit OTP"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
-            inputProps={{
-              inputMode: "numeric",
-              pattern: "[0-9]*",
-              maxLength: 6,
-              autoComplete: "one-time-code",
-            }}
+            inputProps={{ maxLength: 6 }}
             disabled={isLoading}
-            autoFocus
           />
-
           <Button
-            sx={{ marginTop: "16px", height: "48px" }}
+            onClick={verifyOtp}
             fullWidth
             variant="contained"
-            onClick={verifyOtp}
             disabled={!otp || otp.length !== 6 || isLoading}
+            sx={{ mt: 2, height: "48px", bgcolor: "green" }}
           >
             {isLoading ? "Verifying..." : "Verify OTP"}
           </Button>
-
           <Button
-            sx={{ marginTop: "8px" }}
-            fullWidth
-            variant="text"
             onClick={() => {
               setConfirmationResult(null);
               setOtp("");
               setError("");
             }}
+            fullWidth
+            variant="text"
+            sx={{ mt: 1 }}
             disabled={isLoading}
           >
             Change Details
@@ -407,11 +323,7 @@ const PhoneAuth: React.FC = () => {
         </>
       )}
 
-      <div
-        ref={recaptchaWrapperRef}
-        id="recaptcha-container-wrapper"
-        style={{ marginTop: "1rem" }}
-      ></div>
+      <div ref={recaptchaWrapperRef} style={{ marginTop: "1rem" }} />
     </Paper>
   );
 };
