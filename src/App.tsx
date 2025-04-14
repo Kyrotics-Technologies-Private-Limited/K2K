@@ -24,6 +24,8 @@ import Traceability from "./pages/Traceability";
 import ForgotPasswordPage from "./pages/ForgotPassword";
 import ResetPasswordPage from "./pages/ResetPassword";
 import UserProfilePage from "./pages/ProfilePage";
+import OrdersPage from "./pages/OrdersPage";
+import OrderDetailPage from "./pages/OrderDetailPage";
 //import PhoneAuth from "./components/PhoneAuth";
 // import ProductPage from "./pages/admin/ProductPage";
 
@@ -46,6 +48,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path='/forgot-password' element={<ForgotPasswordPage/>}/>
             <Route path='/reset-password' element={<ResetPasswordPage/>}/>
+            <Route path="/orders" element={<OrdersPage/>}/>
+            <Route path="/orders/:id" element={<OrderDetailPage/>}/>
             <Route path='/our-story' element={<OurStory/>}/>
             <Route path='/traceability' element={<Traceability/>}/>
             <Route path='/privacypolicy' element={<PrivacyPolicy/>}/>

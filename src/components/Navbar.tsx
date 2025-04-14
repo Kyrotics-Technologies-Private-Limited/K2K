@@ -5,8 +5,12 @@ import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import PhoneAuth from "../components/PhoneAuth";
 
+interface NavbarProps {
+  onCartClick?: () => void;
+}
 
-const Navbar: React.FC = () => {
+
+const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { state } = useCart();
@@ -125,7 +129,7 @@ const Navbar: React.FC = () => {
             )}
 
             <button
-              onClick={() => handleNavigation("/cart")}
+              onClick={onCartClick}
               className="relative p-2"
             >
               <ShoppingCart className="text-gray-700 w-6 h-6" />

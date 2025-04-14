@@ -2,7 +2,7 @@
 import { getAuth, User } from 'firebase/auth';
 
 // API base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5566';
 
 // Cart related interfaces
 interface CartItem {
@@ -109,7 +109,7 @@ const cartApi = {
    * @returns Promise with cart data and items
    */
   getCart: (): Promise<CartResponse> => 
-    authFetch<CartResponse>('/api/cart'),
+    authFetch<CartResponse>('/api/carts'),
   
   /**
    * Add an item to the cart
@@ -119,7 +119,7 @@ const cartApi = {
    * @returns Promise with the added cart item
    */
   addItem: (productId: string, variantId: string | null = null, quantity: number = 1): Promise<CartItem> => 
-    authFetch<CartItem>('/api/cart/items', {
+    authFetch<CartItem>('/api/carts/items', {
       method: 'POST',
       body: JSON.stringify({
         product_id: productId,
@@ -135,7 +135,7 @@ const cartApi = {
    * @returns Promise with the updated cart item or removal confirmation
    */
   updateItem: (itemId: string, quantity: number): Promise<CartItem | { message: string }> => 
-    authFetch<CartItem | { message: string }>(`/api/cart/items/${itemId}`, {
+    authFetch<CartItem | { message: string }>(`/api/carts/items/${itemId}`, {
       method: 'PUT',
       body: JSON.stringify({ quantity } as UpdateItemRequest)
     }),
@@ -146,7 +146,7 @@ const cartApi = {
    * @returns Promise with removal confirmation
    */
   removeItem: (itemId: string): Promise<{ message: string }> => 
-    authFetch<{ message: string }>(`/api/cart/items/${itemId}`, {
+    authFetch<{ message: string }>(`/api/carts/items/${itemId}`, {
       method: 'DELETE'
     }),
   
@@ -155,7 +155,7 @@ const cartApi = {
    * @returns Promise with confirmation message
    */
   clearCart: (): Promise<{ message: string }> => 
-    authFetch<{ message: string }>('/api/cart/items', {
+    authFetch<{ message: string }>('/api/carts/items', {
       method: 'DELETE'
     }),
   
@@ -164,7 +164,7 @@ const cartApi = {
    * @returns Promise with cart summary including subtotal, tax, and total
    */
   getCartSummary: (): Promise<CartSummary> => 
-    authFetch<CartSummary>('/api/cart/summary')
+    authFetch<CartSummary>('/api/carts/summary')
 };
 
 export default cartApi;
