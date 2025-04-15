@@ -120,14 +120,13 @@ const Login = () => {
 
 export default Login;*/
 
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth } from "../../services/firebase/firebase"; // Adjust the path as necessary
 import axios from "axios";
 
 const Login: React.FC = () => {
@@ -313,4 +312,3 @@ const Login: React.FC = () => {
 };
 
 export default Login;
-

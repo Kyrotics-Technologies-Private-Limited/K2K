@@ -1,6 +1,6 @@
 // src/services/auth.service.ts
-import { User } from "../types/user";
-import api from "./api";
+import { User } from "../../types/user";
+import api from "../api/api";
 import {
   getAuth,
   RecaptchaVerifier,

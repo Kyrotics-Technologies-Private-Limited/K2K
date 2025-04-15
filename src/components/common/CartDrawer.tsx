@@ -156,6 +156,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
+<<<<<<< HEAD:src/components/CartDrawer.tsx
+=======
+import { useCart } from '../../context/CartContext';
+>>>>>>> 84ce2956d5e340402464e9620f7819e7aa4046cb:src/components/common/CartDrawer.tsx
 import { useNavigate } from 'react-router-dom';
 import cartApi, { CartItem, Cart, CartSummary } from '../services/cartApi';
 

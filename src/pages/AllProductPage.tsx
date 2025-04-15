@@ -94,8 +94,8 @@
 //           </p>
 //           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
 //             {healthIssues.map((issue, index) => (
-//               <div 
-//                 key={index} 
+//               <div
+//                 key={index}
 //                 className="group relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-500 cursor-pointer"
 //               >
 //                 {/* Background Image with Overlay */}
@@ -126,7 +126,7 @@
 
 //       {/* Banner Section */}
 //       <div className="max-w-7xl mx-auto px-4">
-//         <div 
+//         <div
 //           className="relative rounded-xl shadow-lg p-8 my-4 bg-cover bg-center h-[300px]"
 //           style={{
 //             backgroundImage: 'url("/assets/bannerimg/banner.jpg")',
@@ -142,7 +142,7 @@
 //           </div>
 //         </div>
 //       </div>
-      
+
 //       {/* Natural Solutions Section */}
 //       <div className="max-w-7xl mx-auto px-4">
 //         <ProductGrid products={sampleProducts} />
@@ -150,14 +150,14 @@
 
 //       {/* Bottom Banner Section */}
 //       <div className="max-w-7xl mx-auto px-4">
-//         <div 
+//         <div
 //           className="relative rounded-xl shadow-lg p-8 my-4 bg-cover bg-center h-[300px]"
 //           style={{
 //             backgroundImage: 'url("/assets/honeyimg/honey.jpeg")',
 //           }}
 //         >
 //           <div className="absolute inset-0  rounded-xl"></div>
-          
+
 //         </div>
 //       </div>
 //       <div className=" py-4">
@@ -168,8 +168,6 @@
 // }
 
 // export default AllProductPage;
-
-
 
 import React, { useEffect, useState } from "react";
 import { ProductGrid } from "../components/products/ProductGrid";
@@ -186,12 +184,11 @@ import {
   Moon,
   Shield,
 } from "lucide-react";
-import RecognizedBy from "../components/RecognizedBy";
-import { productApi } from "../services/api";
+import RecognizedBy from "../components/homePageComponents/RecognizedBy";
+import { productApi } from '../services/api/api'
 import { Product } from "../types";
 
 const AllProductPage = () => {
-
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -456,7 +453,9 @@ const AllProductPage = () => {
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-4">
-        {loading ? (<ProductGrid products={products} />) : error ?  (
+        {loading ? (
+          <ProductGrid products={products} />
+        ) : error ? (
           <div className="text-center py-12">
             <p className="text-red-600">{error}</p>
             <button

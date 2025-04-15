@@ -54,7 +54,7 @@ import {
   User as FirebaseUser,
   updateProfile,
 } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth } from "../services/firebase/firebase";
 
 interface User {
   email: string;

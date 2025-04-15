@@ -1,13 +1,17 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 import { Menu, X, ShoppingCart, Search, ChevronDown, User } from "lucide-react";
-import { useCart } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
+import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+<<<<<<< HEAD:src/components/Navbar.tsx
 import PhoneAuth from "../components/PhoneAuth";
 
 interface NavbarProps {
   onCartClick?: () => void;
 }
+=======
+import PhoneAuth from "../authComponents/PhoneAuth";
+>>>>>>> 84ce2956d5e340402464e9620f7819e7aa4046cb:src/components/common/Navbar.tsx
 
 
 const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
@@ -19,10 +23,6 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const [userName] = useState<string | null>(null);
 
   const itemCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
-
-  
-
-
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -93,8 +93,8 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             {user ? (
               <div className="relative group">
                 <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center cursor-pointer">
-    <User className="w-5 h-5" /> {/* Display user icon */}
-  </div>
+                  <User className="w-5 h-5" /> {/* Display user icon */}
+                </div>
                 <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg py-2 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-50">
                   <div className="px-4 py-2 text-sm font-semibold border-b text-gray-800">
                     Hello, {userName ? userName.split(" ")[0] : "User"}
@@ -222,7 +222,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             <h2 className="text-2xl font-semibold text-green-700 text-center mb-4">
               Login with Kishan2Kitchen
             </h2>
-            <PhoneAuth  />
+            <PhoneAuth />
           </div>
         </div>
       )}
