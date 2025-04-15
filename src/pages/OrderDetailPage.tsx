@@ -1,7 +1,7 @@
 // src/pages/OrderDetailPage.tsx
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getOrder, cancelOrder, getTracking } from '../services/orderApi';
+import { getOrder, cancelOrder, getTracking } from '../services/api/orderApi';
 import { useAuth } from '../context/AuthContext';
 import { Order, TrackingInfo } from '../types/order';
 import { Loader2, Package, PackageCheck, PackageX, Truck, ChevronLeft } from 'lucide-react';

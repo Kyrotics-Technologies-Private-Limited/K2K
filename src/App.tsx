@@ -45,7 +45,7 @@ function App() {
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/kishanParivarPage" element={<KishanParivarPage />} />
             <Route path="/register" element={<SignUp />} />
-            <Route path="/login" element={<Login />} />
+            {/* <Route path="/login" element={<Login />} /> */}
             <Route path='/forgot-password' element={<ForgotPasswordPage/>}/>
             <Route path='/reset-password' element={<ResetPasswordPage/>}/>
             <Route path="/orders" element={<OrdersPage/>}/>

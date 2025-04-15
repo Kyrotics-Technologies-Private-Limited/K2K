@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Product } from '../types';
+import { Product } from '../../types';
 
 // Base URL for the API
 const API_BASE_URL = 'http://localhost:5566/api'; // Adjust this to match your backend URL

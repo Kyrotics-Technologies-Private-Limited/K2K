@@ -3,15 +3,12 @@ import { Menu, X, ShoppingCart, Search, ChevronDown, User } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-<<<<<<< HEAD:src/components/Navbar.tsx
-import PhoneAuth from "../components/PhoneAuth";
+import PhoneAuth from "../authComponents/PhoneAuth";
+
 
 interface NavbarProps {
   onCartClick?: () => void;
 }
-=======
-import PhoneAuth from "../authComponents/PhoneAuth";
->>>>>>> 84ce2956d5e340402464e9620f7819e7aa4046cb:src/components/common/Navbar.tsx
 
 
 const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {

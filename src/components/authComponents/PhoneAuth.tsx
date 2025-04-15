@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import * as authService from "../../services/firebase/auth.service";
+import * as authService from "../../services/api/authApi";
 import { RecaptchaVerifier, ConfirmationResult } from "firebase/auth";
 
 // shadcn/ui components
@@ -238,9 +238,9 @@ const PhoneAuth: React.FC = () => {
           Authentication Successful
         </h2>
         <p className="mb-4">Welcome{name ? `, ${name}` : ""}!</p>
-        <Button onClick={handleSignOut} variant="outline">
+        {/* <Button onClick={handleSignOut} variant="outline">
           Sign Out
-        </Button>
+        </Button> */}
       </div>
     );
   }

@@ -335,8 +335,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ShoppingBag, CreditCard, Plus, Minus, Trash2 } from 'lucide-react';
-import { createOrder } from '../services/orderApi';
-import cartApi, { CartItem as ApiCartItem, CartSummary } from '../services/cartApi';
+import { createOrder } from '../services/api/orderApi';
+import cartApi, { CartItem as ApiCartItem, CartSummary } from '../services/api/cartApi';
 
 interface ShippingDetails {
   firstName: string;

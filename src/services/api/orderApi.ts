@@ -1,7 +1,8 @@
 // src/services/orderApi.ts
 import axios, { AxiosResponse } from 'axios';
-import { Order, OrderItem, TrackingInfo, CreateOrderData, OrderFilters } from '../types/order';
-import { auth } from '../firebase'; // Correct import
+import { Order, OrderItem, TrackingInfo, CreateOrderData, OrderFilters } from '../../types/order';
+// import { auth } from '../firebase'; // Correct import
+import { auth } from '../firebase/firebase'; // Ensure this is the correct path to your firebase config
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 

@@ -439,7 +439,7 @@ import { ProductBadges } from "./Productbadge";
 import { BenefitsBanner } from "./InformationBanner";
 import { HealthBenefits } from "./HealthBenefits";
 import RecognizedBy from "../homePageComponents/RecognizedBy";
-import cartApi from "../../services/cartApi";
+import cartApi from "../../services/api/cartApi";
 
 interface ProductDetailProps {
   product: Product | undefined;
