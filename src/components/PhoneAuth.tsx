@@ -1,92 +1,80 @@
 import React, { useState, useEffect, useRef } from "react";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
-import { Button, TextField, Paper, Typography } from "@mui/material";
+import * as authService from "../services/auth.service";
+import { RecaptchaVerifier, ConfirmationResult } from "firebase/auth";
+
+// shadcn/ui components
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  ConfirmationResult,
-  Auth,
-} from "firebase/auth";
-import { auth, db } from "../firebase"; // Make sure this is correctly configured
-import { doc, setDoc } from "firebase/firestore";
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const PhoneAuth: React.FC = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  // States for authentication
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
-  const [confirmationResult, setConfirmationResult] =
+  const [confirmationResult, setConfirmationResult] = 
     useState<ConfirmationResult | null>(null);
-  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // States for user info
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [showUserInfoModal, setShowUserInfoModal] = useState(false);
+
+  // States for operation
   const recaptchaWrapperRef = useRef<HTMLDivElement>(null);
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [cooldown, setCooldown] = useState(false);
-  const [cooldownTime, setCooldownTime] = useState(0);
   const [error, setError] = useState("");
-  const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
-    if (!auth || !recaptchaWrapperRef.current) return;
-
-    if (recaptchaVerifierRef.current) {
-      recaptchaVerifierRef.current.clear();
+    // Check if user is already authenticated
+    if (authService.isAuthenticated()) {
+      setIsAuthenticated(true);
+      fetchUserData();
     }
 
-    try {
-      recaptchaVerifierRef.current = new RecaptchaVerifier(
-        auth as Auth,
-        recaptchaWrapperRef.current,
-        {
-          size: "invisible",
-          callback: () => {},
-          "expired-callback": () => {
-            setError("reCAPTCHA expired. Please try again.");
-          },
-        }
+    // Initialize recaptcha when component mounts
+    if (recaptchaWrapperRef.current) {
+      recaptchaVerifierRef.current = authService.initRecaptcha(
+        recaptchaWrapperRef.current
       );
-      recaptchaVerifierRef.current.render();
-    } catch (err) {
-      console.error("reCAPTCHA init failed:", err);
-      setError("reCAPTCHA initialization failed. Please refresh the page.");
     }
 
     return () => {
+      // Clean up recaptcha on unmount
       if (recaptchaVerifierRef.current) {
         recaptchaVerifierRef.current.clear();
-        recaptchaVerifierRef.current = null;
       }
     };
   }, []);
 
-  const validateEmail = () => {
+  const fetchUserData = async () => {
+    try {
+      const userData = await authService.getCurrentUser();
+      setName(userData.name || "");
+      setEmail(userData.email || "");
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  const validateEmail = (email: string): string => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim()) {
-      setError("Please enter your email");
-      return false;
+      return "Please enter your email";
     } else if (!regex.test(email)) {
-      setError("Invalid email address");
-      return false;
+      return "Invalid email address";
     }
-    return true;
+    return "";
   };
 
   const sendOtp = async () => {
     setError("");
-
-    if (!name.trim()) {
-      setError("Please enter your name");
-      return;
-    }
-
-    if (!validateEmail()) return;
-
-    if (!recaptchaVerifierRef.current) {
-      setError("reCAPTCHA not ready. Please refresh.");
-      return;
-    }
-
-    if (cooldown) return;
 
     if (!phone || phone.trim().length < 10) {
       setError("Please enter a valid phone number");
@@ -96,28 +84,39 @@ const PhoneAuth: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const fullPhone = phone.startsWith("+") ? phone : `+${phone}`;
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        fullPhone,
+      // Re-initialize recaptcha if needed
+      if (!recaptchaVerifierRef.current && recaptchaWrapperRef.current) {
+        recaptchaVerifierRef.current = authService.initRecaptcha(
+          recaptchaWrapperRef.current
+        );
+      }
+
+      if (!recaptchaVerifierRef.current) {
+        throw new Error("reCAPTCHA not initialized");
+      }
+
+      const confirmation = await authService.sendOTP(
+        phone,
         recaptchaVerifierRef.current
       );
       setConfirmationResult(confirmation);
-      startCooldown();
     } catch (err: any) {
       let msg = "Error sending OTP";
       if (err.code === "auth/invalid-phone-number") {
         msg = "Invalid phone number format.";
       } else if (err.code === "auth/too-many-requests") {
         msg = "Too many requests. Please wait before retrying.";
-        startCooldown(120);
       } else if (err.message?.includes("reCAPTCHA")) {
         msg = "reCAPTCHA check failed. Please refresh the page.";
-        setError(msg); // Update error message
-        recaptchaVerifierRef.current?.clear(); // Reset reCAPTCHA
-        recaptchaVerifierRef.current?.render(); // Re-render reCAPTCHA
-      } else {
-        startCooldown(30);
+        // Reset reCAPTCHA verifier
+        if (recaptchaWrapperRef.current) {
+          if (recaptchaVerifierRef.current) {
+            recaptchaVerifierRef.current.clear();
+          }
+          recaptchaVerifierRef.current = authService.initRecaptcha(
+            recaptchaWrapperRef.current
+          );
+        }
       }
       setError(msg);
     } finally {
@@ -141,23 +140,26 @@ const PhoneAuth: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const result = await confirmationResult.confirm(otp);
-      const user = result.user;
+      await authService.verifyOTP(confirmationResult, otp);
+      setIsAuthenticated(true);
 
-      const fullPhone = phone.startsWith("+") ? phone : `+${phone}`;
-      await setDoc(
-        doc(db, "users", fullPhone),
-        {
-          name,
-          email,
-          phone: fullPhone,
-          uid: user.uid,
-          verifiedAt: new Date(),
-        },
-        { merge: true }
-      );
+      // Check if user info exists in the database
+      try {
+        const userCheck = await authService.checkUserExists();
 
-      setIsVerified(true);
+        if (userCheck.exists && userCheck.user) {
+          // User exists, set the user info
+          setName(userCheck.user.name || "");
+          setEmail(userCheck.user.email || "");
+        } else {
+          // User doesn't exist, show the modal to collect info
+          setShowUserInfoModal(true);
+        }
+      } catch (checkError) {
+        console.error("Error checking user existence:", checkError);
+        // If there's an error, still show the modal to be safe
+        setShowUserInfoModal(true);
+      }
     } catch (err: any) {
       let msg = "Verification failed";
       if (err.code === "auth/invalid-verification-code") {
@@ -167,7 +169,6 @@ const PhoneAuth: React.FC = () => {
         setConfirmationResult(null);
       } else if (err.code === "auth/too-many-requests") {
         msg = "Too many attempts. Try again later.";
-        startCooldown(120);
       }
       setError(msg);
     } finally {
@@ -175,156 +176,211 @@ const PhoneAuth: React.FC = () => {
     }
   };
 
-  const startCooldown = (seconds = 60) => {
-    setCooldown(true);
-    setCooldownTime(seconds);
-    const interval = setInterval(() => {
-      setCooldownTime((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setCooldown(false);
-          return 0;
-        }
-        return prev - 1;
+  const saveUserInfo = async () => {
+    setError("");
+
+    const emailError = validateEmail(email);
+    if (emailError) {
+      setError(emailError);
+      return;
+    }
+
+    if (!name.trim()) {
+      setError("Please enter your name");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const fullPhone = phone.startsWith("+") ? phone : `+${phone}`;
+
+      await authService.saveUserInfo({
+        name,
+        phone: fullPhone,
+        email,
       });
-    }, 1000);
+
+      setShowUserInfoModal(false);
+    } catch (err: any) {
+      console.error("Error saving user info:", err);
+      setError("Failed to save user information. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await authService.signOutUser();
+      resetForm();
+    } catch (error) {
+      console.error("Error signing out:", error);
+      setError("Error signing out. Please try again.");
+    }
   };
 
   const resetForm = () => {
-    setName("");
-    setEmail("");
     setPhone("");
     setOtp("");
+    setName("");
+    setEmail("");
     setConfirmationResult(null);
-    setIsVerified(false);
+    setIsAuthenticated(false);
+    setShowUserInfoModal(false);
     setError("");
   };
 
+  if (isAuthenticated) {
+    return (
+      <div className="text-center p-6">
+        <h2 className="text-xl font-semibold mb-4">Authentication Successful</h2>
+        <p className="mb-4">Welcome{name ? `, ${name}` : ""}!</p>
+        <Button onClick={handleSignOut} variant="outline">Sign Out</Button>
+      </div>
+    );
+  }
+
   return (
-    <Paper elevation={3} className="p-6 sm:p-10 max-w-md w-full">
-      <Typography
-        variant="h4"
-        align="center"
-        sx={{ fontWeight: 600, color: "green", mb: 3 }}
-      >
-        {isVerified ? "Verification Complete" : "Phone Verification"}
-      </Typography>
-
-      {error && (
-        <Typography color="error" align="center" sx={{ mb: 2 }}>
-          {error}
-        </Typography>
-      )}
-
-      {isVerified ? (
-        <>
-          <Typography align="center" sx={{ mb: 3 }}>
-            Thank you, {name}! Your phone number has been verified.
-          </Typography>
-          <Button
-            onClick={resetForm}
-            fullWidth
-            variant="contained"
-            sx={{ height: "48px", bgcolor: "green" }}
-          >
-            Start Over
-          </Button>
-        </>
-      ) : !confirmationResult ? (
-        <>
-          <TextField
-            fullWidth
-            label="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            margin="normal"
+    <div className="  p-4 bg-white rounded-md shadow-sm">
+      {/* Header with logo */}
+      <div className="text-center mb-6">
+        <img 
+          src="/assets/images/K2K Logo.png" 
+          alt="Company Logo" 
+          className="mx-auto mb-2 h-16 w-16 object-cover rounded-md" 
+        />
+        <h2 className="text-xl font-medium">Sign In</h2>
+      </div>
+      
+      {/* Phone input or OTP input */}
+      {!confirmationResult ? (
+        <div className="space-y-4">
+          <div className="flex">
+            <div className="flex items-center justify-center bg-gray-100 rounded-l-md px-2 border border-gray-300 border-r-0">
+              <span className="text-gray-600 mr-2">🇮🇳</span>
+            </div>
+            <Input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="10-digit phone number"
+              className="rounded-l-none focus-visible:ring-0"
+              disabled={isLoading}
+            />
+          </div>
+          
+          <Button 
+            onClick={sendOtp} 
+            className="w-full bg-teal-700 hover:bg-teal-800"
             disabled={isLoading}
-          />
-          <TextField
-            fullWidth
-            label="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            margin="normal"
-            disabled={isLoading}
-          />
-          <PhoneInput
-            country={"in"}
-            value={phone}
-            onChange={(value) => setPhone(value)}
-            inputStyle={{
-              width: "100%",
-              height: "56px",
-              fontSize: "16px",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-              paddingLeft: "60px",
-            }}
-            buttonStyle={{
-              borderRadius: "8px 0 0 8px",
-              border: "1px solid #ccc",
-            }}
-            containerStyle={{ marginBottom: "16px" }}
-            inputProps={{
-              name: "phone",
-              required: true,
-              disabled: isLoading,
-            }}
-          />
-          <Button
-            onClick={sendOtp}
-            fullWidth
-            variant="contained"
-            disabled={!name || !email || !phone || isLoading || cooldown}
-            sx={{ mt: 2, height: "48px", bgcolor: "green" }}
           >
-            {isLoading
-              ? "Sending..."
-              : cooldown
-              ? `Wait ${cooldownTime}s`
-              : "Send OTP"}
+            {isLoading ? "Sending..." : "Login"}
           </Button>
-        </>
+          
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+          
+          <p className="text-xs text-gray-500 mt-2">
+            By proceeding, you are agreeing to our <a href="#" className="text-gray-700">T&C</a> and{" "}
+            <a href="#" className="text-gray-700">Privacy policy</a>
+          </p>
+        </div>
       ) : (
-        <>
-          <Typography align="center" sx={{ mb: 1 }}>
-            Enter OTP sent to +{phone}
-          </Typography>
-          <TextField
-            fullWidth
-            label="6-digit OTP"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            inputProps={{ maxLength: 6 }}
+        <div className="space-y-4">
+          <div className="flex justify-center mb-4">
+            <InputOTP
+              maxLength={6}
+              value={otp}
+              onChange={(value) => setOtp(value)}
+              disabled={isLoading}
+            >
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+          </div>
+          
+          <Button 
+            onClick={verifyOtp} 
+            className="w-full bg-teal-700 hover:bg-teal-800"
             disabled={isLoading}
-          />
-          <Button
-            onClick={verifyOtp}
-            fullWidth
-            variant="contained"
-            disabled={!otp || otp.length !== 6 || isLoading}
-            sx={{ mt: 2, height: "48px", bgcolor: "green" }}
           >
             {isLoading ? "Verifying..." : "Verify OTP"}
           </Button>
-          <Button
-            onClick={() => {
-              setConfirmationResult(null);
-              setOtp("");
-              setError("");
-            }}
-            fullWidth
-            variant="text"
-            sx={{ mt: 1 }}
-            disabled={isLoading}
-          >
-            Change Details
-          </Button>
-        </>
+          
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+          
+          <div className="text-center">
+            <Button
+              variant="link"
+              onClick={() => {
+                setConfirmationResult(null);
+                setOtp("");
+                setError("");
+              }}
+              className="text-sm text-teal-700"
+              disabled={isLoading}
+            >
+              Change Phone Number
+            </Button>
+          </div>
+        </div>
       )}
-
-      <div ref={recaptchaWrapperRef} style={{ marginTop: "1rem" }} />
-    </Paper>
+      
+      <div ref={recaptchaWrapperRef} className="mt-4"></div>
+      
+      {/* Powered by text */}
+      <div className="text-center text-xs text-gray-500 mt-6">
+        Powered by <span className="font-medium">kishan2kitchen</span>
+      </div>
+      
+      {/* User Info Modal */}
+      <Dialog open={showUserInfoModal} onOpenChange={(open) => {
+        if (!isLoading) setShowUserInfoModal(open);
+      }}>
+        <DialogContent className="sm:max-w-md p-6">
+          <h2 className="text-xl font-medium text-center mb-4">Complete Your Profile</h2>
+          
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm text-gray-700 mb-1 block">Name</label>
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={isLoading}
+                placeholder="Enter your name"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm text-gray-700 mb-1 block">Email</label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                placeholder="Enter your email"
+              />
+            </div>
+            
+            <Button
+              onClick={saveUserInfo}
+              className="w-full bg-teal-700 hover:bg-teal-800"
+              disabled={isLoading}
+            >
+              {isLoading ? "Saving..." : "Save"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 
