@@ -16,7 +16,7 @@ import { Product } from "../../types";
 import { ProductBadges } from "./Productbadge";
 import { BenefitsBanner } from "./InformationBanner";
 import { HealthBenefits } from "./HealthBenefits";
-import RecognizedBy from "../RecognizedBy";
+import RecognizedBy from "../homePageComponents/RecognizedBy";
 
 interface ProductDetailProps {
   product: Product | undefined;

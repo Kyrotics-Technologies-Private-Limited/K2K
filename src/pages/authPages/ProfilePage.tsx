@@ -10,7 +10,7 @@ import {
   FaEnvelope,
 } from "react-icons/fa";
 import { MdLocationOn } from "react-icons/md";
-import { db, storage } from "../firebase";
+import { db, storage } from "../../services/firebase/firebase";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import {
   ref,
@@ -19,7 +19,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import { FileEdit } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 interface UserProfile {
   id: string;

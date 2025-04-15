@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import * as authService from "../services/auth.service";
+import * as authService from "../../services/firebase/auth.service";
 import { RecaptchaVerifier, ConfirmationResult } from "firebase/auth";
 
 // shadcn/ui components
@@ -16,7 +16,7 @@ const PhoneAuth: React.FC = () => {
   // States for authentication
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
-  const [confirmationResult, setConfirmationResult] = 
+  const [confirmationResult, setConfirmationResult] =
     useState<ConfirmationResult | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -234,9 +234,13 @@ const PhoneAuth: React.FC = () => {
   if (isAuthenticated) {
     return (
       <div className="text-center p-6">
-        <h2 className="text-xl font-semibold mb-4">Authentication Successful</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          Authentication Successful
+        </h2>
         <p className="mb-4">Welcome{name ? `, ${name}` : ""}!</p>
-        <Button onClick={handleSignOut} variant="outline">Sign Out</Button>
+        <Button onClick={handleSignOut} variant="outline">
+          Sign Out
+        </Button>
       </div>
     );
   }
@@ -245,14 +249,14 @@ const PhoneAuth: React.FC = () => {
     <div className="  p-4 bg-white rounded-md shadow-sm">
       {/* Header with logo */}
       <div className="text-center mb-6">
-        <img 
-          src="/assets/images/K2K Logo.png" 
-          alt="Company Logo" 
-          className="mx-auto mb-2 h-16 w-16 object-cover rounded-md" 
+        <img
+          src="/assets/images/K2K Logo.png"
+          alt="Company Logo"
+          className="mx-auto mb-2 h-16 w-16 object-cover rounded-md"
         />
         <h2 className="text-xl font-medium">Sign In</h2>
       </div>
-      
+
       {/* Phone input or OTP input */}
       {!confirmationResult ? (
         <div className="space-y-4">
@@ -269,20 +273,26 @@ const PhoneAuth: React.FC = () => {
               disabled={isLoading}
             />
           </div>
-          
-          <Button 
-            onClick={sendOtp} 
+
+          <Button
+            onClick={sendOtp}
             className="w-full bg-teal-700 hover:bg-teal-800"
             disabled={isLoading}
           >
             {isLoading ? "Sending..." : "Login"}
           </Button>
-          
+
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-          
+
           <p className="text-xs text-gray-500 mt-2">
-            By proceeding, you are agreeing to our <a href="#" className="text-gray-700">T&C</a> and{" "}
-            <a href="#" className="text-gray-700">Privacy policy</a>
+            By proceeding, you are agreeing to our{" "}
+            <a href="#" className="text-gray-700">
+              T&C
+            </a>{" "}
+            and{" "}
+            <a href="#" className="text-gray-700">
+              Privacy policy
+            </a>
           </p>
         </div>
       ) : (
@@ -304,17 +314,17 @@ const PhoneAuth: React.FC = () => {
               </InputOTPGroup>
             </InputOTP>
           </div>
-          
-          <Button 
-            onClick={verifyOtp} 
+
+          <Button
+            onClick={verifyOtp}
             className="w-full bg-teal-700 hover:bg-teal-800"
             disabled={isLoading}
           >
             {isLoading ? "Verifying..." : "Verify OTP"}
           </Button>
-          
+
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-          
+
           <div className="text-center">
             <Button
               variant="link"
@@ -331,23 +341,28 @@ const PhoneAuth: React.FC = () => {
           </div>
         </div>
       )}
-      
+
       <div ref={recaptchaWrapperRef} className="mt-4"></div>
-      
+
       {/* Powered by text */}
       <div className="text-center text-xs text-gray-500 mt-6">
         Powered by <span className="font-medium">kishan2kitchen</span>
       </div>
-      
+
       {/* User Info Modal */}
-      <Dialog open={showUserInfoModal} onOpenChange={(open) => {
-        if (!isLoading) setShowUserInfoModal(open);
-      }}>
+      <Dialog
+        open={showUserInfoModal}
+        onOpenChange={(open) => {
+          if (!isLoading) setShowUserInfoModal(open);
+        }}
+      >
         <DialogContent className="sm:max-w-md p-6">
-          <h2 className="text-xl font-medium text-center mb-4">Complete Your Profile</h2>
-          
+          <h2 className="text-xl font-medium text-center mb-4">
+            Complete Your Profile
+          </h2>
+
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-          
+
           <div className="space-y-4">
             <div>
               <label className="text-sm text-gray-700 mb-1 block">Name</label>
@@ -358,7 +373,7 @@ const PhoneAuth: React.FC = () => {
                 placeholder="Enter your name"
               />
             </div>
-            
+
             <div>
               <label className="text-sm text-gray-700 mb-1 block">Email</label>
               <Input
@@ -369,7 +384,7 @@ const PhoneAuth: React.FC = () => {
                 placeholder="Enter your email"
               />
             </div>
-            
+
             <Button
               onClick={saveUserInfo}
               className="w-full bg-teal-700 hover:bg-teal-800"

@@ -3,8 +3,8 @@ import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { useState, useEffect } from "react";
-import { ProductCard } from "./products/ProductCard";
-import { sampleProducts } from "../mockData/SampleProduct";
+import { ProductCard } from "../products/ProductCard";
+import { sampleProducts } from "../../mockData/SampleProduct";
 
 const ProductSection = () => {
   const [loaded, setLoaded] = useState(false);
