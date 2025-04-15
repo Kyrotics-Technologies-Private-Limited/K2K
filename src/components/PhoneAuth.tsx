@@ -143,7 +143,9 @@ const PhoneAuth: React.FC = () => {
     try {
       const result = await confirmationResult.confirm(otp);
       const user = result.user;
-
+      console.log("User verified:", user);
+      const idToken = await user.getIdToken();
+      console.log("User verified. ID Token:", idToken);
       const fullPhone = phone.startsWith("+") ? phone : `+${phone}`;
       await setDoc(
         doc(db, "users", fullPhone),
