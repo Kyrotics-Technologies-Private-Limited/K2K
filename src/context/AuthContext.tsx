@@ -167,7 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(true);
       setError(null);
       await signOut(auth);
-      navigate("/login");
+      // navigate("/");
     } catch (error: any) {
       setError(error.message || "Logout failed");
       throw error;

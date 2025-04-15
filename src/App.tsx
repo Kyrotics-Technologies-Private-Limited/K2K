@@ -21,6 +21,8 @@ import TermsOfService from "./pages/policyPages/TermsOfService";
 import ShippingPolicy from "./pages/policyPages/ShippingPolicy";
 import RefundPolicy from "./pages/policyPages/RefundPolicy";
 import Traceability from "./pages/Traceability";
+import OrdersPage from "./pages/OrdersPage";
+import OrderDetailPage from "./pages/OrderDetailPage";
 import ForgotPasswordPage from "./pages/authPages/ForgotPassword";
 import ResetPasswordPage from "./pages/authPages/ResetPassword";
 import UserProfilePage from "./pages/authPages/ProfilePage";
@@ -43,17 +45,19 @@ function App() {
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/kishanParivarPage" element={<KishanParivarPage />} />
             <Route path="/register" element={<SignUp />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/our-story" element={<OurStory />} />
-            <Route path="/traceability" element={<Traceability />} />
-            <Route path="/privacypolicy" element={<PrivacyPolicy />} />
-            <Route path="/termsofservice" element={<TermsOfService />} />
-            <Route path="/shipping" element={<ShippingPolicy />} />
-            <Route path="/refund" element={<RefundPolicy />} />
-            <Route path="/profile" element={<UserProfilePage />} />
-
+            {/* <Route path="/login" element={<Login />} /> */}
+            <Route path='/forgot-password' element={<ForgotPasswordPage/>}/>
+            <Route path='/reset-password' element={<ResetPasswordPage/>}/>
+            <Route path="/orders" element={<OrdersPage/>}/>
+            <Route path="/orders/:id" element={<OrderDetailPage/>}/>
+            <Route path='/our-story' element={<OurStory/>}/>
+            <Route path='/traceability' element={<Traceability/>}/>
+            <Route path='/privacypolicy' element={<PrivacyPolicy/>}/>
+            <Route path='/termsofservice' element={<TermsOfService/>}/>
+            <Route path='/shipping' element={<ShippingPolicy/>}/>
+            <Route path='/refund' element={<RefundPolicy/>}/>
+            <Route path='/profile' element={<UserProfilePage/>}/>
+           
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<OverviewPage />} />
