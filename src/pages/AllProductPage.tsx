@@ -185,7 +185,7 @@ import {
   Shield,
 } from "lucide-react";
 import RecognizedBy from "../components/homePageComponents/RecognizedBy";
-import { productApi } from '../services/api/api'
+import { productApi } from '../services/api/productApi'
 import { Product } from "../types";
 
 const AllProductPage = () => {
