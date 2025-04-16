@@ -26,6 +26,7 @@ import OrderDetailPage from "./pages/OrderDetailPage";
 import ForgotPasswordPage from "./pages/authPages/ForgotPassword";
 import ResetPasswordPage from "./pages/authPages/ResetPassword";
 import UserProfilePage from "./pages/authPages/ProfilePage";
+//import AddressPage from "./pages/AddressPage";
 //import PhoneAuth from "./components/PhoneAuth";
 // import ProductPage from "./pages/admin/ProductPage";
 
@@ -57,7 +58,7 @@ function App() {
             <Route path='/shipping' element={<ShippingPolicy/>}/>
             <Route path='/refund' element={<RefundPolicy/>}/>
             <Route path='/profile' element={<UserProfilePage/>}/>
-           
+
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<OverviewPage />} />
