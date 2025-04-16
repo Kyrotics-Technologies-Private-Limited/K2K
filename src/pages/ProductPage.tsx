@@ -22,7 +22,7 @@
 import React, { useState, useEffect } from "react";
 import { ProductDetail } from "../components/products/ProductDetail";
 import { Product } from "../types";
-import { productApi } from "../services/api/api";
+import { productApi } from "../services/api/productApi";
 import { useParams, useNavigate } from "react-router-dom";
 
 const ProductPage = () => {
