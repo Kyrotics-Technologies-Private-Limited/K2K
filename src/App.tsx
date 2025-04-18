@@ -30,6 +30,7 @@ import AdminDashboard from "./pages/admin/Admindashboard";
 import { store } from "./store/store";
 import { Provider } from "react-redux";
 import AppProvider from "./AppProvider";
+import AdminProducts from "./pages/admin/AdminProducts";
 //import PhoneAuth from "./components/PhoneAuth";
 // import ProductPage from "./pages/admin/ProductPage";
 const PublicLayout = () => {
@@ -78,8 +79,7 @@ function App() {
             {/* Admin Routes */}
             <Route path="/admin" element={<Layout />}>
             <Route index element={<AdminDashboard />} />
-              {/* <Route index element={<OverviewPage />} /> */}
-              <Route path="products" element={<ProductPage />} />
+              <Route path="products" element={<AdminProducts />} />
             </Route>
           </Routes>
       <Footer />
