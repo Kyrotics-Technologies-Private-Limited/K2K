@@ -1,171 +1,211 @@
-// src/services/cartApi.ts
-import { getAuth, User } from 'firebase/auth';
+// // src/services/api/cartApi.ts
+// import api from 'api';
+// import { CartItem, Cart, CartSummary } from '../../types/cart';
+// import { getAuth } from 'firebase/auth';
 
-// API base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5566';
+// const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-// Cart related interfaces
-interface CartItem {
-  id: string;
-  cart_id: string;
-  product_id: string;
-  variant_id: string | null;
-  quantity: number;
-  created_at: any; // Firestore timestamp
-  updated_at: any; // Firestore timestamp
-}
+// const getAuthToken = async () => {
+//   const auth = getAuth();
+//   const user = auth.currentUser;
+//   if (!user) throw new Error('User not authenticated');
+//   return await user.getIdToken();
+// };
 
-interface Cart {
-  id: string;
-  user_id: string;
-  created_at: any; // Firestore timestamp
-  updated_at: any; // Firestore timestamp
-  items: CartItem[];
-}
+// export const cartApi = {
+//   getCart: async (): Promise<{ cart: Cart }> => {
+//     const token = await getAuthToken();
+//     const response = await api.get(`/cart`, {
+//       headers: { Authorization: `Bearer ${token}` }
+//     });
+//     return response.data;
+//   },
 
-interface CartResponse {
-  cart: Cart;
-}
+//   getCartSummary: async (): Promise<CartSummary> => {
+//     const token = await getAuthToken();
+//     const response = await api.get(`/cart/summary`, {
+//       headers: { Authorization: `Bearer ${token}` }
+//     });
+//     return response.data;
+//   },
 
-interface CartSummary {
-  item_count: number;
-  subtotal: number;
-  tax: number;
-  total: number;
-  cart_id: string;
-}
+//   addItem: async (productId: string, variantId?: string, quantity = 1): Promise<CartItem> => {
+//     const token = await getAuthToken();
+//     const response = await api.post(`/cart/items`, {
+//       product_id: productId,
+//       variant_id: variantId,
+//       quantity
+//     }, {
+//       headers: { Authorization: `Bearer ${token}` }
+//     });
+//     return response.data;
+//   },
 
-interface ApiError {
-  error: string;
-  message?: string;
-}
+//   updateItem: async (itemId: string, quantity: number): Promise<CartItem> => {
+//     const token = await getAuthToken();
+//     const response = await api.put(`/cart/items/${itemId}`, {
+//       quantity
+//     }, {
+//       headers: { Authorization: `Bearer ${token}` }
+//     });
+//     return response.data;
+//   },
 
-interface AddItemRequest {
-  product_id: string;
-  variant_id: string | null;
-  quantity: number;
-}
+//   removeItem: async (itemId: string): Promise<void> => {
+//     const token = await getAuthToken();
+//     await api.delete(`/cart/items/${itemId}`, {
+//       headers: { Authorization: `Bearer ${token}` }
+//     });
+//   },
 
-interface UpdateItemRequest {
-  quantity: number;
-}
+//   clearCart: async (): Promise<void> => {
+//     const token = await getAuthToken();
+//     await api.delete(`/cart/items`, {
+//       headers: { Authorization: `Bearer ${token}` }
+//     });
+//   }
+// };
 
-/**
- * Get authentication token from Firebase
- * @returns Promise with the authentication token
- */
-async function getAuthToken(): Promise<string> {
+// src/services/api/cartApi.ts
+
+import api from "./api";
+import { CartItem, Cart } from "../../types/cart";
+import { getAuth } from "firebase/auth";
+
+const getAuthToken = async () => {
   const auth = getAuth();
-  const user: User | null = auth.currentUser;
-  
-  if (!user) {
-    throw new Error('User not authenticated');
-  }
-  
-  return user.getIdToken();
-}
-
-/**
- * Make authenticated API requests
- * @param endpoint - API endpoint
- * @param options - Fetch options
- * @returns Promise with the response data
- */
-async function authFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  try {
-    const token = await getAuthToken();
-    
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-      ...(options.headers || {})
-    };
-    
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      ...options,
-      headers
-    });
-    
-    if (!response.ok) {
-      const errorData: ApiError = await response.json().catch(() => ({ 
-        error: `API request failed with status ${response.status}` 
-      }));
-      throw new Error(errorData.error || `API request failed with status ${response.status}`);
-    }
-    
-    return response.json() as Promise<T>;
-  } catch (error) {
-    console.error('Cart API Error:', error);
-    throw error;
-  }
-}
-
-/**
- * Cart API methods for interacting with the cart service
- */
-const cartApi = {
-  /**
-   * Get the current user's cart
-   * @returns Promise with cart data and items
-   */
-  getCart: (): Promise<CartResponse> => 
-    authFetch<CartResponse>('/api/carts'),
-  
-  /**
-   * Add an item to the cart
-   * @param productId - Product ID
-   * @param variantId - Variant ID (optional)
-   * @param quantity - Quantity to add
-   * @returns Promise with the added cart item
-   */
-  addItem: (productId: string, variantId: string | null = null, quantity: number = 1): Promise<CartItem> => 
-    authFetch<CartItem>('/api/carts/items', {
-      method: 'POST',
-      body: JSON.stringify({
-        product_id: productId,
-        variant_id: variantId,
-        quantity
-      } as AddItemRequest)
-    }),
-  
-  /**
-   * Update cart item quantity
-   * @param itemId - Cart item ID
-   * @param quantity - New quantity (0 removes the item)
-   * @returns Promise with the updated cart item or removal confirmation
-   */
-  updateItem: (itemId: string, quantity: number): Promise<CartItem | { message: string }> => 
-    authFetch<CartItem | { message: string }>(`/api/carts/items/${itemId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ quantity } as UpdateItemRequest)
-    }),
-  
-  /**
-   * Remove an item from the cart
-   * @param itemId - Cart item ID
-   * @returns Promise with removal confirmation
-   */
-  removeItem: (itemId: string): Promise<{ message: string }> => 
-    authFetch<{ message: string }>(`/api/carts/items/${itemId}`, {
-      method: 'DELETE'
-    }),
-  
-  /**
-   * Clear all items from the cart
-   * @returns Promise with confirmation message
-   */
-  clearCart: (): Promise<{ message: string }> => 
-    authFetch<{ message: string }>('/api/carts/items', {
-      method: 'DELETE'
-    }),
-  
-  /**
-   * Get cart summary with totals
-   * @returns Promise with cart summary including subtotal, tax, and total
-   */
-  getCartSummary: (): Promise<CartSummary> => 
-    authFetch<CartSummary>('/api/carts/summary')
+  const user = auth.currentUser;
+  if (!user) throw new Error("User not authenticated");
+  return await user.getIdToken();
 };
 
-export default cartApi;
-export type { CartItem, Cart, CartResponse, CartSummary };
+export const cartApi = {
+  // Create a new cart
+  createCart: async (): Promise<Cart> => {
+    const token = await getAuthToken();
+    const response = await api.post(
+      `/carts/create`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  },
+
+  // Get all carts (admin function)
+  getAllCarts: async (): Promise<Cart[]> => {
+    const token = await getAuthToken();
+    const response = await api.get(`/carts/get`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  // Get cart by ID
+  getCartById: async (cartId: string): Promise<Cart> => {
+    const token = await getAuthToken();
+    const response = await api.get(`/carts/${cartId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  // Get cart by user ID (current user)
+  getUserCart: async (): Promise<Cart> => {
+    const token = await getAuthToken();
+    const response = await api.get(`/carts/user`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  // Update cart
+  updateCart: async (cartId: string): Promise<Cart> => {
+    const token = await getAuthToken();
+    const response = await api.put(
+      `/carts/${cartId}`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  },
+
+  // Delete cart
+  deleteCart: async (cartId: string): Promise<void> => {
+    const token = await getAuthToken();
+    await api.delete(`/carts/${cartId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+
+  // Get cart items
+  getCartItems: async (cartId: string): Promise<CartItem[]> => {
+    const token = await getAuthToken();
+    const response = await api.get(`/carts/${cartId}/get`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  // Add an item to cart
+  addCartItem: async (
+    cartId: string,
+    itemData: Partial<CartItem>
+  ): Promise<CartItem> => {
+    try {
+      const token = await getAuthToken();
+      
+      // let cartId = localStorage.getItem('user_cart_id');
+  
+      if (!cartId) {
+        const cart = await cartApi.getUserCart();
+        cartId = cart.id;
+        localStorage.setItem('user_cart_id', cartId);
+      }
+      console.log('cartId', cartId);
+
+      const response = await api.post(
+        `/carts/${cartId}/items`,
+        itemData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+  
+      console.log('created cart item succesfullyresponse', response);
+      return response.data;
+  
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
+      throw new Error("Failed to add item to cart.");
+    }
+  },
+  
+  // Update cart item
+  updateCartItem: async (
+    cartId: string,
+    itemId: string,
+    itemData: Partial<CartItem>
+  ): Promise<CartItem> => {
+    const token = await getAuthToken();
+    const response = await api.put(
+      `/carts/${cartId}/items/${itemId}`,
+      itemData,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  },
+
+  // Remove cart item
+  removeCartItem: async (cartId: string, itemId: string): Promise<void> => {
+    const token = await getAuthToken();
+    await api.delete(`/carts/${cartId}/items/${itemId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+};

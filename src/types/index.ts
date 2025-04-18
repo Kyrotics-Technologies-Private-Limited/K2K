@@ -1,10 +1,12 @@
+import { Variant } from "./variant";
+
 export interface Product {
     id: string;
     name: string;
     price: {
       amount: number;
       currency: "INR";
-      variants: ProductVariant[];
+      variants: Variant[];
     };
     description: string;
     // ingredients: string[];

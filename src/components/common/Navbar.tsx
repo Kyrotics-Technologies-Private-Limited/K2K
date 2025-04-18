@@ -1,28 +1,50 @@
-import React, { useState } from "react";
-import { Menu, X, ShoppingCart, Search, ChevronDown, User } from "lucide-react";
-import { useCart } from "../../context/CartContext";
-import { useAuth } from "../../context/AuthContext";
+import React, { useState, useEffect } from "react";
+import { Menu, X, ShoppingCart, Search, ChevronDown, User as UserIcon } from "lucide-react";
+import { RootState, useAppDispatch, useAppSelector } from "../../store/store";
 import { Link, useNavigate } from "react-router-dom";
 import PhoneAuth from "../authComponents/PhoneAuth";
-
+import { signOut } from "../../store/slices/authSlice";
 
 interface NavbarProps {
   onCartClick?: () => void;
 }
 
-
 const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const { state } = useCart();
-  const { user, logout } = useAuth();
+  
+  // Get auth state from Redux
+  const { user, isAuthenticated, loading } = useAppSelector(state => state.auth);
+  // console.log('user',user)
+  // Get cart state from Redux
+  const cart = useAppSelector(state => state.cart);
+  const itemCount =  0; // Safely access cart items count
+  
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [userName] = useState<string | null>(null);
+  
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  
+  // Get user's name or display a default
+  const displayName = user?.name || "User";
 
-  const itemCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
-
+  // Handle navigation to different routes
   const handleNavigation = (path: string) => {
     navigate(path);
+    setIsOpen(false); // Close mobile menu when navigating
+  };
+
+  // Handle logout
+  const logout = async () => {
+    setIsSigningOut(true);
+    try {
+      await dispatch(signOut()).unwrap();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setIsSigningOut(false);
+    }
   };
 
   return (
@@ -87,14 +109,15 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
           <div className="flex items-center space-x-4">
             <Search className="h-5 w-5 text-gray-700 hover:text-green-600 cursor-pointer" />
 
-            {user ? (
+            {/* User Authentication Section */}
+            {isAuthenticated ? (
               <div className="relative group">
                 <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center cursor-pointer">
-                  <User className="w-5 h-5" /> {/* Display user icon */}
+                  {displayName.charAt(0).toUpperCase()}
                 </div>
                 <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg py-2 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-50">
                   <div className="px-4 py-2 text-sm font-semibold border-b text-gray-800">
-                    Hello, {userName ? userName.split(" ")[0] : "User"}
+                    Hello, {displayName.split(" ")[0]}
                   </div>
                   <button
                     onClick={() => handleNavigation("/profile")}
@@ -110,9 +133,10 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                   </button>
                   <button
                     onClick={logout}
+                    disabled={isSigningOut}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
-                    Logout
+                    {isSigningOut ? "Logging out..." : "Logout"}
                   </button>
                 </div>
               </div>
@@ -121,18 +145,19 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                 onClick={() => setShowLoginModal(true)}
                 className="text-gray-700 hover:text-green-600 transition"
               >
-                <User className="w-6 h-6" />
+                <UserIcon className="w-6 h-6" />
               </button>
             )}
 
+            {/* Cart Button */}
             <button
               onClick={onCartClick}
               className="relative p-2"
             >
               <ShoppingCart className="text-gray-700 w-6 h-6" />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-green-600 text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
-                  {itemCount}
+                <span className="absolute -top-1 -right-1 bg-green-600 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
+                  {itemCount > 99 ? '99+' : itemCount}
                 </span>
               )}
             </button>
@@ -140,7 +165,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
           {/* Mobile Menu Icon */}
           <div className="md:hidden flex items-center space-x-3">
-            <button onClick={() => setIsOpen(!isOpen)}>
+            <button onClick={() => setIsOpen(!isOpen)} aria-label={isOpen ? "Close menu" : "Open menu"}>
               {isOpen ? (
                 <X className="h-6 w-6" />
               ) : (
@@ -166,29 +191,37 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             <Link
               key={path}
               to={path}
-              className="block text-gray-500 hover:text-black"
+              className="block text-gray-500 hover:text-black py-2"
               onClick={() => setIsOpen(false)}
             >
               {label}
             </Link>
           ))}
-          {user ? (
+          {isAuthenticated ? (
             <>
               <Link
                 to="/profile"
-                className="block text-gray-500 hover:text-black"
+                className="block text-gray-500 hover:text-black py-2"
                 onClick={() => setIsOpen(false)}
               >
                 My Profile
+              </Link>
+              <Link
+                to="/orders"
+                className="block text-gray-500 hover:text-black py-2"
+                onClick={() => setIsOpen(false)}
+              >
+                My Orders
               </Link>
               <button
                 onClick={() => {
                   logout();
                   setIsOpen(false);
                 }}
-                className="block w-full text-left text-gray-500 hover:text-black"
+                disabled={isSigningOut}
+                className="block w-full text-left text-gray-500 hover:text-black py-2"
               >
-                Logout
+                {isSigningOut ? "Logging out..." : "Logout"}
               </button>
             </>
           ) : (
@@ -197,7 +230,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                 setIsOpen(false);
                 setShowLoginModal(true);
               }}
-              className="block w-full text-left text-gray-500 hover:text-black"
+              className="block w-full text-left text-gray-500 hover:text-black py-2"
             >
               Login
             </button>
@@ -206,7 +239,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
       )}
 
       {/* Login Modal */}
-      {showLoginModal && (
+       {showLoginModal && (
         <div className="fixed inset-0 z-50 bg-black/40 flex justify-center items-center p-4 sm:p-8">
           <div className="relative bg-green-50 rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-gray-100 animate-fade-in">
             <button

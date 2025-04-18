@@ -15,19 +15,24 @@ import { ProductBadges } from "./Productbadge";
 import { BenefitsBanner } from "./InformationBanner";
 import { HealthBenefits } from "./HealthBenefits";
 import RecognizedBy from "../homePageComponents/RecognizedBy";
-import cartApi from "../../services/api/cartApi";
-import variantApi from '../../services/api/variantApi';
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { addToCart, createCart } from "../../store/slices/cartSlice";
+import variantApi from "../../services/api/variantApi";
 import { Variant } from "../../types/variant";
 
 interface ProductDetailProps {
   product: Product | undefined;
   relatedProducts: Product[];
+  onAddToCart?: () => void; // New prop for opening cart drawer
 }
 
 export const ProductDetail: React.FC<ProductDetailProps> = ({
   product,
   relatedProducts,
+  onAddToCart,
 }) => {
+  const dispatch = useAppDispatch();
+  let { activeCartId } = useAppSelector((state) => state.cart);
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [variants, setVariants] = useState<Variant[]>([]);
@@ -42,15 +47,15 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   useEffect(() => {
     const fetchVariants = async () => {
       if (!product) return;
-      
+
       try {
         setLoading(true);
         const fetchedVariants = await variantApi.getProductVariants(product.id);
         setVariants(fetchedVariants);
         setError(null);
       } catch (err) {
-        console.error('Error fetching variants:', err);
-        setError('Failed to load variants');
+        console.error("Error fetching variants:", err);
+        setError("Failed to load variants");
       } finally {
         setLoading(false);
       }
@@ -69,29 +74,53 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
-    
-    if (!product) return;
-    
+
+    if (!product || !variants[selectedVariant]) {
+      setError("Cannot add to cart: No product or variant selected");
+      return;
+    }
+
+    // Create a cart if one doesn't exist
+    let cartId = activeCartId;
+    if (!cartId) {
+      try {
+        const newCart = await dispatch(createCart()).unwrap();
+        activeCartId = newCart.id;
+      } catch (error) {
+        setError("Failed to create cart");
+        return;
+      }
+    }
+
+    setLoading(true);
+    setError(null);
+
     try {
-      setLoading(true);
-      setError(null);
-      
-      // Use the cartApi to add the item to the cart
-      await cartApi.addItem(
-        product.id, 
-        selectedVariant.toString(), // Assuming variant_id is the index as a string
-        quantity
-      );
-      
+      // Prepare item data
+      const itemData = {
+        productId: product.id,
+        variantId: variants[selectedVariant].id,
+        quantity: quantity,
+      };
+
+      await dispatch(
+        addToCart({
+          cartId: activeCartId!,
+          itemData,
+        })
+      ).unwrap();
+
       setSuccess("Item added to cart successfully!");
-      
+      if (onAddToCart) {
+        onAddToCart();
+      }
+
       // Clear success message after 3 seconds
       setTimeout(() => {
         setSuccess(null);
       }, 3000);
-      
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to add item to cart");
+      setError("Failed to add item to cart");
       console.error("Failed to add item to cart:", err);
     } finally {
       setLoading(false);
@@ -100,25 +129,35 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 
   const handleBuyNow = async (e: React.MouseEvent) => {
     e.preventDefault();
-    
-    if (!product) return;
-    
+
+    if (!product || !variants[selectedVariant] || !activeCartId) {
+      setError("Cannot proceed: Missing required information");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
     try {
-      setLoading(true);
-      setError(null);
-      
+      // Prepare item data
+      const itemData = {
+        productId: product.id,
+        variantId: variants[selectedVariant].id,
+        quantity: quantity,
+      };
+
       // Add to cart first
-      await cartApi.addItem(
-        product.id, 
-        selectedVariant.toString(), 
-        quantity
-      );
-      
+      await dispatch(
+        addToCart({
+          cartId: activeCartId,
+          itemData,
+        })
+      ).unwrap();
+
       // Then navigate to checkout
       navigate("/checkout");
-      
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to process buy now");
+      setError("Failed to process buy now request");
       console.error("Failed to process buy now:", err);
     } finally {
       setLoading(false);
@@ -134,13 +173,13 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
             {error}
           </div>
         )}
-        
+
         {success && (
           <div className="bg-green-50 text-green-600 p-4 rounded-lg mb-4">
             {success}
           </div>
         )}
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
           {/* Image Gallery */}
           <div className="space-y-4">
@@ -414,7 +453,10 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   <button
                     onClick={handleAddToCart}
                     className="flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
-                    disabled={!product.price.variants[selectedVariant].inStock || loading}
+                    disabled={
+                      !product.price.variants[selectedVariant].inStock ||
+                      loading
+                    }
                   >
                     {loading ? (
                       "Adding..."
@@ -428,7 +470,10 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   <button
                     onClick={handleBuyNow}
                     className="flex-1 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
-                    disabled={!product.price.variants[selectedVariant].inStock || loading}
+                    disabled={
+                      !product.price.variants[selectedVariant].inStock ||
+                      loading
+                    }
                   >
                     {loading ? (
                       "Processing..."
