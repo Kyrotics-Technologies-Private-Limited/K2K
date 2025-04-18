@@ -35,6 +35,7 @@ import RefundPolicy from "./pages/policyPages/RefundPolicy";
 import Layout from "./components/admin/layout/Layout";
 import AdminDashboard from "./pages/admin/Admindashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
+import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
 
 const PublicLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -87,6 +88,7 @@ function App() {
             <Route path="/admin" element={<Layout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="products" element={<AdminProducts />} />
+              <Route path="/admin/products/:productId" element={<ProductDetailsPage/>}/>
               {/* Add other admin routes as needed */}
             </Route>
           </Routes>

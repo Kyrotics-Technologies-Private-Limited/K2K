@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiX } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 const AdminProducts = () => {
   // Initial products data
@@ -108,13 +109,22 @@ const AdminProducts = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState({
-    id: null,
-    name: "",
-    price: "",
-    stock: "",
-    category: "",
-  });
+  const [currentProduct, setCurrentProduct] = useState<{
+      id: number | null;
+      name: string;
+      price: string;
+      stock: string | number;
+      category: string;
+      description?: string;
+      status?: string;
+      sku?: string;
+    }>({
+      id: null,
+      name: "",
+      price: "",
+      stock: "",
+      category: "",
+    });
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<{
     id: number;
@@ -136,7 +146,7 @@ const AdminProducts = () => {
   });
 
   // Form handlers
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setCurrentProduct({
       ...currentProduct,
@@ -145,7 +155,7 @@ const AdminProducts = () => {
   };
 
   // Form submission handler
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (currentProduct.id) {
@@ -161,6 +171,15 @@ const AdminProducts = () => {
         ...currentProduct,
         id: Math.max(...products.map((p) => p.id)) + 1,
         stock: Number(currentProduct.stock), // Convert stock to number
+        description: currentProduct.description || "",
+        variants: [],
+        status: "active",
+        sku: currentProduct.sku || "",
+        origin: "",
+        floralSource: undefined,
+        extractionMethod: undefined,
+        mgoRating: undefined,
+        acidity: undefined,
       };
       setProducts([...products, newProduct]);
     }
@@ -169,13 +188,13 @@ const AdminProducts = () => {
   };
 
   // Edit product handler
-  const handleEdit = (product) => {
+  const handleEdit = (product: typeof initialProducts[number]) => {
     setCurrentProduct({ ...product });
     setIsModalOpen(true);
   };
 
   // Delete confirmation
-  const confirmDelete = (product) => {
+  const confirmDelete = (product: typeof initialProducts[number]) => {
     setProductToDelete(product);
     setIsDeleteConfirmOpen(true);
   };
@@ -183,7 +202,7 @@ const AdminProducts = () => {
   // Delete product handler
   const handleDelete = () => {
     setProducts(
-      products.filter((product) => product.id !== productToDelete.id)
+      products.filter((product) => productToDelete && product.id !== productToDelete.id)
     );
     setIsDeleteConfirmOpen(false);
   };
@@ -203,7 +222,13 @@ const AdminProducts = () => {
   // Close modal
   const closeModal = () => {
     setIsModalOpen(false);
-    setCurrentProduct(null);
+    setCurrentProduct({
+      id: null,
+      name: "",
+      price: "",
+      stock: "",
+      category: "",
+    });
   };
 
   return (
@@ -268,16 +293,36 @@ const AdminProducts = () => {
               {filteredProducts.map((product) => (
                 <tr key={product.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {product.name}
+                    <Link
+                      to={`/admin/products/${product.id}`}
+                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {product.name}
+                    </Link>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    ${product.price}
+                    <Link
+                      to={`/admin/products/${product.id}`}
+                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      ${product.price}
+                    </Link>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {product.stock}
+                    <Link
+                      to={`/admin/products/${product.id}`}
+                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {product.stock}
+                    </Link>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {product.category}
+                    <Link
+                      to={`/admin/products/${product.id}`}
+                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {product.category}
+                    </Link>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap flex space-x-2">
                     <button
