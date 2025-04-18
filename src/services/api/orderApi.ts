@@ -1,73 +1,71 @@
-// src/services/orderApi.ts
-import axios, { AxiosResponse } from 'axios';
-import { Order, OrderItem, TrackingInfo, CreateOrderData, OrderFilters } from '../../types/order';
-// import { auth } from '../firebase'; // Correct import
-import { auth } from '../firebase/firebase'; // Ensure this is the correct path to your firebase config
+// src/services/api/orderApi.ts
+import axios from 'axios';
+import { getAuth } from 'firebase/auth';
+import {
+  Order,
+  OrderItem,
+  TrackingInfo,
+  CreateOrderPayload,
+  CreateOrderResponse,
+  OrderListResponse,
+  UpdateOrderStatusPayload
+} from '../../types/order';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-const orderApi = axios.create({
-  baseURL: API_BASE_URL,
-});
-
-// Add a request interceptor to include the auth token
-orderApi.interceptors.request.use(async (config) => {
+const getAuthToken = async () => {
+  const auth = getAuth();
   const user = auth.currentUser;
-  if (user) {
-    const token = await user.getIdToken();
-    config.headers.Authorization = `Bearer ${token}`;
+  if (!user) throw new Error('User not authenticated');
+  return await user.getIdToken();
+};
+
+export const orderApi = {
+  createOrder: async (payload: CreateOrderPayload): Promise<CreateOrderResponse> => {
+    const token = await getAuthToken();
+    const response = await axios.post(`${API_BASE}/orders`, payload, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  },
+
+  getOrders: async (page = 1, limit = 10): Promise<OrderListResponse> => {
+    const token = await getAuthToken();
+    const response = await axios.get(`${API_BASE}/orders`, {
+      params: { page, limit },
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  },
+
+  getOrder: async (orderId: string): Promise<Order> => {
+    const token = await getAuthToken();
+    const response = await axios.get(`${API_BASE}/orders/${orderId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  },
+
+  cancelOrder: async (orderId: string, reason?: string): Promise<void> => {
+    const token = await getAuthToken();
+    await axios.put(`${API_BASE}/orders/${orderId}/cancel`, { reason }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  },
+
+  getTracking: async (orderId: string): Promise<TrackingInfo> => {
+    const token = await getAuthToken();
+    const response = await axios.get(`${API_BASE}/orders/${orderId}/tracking`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  },
+
+  updateOrderStatus: async (orderId: string, payload: UpdateOrderStatusPayload): Promise<Order> => {
+    const token = await getAuthToken();
+    const response = await axios.put(`${API_BASE}/orders/${orderId}/status`, payload, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
   }
-  return config;
-});
-
-// Response interceptor for error handling
-orderApi.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized access
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
-// User endpoints
-export const getOrders = async (): Promise<AxiosResponse<Order[]>> => {
-  return orderApi.get('/api/orders');
 };
-
-export const getOrder = async (id: string): Promise<AxiosResponse<Order>> => {
-  return orderApi.get(`/api/orders/${id}`);
-};
-
-export const createOrder = async (
-  orderData: Omit<CreateOrderData, 'user_id'>,
-  items: Omit<OrderItem, 'id' | 'created_at' | 'order_id'>[]
-): Promise<AxiosResponse<{ id: string }>> => {
-  return orderApi.post('/api/orders', { ...orderData, items });
-};
-
-export const cancelOrder = async (id: string): Promise<AxiosResponse<{ message: string }>> => {
-  return orderApi.put(`/api/orders/${id}/cancel`);
-};
-
-export const getTracking = async (id: string): Promise<AxiosResponse<TrackingInfo>> => {
-  return orderApi.get(`/api/orders/${id}/tracking`);
-};
-
-// Admin endpoints
-export const getAllOrdersAdmin = async (
-  filters: OrderFilters = {}
-): Promise<AxiosResponse<Order[]>> => {
-  return orderApi.get('/api/admin/orders', { params: filters });
-};
-
-export const updateOrderStatus = async (
-  id: string,
-  status: string
-): Promise<AxiosResponse<{ message: string }>> => {
-  return orderApi.put(`/api/admin/orders/${id}/status`, { status });
-};
-
-export default orderApi;

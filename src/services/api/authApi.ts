@@ -2,15 +2,13 @@
 import { User } from "../../types/user";
 import api from "./api";
 import {
-  getAuth,
   RecaptchaVerifier,
   signInWithPhoneNumber,
   ConfirmationResult,
   signOut,
 } from "firebase/auth";
 
-// Authentication services
-const auth = getAuth();
+import { auth } from "../firebase/firebase";
 
 /**
  * Initialize reCAPTCHA verifier
