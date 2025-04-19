@@ -47,10 +47,10 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   useEffect(() => {
     const fetchVariants = async () => {
       if (!product) return;
-
       try {
         setLoading(true);
         const fetchedVariants = await variantApi.getProductVariants(product.id);
+        console.log("Fetched Variants: ", fetchedVariants);
         setVariants(fetchedVariants);
         setError(null);
       } catch (err) {
@@ -62,12 +62,19 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
     };
 
     fetchVariants();
-  }, [product]);
+  }, [product]); // Add product as dependency
 
-  if (!product) {
+  // Set initial variant when variants array is populated
+  useEffect(() => {
+    if (variants.length > 0) {
+      setSelectedVariant(0);
+    }
+  }, [variants]);
+
+  if (!product || variants.length === 0) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <p>Product not found</p>
+        <p>Loading...</p>
       </div>
     );
   }
@@ -163,6 +170,14 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -295,15 +310,21 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                         >
                           ₹{variant.price.toLocaleString("en-IN")}
                         </span>
-                        {variant.originalPrice && (
-                          <span
-                            className={`text-xs line-through ${
-                              selectedVariant === index
-                                ? "text-gray-200"
-                                : "text-gray-500"
-                            }`}
-                          >
-                            ₹{variant.originalPrice.toLocaleString("en-IN")}
+                        {/* {variant.originalPrice && (
+                          <span className="text-sm font-semibold text-gray-500 line-through">
+                            ₹
+                            {(
+                              variants[selectedVariant].price *
+                              1.2
+                            ).toLocaleString("en-IN")}
+                          </span>
+                        )} */}
+                         {variant.originalPrice && (
+                          <span className="text-sm font-semibold text-gray-500 line-through">
+                            ₹
+                            {(
+                              variant.originalPrice
+                            ).toLocaleString("en-IN")}
                           </span>
                         )}
                         {variant.discount && (
@@ -329,18 +350,18 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                 <div className="flex flex-row gap-4 relative">
                   <span className="text-4xl font-bold text-black">
                     ₹
-                    {product.price.variants[
+                    {variants[
                       selectedVariant
                     ].price.toLocaleString("en-IN")}
                   </span>
                   <span className="text-lg font-bold text-gray-500 line-through pt-2">
                     ₹
                     {(
-                      product.price.variants[selectedVariant].price * 1.2
+                    variants[selectedVariant].originalPrice!
                     ).toLocaleString("en-IN")}
                   </span>
                   <span className="text-lg font-bold text-gray-500 pt-2">
-                    <p className="text-green-800">Save 20%</p>
+                    <p className="text-green-800"> save {variants[selectedVariant].discount}% off</p>
                   </span>
                   <div className="relative">
                     <button
@@ -371,7 +392,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                             <span className="text-sm font-semibold text-gray-500 line-through">
                               ₹
                               {(
-                                product.price.variants[selectedVariant].price *
+                                variants[selectedVariant].price *
                                 1.2
                               ).toLocaleString("en-IN")}
                             </span>
@@ -392,7 +413,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                             </span>
                             <span className="text-base font-bold text-green-800">
                               ₹
-                              {product.price.variants[
+                              {variants[
                                 selectedVariant
                               ].price.toLocaleString("en-IN")}
                             </span>
@@ -454,7 +475,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                     onClick={handleAddToCart}
                     className="flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
                     disabled={
-                      !product.price.variants[selectedVariant].inStock ||
+                      !variants[selectedVariant].inStock ||
                       loading
                     }
                   >
@@ -471,7 +492,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                     onClick={handleBuyNow}
                     className="flex-1 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
                     disabled={
-                      !product.price.variants[selectedVariant].inStock ||
+                      !variants[selectedVariant].inStock ||
                       loading
                     }
                   >

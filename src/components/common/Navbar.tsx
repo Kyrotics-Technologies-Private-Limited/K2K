@@ -18,7 +18,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   // console.log('user',user)
   // Get cart state from Redux
   const cart = useAppSelector(state => state.cart);
-  const itemCount =  0; // Safely access cart items count
+  const itemCount = cart.cartItems.reduce((total, item) => total + item.quantity, 0);
   
   const dispatch = useAppDispatch();
   const navigate = useNavigate();

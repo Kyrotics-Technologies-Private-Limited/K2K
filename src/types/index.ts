@@ -1,4 +1,4 @@
-import { Variant } from "./variant";
+// import { Variant } from "./variant";
 
 export interface Product {
     id: string;
@@ -6,7 +6,7 @@ export interface Product {
     price: {
       amount: number;
       currency: "INR";
-      variants: Variant[];
+     
     };
     description: string;
     // ingredients: string[];
