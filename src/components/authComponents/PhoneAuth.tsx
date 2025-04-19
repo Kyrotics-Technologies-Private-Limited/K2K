@@ -614,16 +614,18 @@ const PhoneAuth: React.FC = () => {
     dispatch(clearError());
   };
 
-  if (isAuthenticated && user) {
+  // console.log("User:", user);
+
+  if (isAuthenticated && user && !user.needsProfileCompletion) {
     return (
       <div className="text-center p-6">
         <h2 className="text-xl font-semibold mb-4">
           Authentication Successful
         </h2>
         <p className="mb-4">Welcome{user.name ? `, ${user.name}` : ""}!</p>
-        <Button onClick={handleSignOut} variant="outline">
+        {/* <Button onClick={handleSignOut} variant="outline">
           Sign Out
-        </Button>
+        </Button> */}
       </div>
     );
   }

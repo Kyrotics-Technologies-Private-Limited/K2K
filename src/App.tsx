@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { useState } from "react";
-import { AuthProvider } from "./context/AuthContext"; // Keep AuthContext if you're using it for auth
 
 // Public components
 import AdvertisementBar from "./components/common/AdvertisementBar";
@@ -32,7 +31,9 @@ import { Provider } from "react-redux";
 import AppProvider from "./AppProvider";
 import AdminProducts from "./pages/admin/AdminProducts";
 //import PhoneAuth from "./components/PhoneAuth";
-// import ProductPage from "./pages/admin/ProductPage";
+
+import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
+
 const PublicLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -56,30 +57,35 @@ function App() {
       <BrowserRouter>
         <AppProvider>
           <Routes>
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/all-products" element={<AllProductPage />} />
-            <Route path="/product/:id" element={<ProductPage />} />
-            {/* <Route path="/checkout" element={<CheckoutPage />} /> */}
-            <Route path="/kishanParivarPage" element={<KishanParivarPage />} />
-            <Route path="/register" element={<SignUp />} />
-            <Route path="/login" element={<Login />} />
-            <Route path='/forgot-password' element={<ForgotPasswordPage/>}/>
-            <Route path='/reset-password' element={<ResetPasswordPage/>}/>
-            {/* <Route path="/orders" element={<OrdersPage/>}/> */}
-            {/* <Route path="/orders/:id" element={<OrderDetailPage/>}/> */}
-            <Route path='/our-story' element={<OurStory/>}/>
-            <Route path='/traceability' element={<Traceability/>}/>
-            <Route path='/privacypolicy' element={<PrivacyPolicy/>}/>
-            <Route path='/termsofservice' element={<TermsOfService/>}/>
-            <Route path='/shipping' element={<ShippingPolicy/>}/>
-            <Route path='/refund' element={<RefundPolicy/>}/>
-            <Route path='/profile' element={<UserProfilePage/>}/>
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/all-products" element={<AllProductPage />} />
+              <Route path="/product/:id" element={<ProductPage />} />
+              {/* <Route path="/checkout" element={<CheckoutPage />} /> */}
+              <Route
+                path="/kishanParivarPage"
+                element={<KishanParivarPage />}
+              />
+              <Route path="/register" element={<SignUp />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+              {/* <Route path="/orders" element={<OrdersPage/>}/> */}
+              {/* <Route path="/orders/:id" element={<OrderDetailPage/>}/> */}
+              <Route path="/our-story" element={<OurStory />} />
+              <Route path="/traceability" element={<Traceability />} />
+              <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+              <Route path="/termsofservice" element={<TermsOfService />} />
+              <Route path="/shipping" element={<ShippingPolicy />} />
+              <Route path="/refund" element={<RefundPolicy />} />
+              <Route path="/profile" element={<UserProfilePage />} />
             </Route>
             {/* Admin Routes */}
             <Route path="/admin" element={<Layout />}>
-            <Route index element={<AdminDashboard />} />
+              <Route index element={<AdminDashboard />} />
               <Route path="products" element={<AdminProducts />} />
+              <Route path="products/:id" element={<ProductDetailsPage />} />
+              {/* Add other admin routes as needed */}
             </Route>
           </Routes>
         </AppProvider>
