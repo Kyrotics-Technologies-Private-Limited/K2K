@@ -336,7 +336,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ShoppingBag, CreditCard, Plus, Minus, Trash2 } from 'lucide-react';
 import { createOrder } from '../services/api/orderApi';
-import cartApi, { CartItem as ApiCartItem, CartSummary } from '../services/api/cartApi';
+import { cartApi } from '../services/api/cartApi';
+import { Cart, CartItem, CartSummary } from '../types/cart';
 
 interface ShippingDetails {
   firstName: string;
@@ -371,7 +372,7 @@ export const CheckoutPage: React.FC = () => {
   const [cart, setCart] = useState<CartState>({
     items: [],
     summary: {
-      item_count: 0,
+      total_items: 0,
       subtotal: 0,
       tax: 0,
       total: 0,

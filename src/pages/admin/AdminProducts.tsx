@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiX } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const AdminProducts = () => {
+  const navigate = useNavigate();
   // Initial products data
   const initialProducts = [
     {
@@ -110,21 +111,21 @@ const AdminProducts = () => {
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<{
-      id: number | null;
-      name: string;
-      price: string;
-      stock: string | number;
-      category: string;
-      description?: string;
-      status?: string;
-      sku?: string;
-    }>({
-      id: null,
-      name: "",
-      price: "",
-      stock: "",
-      category: "",
-    });
+    id: number | null;
+    name: string;
+    price: string;
+    stock: string | number;
+    category: string;
+    description?: string;
+    status?: string;
+    sku?: string;
+  }>({
+    id: null,
+    name: "",
+    price: "",
+    stock: "",
+    category: "",
+  });
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<{
     id: number;
@@ -146,7 +147,11 @@ const AdminProducts = () => {
   });
 
   // Form handlers
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
     setCurrentProduct({
       ...currentProduct,
@@ -162,24 +167,33 @@ const AdminProducts = () => {
       // Update existing product
       setProducts(
         products.map((product) =>
-          product.id === currentProduct.id ? currentProduct : product
+          product.id === currentProduct.id
+            ? {
+                ...product,
+                name: currentProduct.name,
+                description: currentProduct.description || "",
+                category: currentProduct.category,
+                price: currentProduct.price,
+                stock: Number(currentProduct.stock),
+                status: currentProduct.status || "active",
+                sku: currentProduct.sku || "",
+              }
+            : product
         )
       );
     } else {
       // Add new product
       const newProduct = {
-        ...currentProduct,
         id: Math.max(...products.map((p) => p.id)) + 1,
-        stock: Number(currentProduct.stock), // Convert stock to number
+        name: currentProduct.name,
         description: currentProduct.description || "",
+        price: currentProduct.price,
+        stock: Number(currentProduct.stock),
+        category: currentProduct.category,
         variants: [],
         status: "active",
         sku: currentProduct.sku || "",
         origin: "",
-        floralSource: undefined,
-        extractionMethod: undefined,
-        mgoRating: undefined,
-        acidity: undefined,
       };
       setProducts([...products, newProduct]);
     }
@@ -188,13 +202,13 @@ const AdminProducts = () => {
   };
 
   // Edit product handler
-  const handleEdit = (product: typeof initialProducts[number]) => {
+  const handleEdit = (product: (typeof initialProducts)[number]) => {
     setCurrentProduct({ ...product });
     setIsModalOpen(true);
   };
 
   // Delete confirmation
-  const confirmDelete = (product: typeof initialProducts[number]) => {
+  const confirmDelete = (product: (typeof initialProducts)[number]) => {
     setProductToDelete(product);
     setIsDeleteConfirmOpen(true);
   };
@@ -202,7 +216,9 @@ const AdminProducts = () => {
   // Delete product handler
   const handleDelete = () => {
     setProducts(
-      products.filter((product) => productToDelete && product.id !== productToDelete.id)
+      products.filter(
+        (product) => productToDelete && product.id !== productToDelete.id
+      )
     );
     setIsDeleteConfirmOpen(false);
   };
@@ -229,6 +245,10 @@ const AdminProducts = () => {
       stock: "",
       category: "",
     });
+  };
+
+  const handleProductClick = (productId: number) => {
+    navigate(`/admin/products/${productId}`);
   };
 
   return (
@@ -261,10 +281,9 @@ const AdminProducts = () => {
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
             <option>All Categories</option>
-            <option>Clothing</option>
-            <option>Electronics</option>
-            <option>Accessories</option>
-            <option>Fitness</option>
+            <option>Ghee</option>
+            <option>Honey</option>
+            <option>Oils</option>
           </select>
         </div>
 
@@ -293,36 +312,36 @@ const AdminProducts = () => {
               {filteredProducts.map((product) => (
                 <tr key={product.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Link
-                      to={`/admin/products/${product.id}`}
+                    <button
+                      onClick={() => handleProductClick(product.id)}
                       className="text-blue-600 hover:text-blue-800 hover:underline"
                     >
                       {product.name}
-                    </Link>
+                    </button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Link
-                      to={`/admin/products/${product.id}`}
+                    <button
+                      onClick={() => handleProductClick(product.id)}
                       className="text-blue-600 hover:text-blue-800 hover:underline"
                     >
                       ${product.price}
-                    </Link>
+                    </button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Link
-                      to={`/admin/products/${product.id}`}
+                    <button
+                      onClick={() => handleProductClick(product.id)}
                       className="text-blue-600 hover:text-blue-800 hover:underline"
                     >
                       {product.stock}
-                    </Link>
+                    </button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Link
-                      to={`/admin/products/${product.id}`}
+                    <button
+                      onClick={() => handleProductClick(product.id)}
                       className="text-blue-600 hover:text-blue-800 hover:underline"
                     >
                       {product.category}
-                    </Link>
+                    </button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap flex space-x-2">
                     <button
@@ -391,7 +410,7 @@ const AdminProducts = () => {
                         value={currentProduct.name}
                         onChange={handleInputChange}
                         className="w-full border border-gray-300 rounded-md px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        placeholder="e.g. Premium Wireless Headphones"
+                        placeholder="e.g. Ghee"
                         required
                       />
                     </div>
@@ -424,10 +443,9 @@ const AdminProducts = () => {
                         required
                       >
                         <option value="">Select category</option>
-                        <option value="Clothing">Clothing</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Accessories">Accessories</option>
-                        <option value="Fitness">Fitness</option>
+                        <option value="Ghee">Ghee</option>
+                        <option value="Oils">Oils</option>
+                        <option value="Honey">Honey</option>
                       </select>
                     </div>
 
