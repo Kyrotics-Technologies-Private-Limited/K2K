@@ -6,37 +6,37 @@ export const sampleProducts : Product[] = [
       price: {
         amount: 1200,
         currency: 'INR',
-        variants: [
-          {
-            weight: '250ml jar',
-            price: 580,
-            originalPrice: 650,
-            discount: 10,
-            inStock: true
-          },
-          {
-            weight: '500ml jar',
-            price: 1110,
-            originalPrice: 1299,
-            discount: 15,
-            inStock: true
-          },
-          {
-            weight: '1L jar',
-            price: 2160,
-            originalPrice: 2400,
-            discount: 10,
-            inStock: true
-          },
+        // variants: [
+        //   {
+        //     weight: '250ml jar',
+        //     price: 580,
+        //     originalPrice: 650,
+        //     discount: 10,
+        //     inStock: true
+        //   },
+        //   {
+        //     weight: '500ml jar',
+        //     price: 1110,
+        //     originalPrice: 1299,
+        //     discount: 15,
+        //     inStock: true
+        //   },
+        //   {
+        //     weight: '1L jar',
+        //     price: 2160,
+        //     originalPrice: 2400,
+        //     discount: 10,
+        //     inStock: true
+        //   },
           
-          {
-            weight: '5L tin can',
-            price: 10449,
-            originalPrice: 10999,
-            discount: 5,
-            inStock: true
-          }
-        ]
+        //   {
+        //     weight: '5L tin can',
+        //     price: 10449,
+        //     originalPrice: 10999,
+        //     discount: 5,
+        //     inStock: true
+        //   }
+        // ]
       },
       description: 'Our adulteration-free desi A2 Cow ghee, handcrafted by rural women, brings remarkable health benefits. Pure Ghee enhances digestion,supports brain function, and strengthens bones. Packed with vitamins and healthy fats, it nourishes the body, boosts immunity,and promotes overall well-being. Experience the goodness of tradition and empower the rural communities with every wholesome drop.',
       
@@ -100,37 +100,37 @@ export const sampleProducts : Product[] = [
       price: {
         amount: 850,
         currency: 'INR',
-        variants: [
-          {
-            weight: '250ml jar',
-            price: 580,
-            originalPrice: 650,
-            discount: 10,
-            inStock: true
-          },
-          {
-            weight: '500ml jar',
-            price: 1110,
-            originalPrice: 1299,
-            discount: 15,
-            inStock: true
-          },
-          {
-            weight: '1L jar',
-            price: 2160,
-            originalPrice: 2400,
-            discount: 10,
-            inStock: true
-          },
+        // variants: [
+        //   {
+        //     weight: '250ml jar',
+        //     price: 580,
+        //     originalPrice: 650,
+        //     discount: 10,
+        //     inStock: true
+        //   },
+        //   {
+        //     weight: '500ml jar',
+        //     price: 1110,
+        //     originalPrice: 1299,
+        //     discount: 15,
+        //     inStock: true
+        //   },
+        //   {
+        //     weight: '1L jar',
+        //     price: 2160,
+        //     originalPrice: 2400,
+        //     discount: 10,
+        //     inStock: true
+        //   },
           
-          {
-            weight: '5L tin can',
-            price: 10449,
-            originalPrice: 10999,
-            discount: 5,
-            inStock: true
-          }
-        ]
+        //   {
+        //     weight: '5L tin can',
+        //     price: 10449,
+        //     originalPrice: 10999,
+        //     discount: 5,
+        //     inStock: true
+        //   }
+        // ]
       },
       description: "Unlock the natural goodness of health with our adulteration-free, raw, and unprocessed honey, sourced directly from dedicated beekeepers.Packed with antioxidants, enzymes, and nutrients, it boosts immunity, soothes sore throats, promotes digestion, and enhances overallwell-being. Indulge in the pure sweetness of nature's gift.",
      
@@ -194,37 +194,37 @@ export const sampleProducts : Product[] = [
       price: {
         amount: 750,
         currency: 'INR',
-        variants: [
-          {
-            weight: '250ml jar',
-            price: 580,
-            originalPrice: 650,
-            discount: 10,
-            inStock: true
-          },
-          {
-            weight: '500ml jar',
-            price: 1110,
-            originalPrice: 1299,
-            discount: 15,
-            inStock: true
-          },
-          {
-            weight: '1L jar',
-            price: 2160,
-            originalPrice: 2400,
-            discount: 10,
-            inStock: true
-          },
+        // variants: [
+        //   {
+        //     weight: '250ml jar',
+        //     price: 580,
+        //     originalPrice: 650,
+        //     discount: 10,
+        //     inStock: true
+        //   },
+        //   {
+        //     weight: '500ml jar',
+        //     price: 1110,
+        //     originalPrice: 1299,
+        //     discount: 15,
+        //     inStock: true
+        //   },
+        //   {
+        //     weight: '1L jar',
+        //     price: 2160,
+        //     originalPrice: 2400,
+        //     discount: 10,
+        //     inStock: true
+        //   },
           
-          {
-            weight: '5L tin can',
-            price: 10449,
-            originalPrice: 10999,
-            discount: 5,
-            inStock: true
-          }
-        ]
+        //   {
+        //     weight: '5L tin can',
+        //     price: 10449,
+        //     originalPrice: 10999,
+        //     discount: 5,
+        //     inStock: true
+        //   }
+        // ]
       },
       description: " Experience the unparalleled health benefits of adulteration-free, cold-pressed, unrefined mustard oil, lovingly made by rural farmers.Packed with essential omega-3 fatty acids, vitamins, and antioxidants, it promotes heart health, boosts immunity, aids digestion,and supports radiant skin and hair. Embrace nature's gift for holistic well-being",
       origin: 'Gujarat',
@@ -287,37 +287,37 @@ export const sampleProducts : Product[] = [
       price: {
         amount: 580,
         currency: 'INR',
-        variants: [
-          {
-            weight: '250ml jar',
-            price: 580,
-            originalPrice: 650,
-            discount: 10,
-            inStock: true
-          },
-          {
-            weight: '500ml jar',
-            price: 1110,
-            originalPrice: 1299,
-            discount: 15,
-            inStock: true
-          },
-          {
-            weight: '1L jar',
-            price: 2160,
-            originalPrice: 2400,
-            discount: 10,
-            inStock: true
-          },
+        // variants: [
+        //   {
+        //     weight: '250ml jar',
+        //     price: 580,
+        //     originalPrice: 650,
+        //     discount: 10,
+        //     inStock: true
+        //   },
+        //   {
+        //     weight: '500ml jar',
+        //     price: 1110,
+        //     originalPrice: 1299,
+        //     discount: 15,
+        //     inStock: true
+        //   },
+        //   {
+        //     weight: '1L jar',
+        //     price: 2160,
+        //     originalPrice: 2400,
+        //     discount: 10,
+        //     inStock: true
+        //   },
           
-          {
-            weight: '5L tin can',
-            price: 10449,
-            originalPrice: 10999,
-            discount: 5,
-            inStock: true
-          }
-        ]
+        //   {
+        //     weight: '5L tin can',
+        //     price: 10449,
+        //     originalPrice: 10999,
+        //     discount: 5,
+        //     inStock: true
+        //   }
+        // ]
       },
       description: "Unlock the natural goodness of health with our adulteration-free, raw, and unprocessed honey, sourced directly from dedicated beekeepers.Packed with antioxidants, enzymes, and nutrients, it boosts immunity, soothes sore throats, promotes digestion, and enhances overallwell-being. Indulge in the pure sweetness of nature's gift.",
      

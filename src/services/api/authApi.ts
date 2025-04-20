@@ -72,7 +72,7 @@ export const verifyOTP = async (
 export const getCurrentUser = async (): Promise<User> => {
   try {
     const token = await auth.currentUser?.getIdToken();
-
+   console.log("Token:", token);
     if (!token) {
       throw new Error("Not authenticated");
     }
