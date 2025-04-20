@@ -82,7 +82,6 @@ function App() {
               <Route path="products" element={<ProductPage />} />
             </Route>
           </Routes>
-      <Footer />
         </AppProvider>
       </BrowserRouter>
     </Provider>
