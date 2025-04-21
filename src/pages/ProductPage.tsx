@@ -18,11 +18,10 @@
 
 // export default ProductPage;
 
-
 import React, { useState, useEffect } from "react";
 import { ProductDetail } from "../components/products/ProductDetail";
-import { Product } from "../types";
-import { productApi } from "../services/api/productApi";
+import { Product } from "../types/index";
+import {productApi} from "../services/api/productApi";
 import { useParams, useNavigate } from "react-router-dom";
 
 const ProductPage = () => {
@@ -44,14 +43,14 @@ const ProductPage = () => {
         setProduct(productData);
 
         // Fetch all products to get related products
-        const allProducts = await productApi.getAllProducts();
+        const allProducts = await productApi.fetchProducts();
 
         // Filter related products (same category, excluding current product)
-        const related = allProducts
-          .filter((p) => p.id !== id && p.category === productData.category)
-          .slice(0, 4); // Limit to 4 related products
-
-        setRelatedProducts(allProducts);
+        setRelatedProducts(
+          allProducts
+            .filter((p) => p.id !== id && p.category === productData.category)
+            .slice(0, 4) // Limit to 4 related products
+        );
         setError(null);
       } catch (err) {
         console.error("Error fetching product:", err);
