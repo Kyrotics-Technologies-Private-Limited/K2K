@@ -33,6 +33,9 @@ import AdminProducts from "./pages/admin/AdminProducts";
 //import PhoneAuth from "./components/PhoneAuth";
 
 import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
+import ProductListPage from "./pages/admin/ProductListPage";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminCustomers from "./pages/admin/AdminCustomers";
 
 const PublicLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -85,6 +88,9 @@ function App() {
               <Route index element={<AdminDashboard />} />
               <Route path="products" element={<AdminProducts />} />
               <Route path="products/:id" element={<ProductDetailsPage />} />
+              <Route path="productlist" element={<ProductListPage />} />
+              <Route path="orders" element={<AdminOrders />} />
+              <Route path="customers" element={<AdminCustomers/>} />
               {/* Add other admin routes as needed */}
             </Route>
           </Routes>
