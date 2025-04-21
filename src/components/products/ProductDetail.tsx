@@ -320,7 +320,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                           </span>
                         )} */}
                          {variant.originalPrice && (
-                          <span className="text-sm font-semibold text-gray-500 line-through">
+                          <span className="text-sm font-semibold text-gray-400 line-through">
                             ₹
                             {(
                               variant.originalPrice

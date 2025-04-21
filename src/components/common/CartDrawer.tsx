@@ -273,12 +273,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           ) : (
             <>
               {/* Cart Banner */}
-              <div
+              {/* <div
                 className="bg-green-50 border-b border-green-100 px-6 py-3 h-32"
                 style={{
                   backgroundImage: 'url("https://picsum.photos/200/300")',
                 }}
-              ></div>
+              ></div> */}
 
               {/* Cart Items */}
               <div className="flex-1 overflow-y-auto py-4">
