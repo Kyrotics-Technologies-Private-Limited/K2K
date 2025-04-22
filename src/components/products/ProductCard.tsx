@@ -482,7 +482,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
     );
   }
 
-  if (error || !selectedVariant) {
+  if (error ) {
     console.error("Rendering error state:", error || "No variant available");
     return (
       <div className="bg-white border-0.5 border-grey-50 rounded-md shadow-md p-4 h-full">
@@ -491,21 +491,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
     );
   }
 
-  const calculateDiscountPrice = (originalPrice: number, discountPercentage: number = 20) => {
-    return originalPrice * (1 - discountPercentage / 100);
-  };
+  // const calculateDiscountPrice = (originalPrice: number, discountPercentage: number = 20) => {
+  //   return originalPrice * (1 - discountPercentage / 100);
+  // };
+    
+    const basePrice = selectedVariant?.originalPrice || 0;
+    const discountedPrice = selectedVariant?.price || 0;
 
-  const basePrice = selectedVariant.price;
-  const discountedPrice = calculateDiscountPrice(basePrice);
-
-  console.log("Rendering ProductCard with:", {
-    productId: product.id,
-    productName: product.name,
-    selectedVariantId: selectedVariant.id,
-    basePrice,
-    discountedPrice,
-    quantity
-  });
+  // console.log("Rendering ProductCard with:", {
+  //   productId: product.id,
+  //   productName: product.name,
+  //   selectedVariantId: selectedVariant!.id,
+  //   basePrice,
+  //   discountedPrice,
+  //   quantity
+  // });
 
   return (
     <Link
@@ -567,7 +567,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
               <span className="text-xs line-through text-gray-500">
                 ₹{basePrice.toLocaleString("en-IN")}
               </span>
-              <span className="text-xs text-green-800">20% off</span>
+              <span className="text-xs text-green-800">{selectedVariant?.discount} off</span>
             </div>
             {product.stockStatus === "out_of_stock" && (
               <span className="text-[10px] text-red-500 font-medium">
