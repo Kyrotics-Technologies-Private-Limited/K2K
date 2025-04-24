@@ -77,7 +77,7 @@ const ProductPage = () => {
         <p className="text-red-600 mb-4">{error || "Product not found"}</p>
         <button
           className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800"
-          onClick={() => navigate("/products")}
+          onClick={() => navigate("/All-products")}
         >
           Back to Products
         </button>

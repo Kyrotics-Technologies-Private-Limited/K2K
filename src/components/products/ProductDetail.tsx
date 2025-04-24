@@ -71,7 +71,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
     }
   }, [variants]);
 
-  if (!product || variants.length === 0) {
+  if (!product) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <p>Loading...</p>
@@ -173,8 +173,8 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <p>Loading...</p>
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-700"></div>
       </div>
     );
   }
@@ -274,240 +274,240 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 
             <div>
               <h2 className="text-xl font-semibold mb-4">Select Variant</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
-                {variants.map((variant, index) => (
-                  <button
-                    key={variant.id}
-                    onClick={() => setSelectedVariant(index)}
-                    className={`flex flex-col items-start p-3 rounded-lg w-full ${
-                      selectedVariant === index
-                        ? "bg-green-800 text-white"
-                        : "bg-gray-50 hover:bg-gray-100"
-                    } ${
-                      !variant.inStock ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                    disabled={!variant.inStock}
-                  >
-                    <div className="flex flex-col items-start w-full">
-                      <div className="flex justify-between w-full items-start">
-                        <span
-                          className={`text-sm font-medium ${
-                            selectedVariant === index
-                              ? "text-white"
-                              : "text-gray-900"
-                          } mb-1`}
-                        >
-                          {variant.weight}
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap items-baseline gap-1 mb-1">
-                        <span
-                          className={`text-lg font-bold ${
-                            selectedVariant === index
-                              ? "text-white"
-                              : "text-gray-900"
-                          }`}
-                        >
-                          ₹{variant.price.toLocaleString("en-IN")}
-                        </span>
-                        {/* {variant.originalPrice && (
-                          <span className="text-sm font-semibold text-gray-500 line-through">
-                            ₹
-                            {(
-                              variants[selectedVariant].price *
-                              1.2
-                            ).toLocaleString("en-IN")}
-                          </span>
-                        )} */}
-                         {variant.originalPrice && (
-                          <span className="text-sm font-semibold text-gray-400 line-through">
-                            ₹
-                            {(
-                              variant.originalPrice
-                            ).toLocaleString("en-IN")}
-                          </span>
-                        )}
-                        {variant.discount && (
+              {variants.length === 0 ? (
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <p className="text-gray-600 text-center">No variants available for this product.</p>
+                  <p className="text-sm text-gray-500 text-center mt-1">Please check back later or contact us for availability.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
+                  {variants.map((variant, index) => (
+                    <button
+                      key={variant.id}
+                      onClick={() => setSelectedVariant(index)}
+                      className={`flex flex-col items-start p-3 rounded-lg w-full ${
+                        selectedVariant === index
+                          ? "bg-green-800 text-white"
+                          : "bg-gray-50 hover:bg-gray-100"
+                      } ${
+                        !variant.inStock ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                      disabled={!variant.inStock}
+                    >
+                      <div className="flex flex-col items-start w-full">
+                        <div className="flex justify-between w-full items-start">
                           <span
-                            className={`text-xs ${
+                            className={`text-sm font-medium ${
                               selectedVariant === index
                                 ? "text-white"
-                                : "text-red-600"
+                                : "text-gray-900"
+                            } mb-1`}
+                          >
+                            {variant.weight}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap items-baseline gap-1 mb-1">
+                          <span
+                            className={`text-lg font-bold ${
+                              selectedVariant === index
+                                ? "text-white"
+                                : "text-gray-900"
                             }`}
                           >
-                            {variant.discount}% off
+                            ₹{variant.price.toLocaleString("en-IN")}
                           </span>
+                          {variant.originalPrice && (
+                            <span className="text-sm font-semibold text-gray-500 line-through">
+                              ₹
+                              {variant.originalPrice.toLocaleString("en-IN")}
+                            </span>
+                          )}
+                          {variant.discount && (
+                            <span
+                              className={`text-xs ${
+                                selectedVariant === index
+                                  ? "text-white"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {variant.discount}% off
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {variants.length > 0 && (
+              <>
+                <div>
+                  <div className="flex items-baseline gap-2">
+                    <div className="flex flex-row gap-4 relative">
+                      <span className="text-4xl font-bold text-black">
+                        ₹
+                        {variants[
+                          selectedVariant
+                        ].price.toLocaleString("en-IN")}
+                      </span>
+                      <span className="text-lg font-bold text-gray-500 line-through pt-2">
+                        ₹
+                        {(
+                        variants[selectedVariant].originalPrice!
+                        ).toLocaleString("en-IN")}
+                      </span>
+                      <span className="text-lg font-bold text-gray-500 pt-2">
+                        <p className="text-green-800"> save {variants[selectedVariant].discount}% off</p>
+                      </span>
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowPricePopup(true)}
+                          className="flex items-center gap-2 pt-2 hover:text-green-800"
+                        >
+                          Know your price
+                          <Info />
+                        </button>
+                        {showPricePopup && (
+                          <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg p-4 w-64 z-50">
+                            <button
+                              onClick={() => setShowPricePopup(false)}
+                              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+
+                            <h2 className="text-lg font-bold text-gray-800 mb-3">
+                              Price Details
+                            </h2>
+
+                            <div className="space-y-3">
+                              <div className="flex justify-between items-center border-b pb-2">
+                                <span className="text-sm text-gray-600">
+                                  Original Price
+                                </span>
+                                <span className="text-sm font-semibold text-gray-500 line-through">
+                                  ₹
+                                  {(
+                                    variants[selectedVariant].price *
+                                    1.2
+                                  ).toLocaleString("en-IN")}
+                                </span>
+                              </div>
+
+                              <div className="flex justify-between items-center border-b pb-2">
+                                <span className="text-sm text-gray-600">
+                                  Discount
+                                </span>
+                                <span className="text-sm font-semibold text-green-800">
+                                  20% OFF
+                                </span>
+                              </div>
+
+                              <div className="flex justify-between items-center border-b pb-2">
+                                <span className="text-sm text-gray-600">
+                                  Final Price
+                                </span>
+                                <span className="text-base font-bold text-green-800">
+                                  ₹
+                                  {variants[
+                                    selectedVariant
+                                  ].price.toLocaleString("en-IN")}
+                                </span>
+                              </div>
+
+                              <div className="mt-2 text-xs text-gray-600">
+                                <p className="font-semibold mb-1">
+                                  Why this price?
+                                </p>
+                                <ul className="list-disc list-inside space-y-1">
+                                  <li>Direct sourcing from farmers</li>
+                                  <li>Minimal processing costs</li>
+                                  <li>No middlemen</li>
+                                  <li>Bulk purchase discounts</li>
+                                  <li>Special promotional offer</li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
                         )}
                       </div>
                     </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-baseline gap-2">
-                <div className="flex flex-row gap-4 relative">
-                  <span className="text-4xl font-bold text-black">
-                    ₹
-                    {variants[
-                      selectedVariant
-                    ].price.toLocaleString("en-IN")}
-                  </span>
-                  <span className="text-lg font-bold text-gray-500 line-through pt-2">
-                    ₹
-                    {(
-                    variants[selectedVariant].originalPrice!
-                    ).toLocaleString("en-IN")}
-                  </span>
-                  <span className="text-lg font-bold text-gray-500 pt-2">
-                    <p className="text-green-800"> save {variants[selectedVariant].discount}% off</p>
-                  </span>
-                  <div className="relative">
-                    <button
-                      onClick={() => setShowPricePopup(true)}
-                      className="flex items-center gap-2 pt-2 hover:text-green-800"
-                    >
-                      Know your price
-                      <Info />
-                    </button>
-                    {showPricePopup && (
-                      <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg p-4 w-64 z-50">
-                        <button
-                          onClick={() => setShowPricePopup(false)}
-                          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-
-                        <h2 className="text-lg font-bold text-gray-800 mb-3">
-                          Price Details
-                        </h2>
-
-                        <div className="space-y-3">
-                          <div className="flex justify-between items-center border-b pb-2">
-                            <span className="text-sm text-gray-600">
-                              Original Price
-                            </span>
-                            <span className="text-sm font-semibold text-gray-500 line-through">
-                              ₹
-                              {(
-                                variants[selectedVariant].price *
-                                1.2
-                              ).toLocaleString("en-IN")}
-                            </span>
-                          </div>
-
-                          <div className="flex justify-between items-center border-b pb-2">
-                            <span className="text-sm text-gray-600">
-                              Discount
-                            </span>
-                            <span className="text-sm font-semibold text-green-800">
-                              20% OFF
-                            </span>
-                          </div>
-
-                          <div className="flex justify-between items-center border-b pb-2">
-                            <span className="text-sm text-gray-600">
-                              Final Price
-                            </span>
-                            <span className="text-base font-bold text-green-800">
-                              ₹
-                              {variants[
-                                selectedVariant
-                              ].price.toLocaleString("en-IN")}
-                            </span>
-                          </div>
-
-                          <div className="mt-2 text-xs text-gray-600">
-                            <p className="font-semibold mb-1">
-                              Why this price?
-                            </p>
-                            <ul className="list-disc list-inside space-y-1">
-                              <li>Direct sourcing from farmers</li>
-                              <li>Minimal processing costs</li>
-                              <li>No middlemen</li>
-                              <li>Bulk purchase discounts</li>
-                              <li>Special promotional offer</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="flex items-center space-x-3">
-              <div className="flex border border-gray-300 rounded-xl">
-                <button
-                  onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                  className="w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
-                  disabled={loading}
-                >
-                  -
-                </button>
-                <span className="text-xl font-medium w-12 text-center mt-1">
-                  {quantity}
-                </span>
-                <button
-                  onClick={() => setQuantity((prev) => prev + 1)}
-                  className="w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
-                  disabled={loading}
-                >
-                  +
-                </button>
-              </div>
+                <div className="flex items-center space-x-3">
+                  <div className="flex border border-gray-300 rounded-xl">
+                    <button
+                      onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                      className="w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
+                      disabled={loading}
+                    >
+                      -
+                    </button>
+                    <span className="text-xl font-medium w-12 text-center mt-1">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() => setQuantity((prev) => prev + 1)}
+                      className="w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
+                      disabled={loading}
+                    >
+                      +
+                    </button>
+                  </div>
 
-              {product.stockStatus === "out_of_stock" ? (
-                <div className="flex-1 bg-gray-100 rounded-lg p-4 text-center">
-                  <p className="text-gray-600 font-medium">
-                    Currently Out of Stock
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Please check back later or contact us for availability
-                  </p>
+                  {product.stockStatus === "out_of_stock" ? (
+                    <div className="flex-1 bg-gray-100 rounded-lg p-4 text-center">
+                      <p className="text-gray-600 font-medium">
+                        Currently Out of Stock
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Please check back later or contact us for availability
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        onClick={handleAddToCart}
+                        className="flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
+                        disabled={
+                          !variants[selectedVariant].inStock ||
+                          loading
+                        }
+                      >
+                        {loading ? (
+                          "Adding..."
+                        ) : (
+                          <>
+                            <ShoppingCart className="w-5 h-5" />
+                            Add to Cart
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={handleBuyNow}
+                        className="flex-1 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
+                        disabled={
+                          !variants[selectedVariant].inStock ||
+                          loading
+                        }
+                      >
+                        {loading ? (
+                          "Processing..."
+                        ) : (
+                          <>
+                            <CreditCard className="w-5 h-5" />
+                            Buy Now
+                          </>
+                        )}
+                      </button>
+                    </>
+                  )}
                 </div>
-              ) : (
-                <>
-                  <button
-                    onClick={handleAddToCart}
-                    className="flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
-                    disabled={
-                      !variants[selectedVariant].inStock ||
-                      loading
-                    }
-                  >
-                    {loading ? (
-                      "Adding..."
-                    ) : (
-                      <>
-                        <ShoppingCart className="w-5 h-5" />
-                        Add to Cart
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={handleBuyNow}
-                    className="flex-1 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
-                    disabled={
-                      !variants[selectedVariant].inStock ||
-                      loading
-                    }
-                  >
-                    {loading ? (
-                      "Processing..."
-                    ) : (
-                      <>
-                        <CreditCard className="w-5 h-5" />
-                        Buy Now
-                      </>
-                    )}
-                  </button>
-                </>
-              )}
-            </div>
+              </>
+            )}
 
             <div>
               <h2 className="text-xl font-semibold mb-2">Description</h2>
