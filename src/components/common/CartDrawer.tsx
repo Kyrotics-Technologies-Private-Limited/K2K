@@ -88,14 +88,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     };
 
     restoreCart();
-  }, [dispatch, activeCartId]);
+  }, [ activeCartId]);
 
   // Fetch cart data when drawer opens
   useEffect(() => {
     if (isOpen && activeCartId) {
       dispatch(fetchCartItems(activeCartId));
     }
-  }, [isOpen, activeCartId, dispatch]);
+  }, [isOpen, activeCartId]);
 
   // Fetch product and variant details when cart items change
   useEffect(() => {
