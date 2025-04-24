@@ -1,0 +1,234 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import {
+  setStep,
+  setPaymentMethod,
+  setProcessing,
+  resetCheckout,
+} from "../../store/slices/checkoutSlice";
+import { orderApi } from "../../services/api/orderApi";
+import { deleteCart } from "../../store/slices/cartSlice";
+
+export const Payment = () => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { selectedAddress, orderSummary, paymentMethod, isProcessing } =
+    useAppSelector((state) => state.checkout);
+  const { activeCartId, cartItems } = useAppSelector((state) => state.cart);
+  const [error, setLocalError] = useState<string | null>(null);
+
+  const handleBack = () => {
+    dispatch(setStep(2));
+  };
+
+  const handlePaymentMethodChange = (method: "cod" | "online") => {
+    dispatch(setPaymentMethod(method));
+    setLocalError(null);
+  };
+
+  const handlePlaceOrder = async () => {
+    if (!paymentMethod) {
+      setLocalError("Please select a payment method");
+      return;
+    }
+
+    if (!selectedAddress || !activeCartId) {
+      setLocalError("Missing required information");
+      return;
+    }
+
+    try {
+      dispatch(setProcessing(true));
+      setLocalError(null);
+
+      // Create order payload
+      const orderPayload = {
+        address_id: selectedAddress.userId!,
+        items: cartItems.map((item) => ({
+          product_id: item.productId,
+          variant_id: item.variantId,
+          quantity: item.quantity,
+        })),
+        payment_id: "asdasdlfkjlkasdfioeklj",
+        total_amount: orderSummary.total,
+        payment_method: paymentMethod,
+      };
+
+      console.log("Order payload:", orderPayload);
+
+      // Place order
+      const response = await orderApi.createOrder(orderPayload);
+
+      // Clear cart
+      if (activeCartId) {
+        await dispatch(deleteCart(activeCartId)).unwrap();
+      }
+        console.log("Order response:", response);
+      // Reset checkout state
+      dispatch(resetCheckout());
+
+      // If online payment, redirect to payment gateway
+      if (paymentMethod === "online" && response.payment_url) {
+        window.location.href = response.payment_url;
+      } else {
+        // For COD, redirect to success page
+        navigate(`/order-success`);
+      }
+    } catch (err) {
+      setLocalError("Failed to place order. Please try again.");
+        console.error("Order placement error:", err);
+      dispatch(setProcessing(false));
+    }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-4">
+      {/* Payment Methods */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-lg font-semibold mb-4">Select Payment Method</h2>
+
+        <div className="space-y-4">
+          {/* Cash on Delivery */}
+          <div
+            className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+              paymentMethod === "cod"
+                ? "border-green-500 bg-green-50"
+                : "border-gray-200 hover:border-green-300"
+            }`}
+            onClick={() => handlePaymentMethodChange("cod")}
+          >
+            <div className="flex items-center">
+              <input
+                type="radio"
+                name="payment"
+                checked={paymentMethod === "cod"}
+                onChange={() => handlePaymentMethodChange("cod")}
+                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+              />
+              <div className="ml-3">
+                <label className="font-medium text-gray-900">
+                  Cash on Delivery
+                </label>
+                <p className="text-gray-500 text-sm">
+                  Pay when your order arrives
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Online Payment */}
+          <div
+            className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+              paymentMethod === "online"
+                ? "border-green-500 bg-green-50"
+                : "border-gray-200 hover:border-green-300"
+            }`}
+            onClick={() => handlePaymentMethodChange("online")}
+          >
+            <div className="flex items-center">
+              <input
+                type="radio"
+                name="payment"
+                checked={paymentMethod === "online"}
+                onChange={() => handlePaymentMethodChange("online")}
+                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+              />
+              <div className="ml-3">
+                <label className="font-medium text-gray-900">
+                  Online Payment
+                </label>
+                <p className="text-gray-500 text-sm">
+                  Pay securely with UPI, Card, or Net Banking
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Final Order Summary */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <span>Total Items</span>
+            <span>{cartItems.length}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Subtotal</span>
+            <span>₹{orderSummary.subtotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>GST (18%)</span>
+            <span>₹{orderSummary.tax.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Shipping</span>
+            <span>
+              {orderSummary.shipping === 0
+                ? "Free"
+                : `₹${orderSummary.shipping.toFixed(2)}`}
+            </span>
+          </div>
+          <div className="flex justify-between font-semibold text-lg pt-2 border-t">
+            <span>Total Amount</span>
+            <span>₹{orderSummary.total.toFixed(2)}</span>
+          </div>
+        </div>
+
+        {error && (
+          <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-md">
+            {error}
+          </div>
+        )}
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="flex justify-between mt-8">
+        <button
+          onClick={handleBack}
+          className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+          disabled={isProcessing}
+        >
+          Back to Review
+        </button>
+        <button
+          onClick={handlePlaceOrder}
+          disabled={isProcessing || !paymentMethod}
+          className={`px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center ${
+            isProcessing ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          {isProcessing ? (
+            <>
+              <svg
+                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                ></path>
+              </svg>
+              Processing...
+            </>
+          ) : (
+            `Place Order (₹${orderSummary.total.toFixed(2)})`
+          )}
+        </button>
+      </div>
+    </div>
+  );
+};

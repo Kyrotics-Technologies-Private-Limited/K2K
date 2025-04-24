@@ -5,7 +5,8 @@ import { useState } from "react";
 import AdvertisementBar from "./components/common/AdvertisementBar";
 import Navbar from "./components/common/Navbar";
 import { CartDrawer } from "./components/common/CartDrawer";
-// import { CheckoutPage } from "./pages/Checkout";
+import { CheckoutPage } from "./pages/Checkout";
+import { OrderSuccess } from "./pages/OrderSuccess";
 import Footer from "./components/common/Footer";
 import KishanParivarPage from "./pages/KishanParivarPage";
 import SignUp from "./pages/authPages/SignUp";
@@ -53,7 +54,6 @@ const PublicLayout = () => {
   );
 };
 
-
 function App() {
   return (
     <Provider store={store}>
@@ -64,7 +64,8 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/all-products" element={<AllProductPage />} />
               <Route path="/product/:id" element={<ProductPage />} />
-              {/* <Route path="/checkout" element={<CheckoutPage />} /> */}
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/order-success" element={<OrderSuccess />} />
               <Route
                 path="/kishanParivarPage"
                 element={<KishanParivarPage />}
@@ -90,7 +91,7 @@ function App() {
               <Route path="products/:id" element={<ProductDetailsPage />} />
               <Route path="productlist" element={<ProductListPage />} />
               <Route path="orders" element={<AdminOrders />} />
-              <Route path="customers" element={<AdminCustomers/>} />
+              <Route path="customers" element={<AdminCustomers />} />
               {/* Add other admin routes as needed */}
             </Route>
           </Routes>
