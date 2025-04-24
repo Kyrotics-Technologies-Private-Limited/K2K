@@ -7,46 +7,8 @@ import {
   updateCartItem,
   removeCartItem,
   fetchCartById,
-  createCart,
-  fetchUserCart,
 } from "../../store/slices/cartSlice";
-import { CartItem } from "../../types/cart";
-import { productApi } from "../../services/api/productApi";
-import variantApi from "../../services/api/variantApi";
-
-// Interface for product details
-interface ProductDetails {
-  id: string;
-  name: string;
-  images: {
-    main: string;
-    gallery: string[];
-    banner: string;
-  };
-  description?: string;
-  [key: string]: any; // Allow for any additional properties
-}
-
-// Interface for variant details
-interface VariantDetails {
-  id: string;
-  createdAt?: Date; // Accept both Date and string types
-  discount?: number;
-  inStock: boolean;
-  originalPrice?: number;
-  price: number;
-  weight: string;
-  [key: string]: any; // Allow for any additional properties
-}
-
-// Combined interface for cart item with product and variant details
-interface CartItemWithDetails {
-  item: CartItem;
-  product: ProductDetails | null;
-  variant: VariantDetails | null;
-  loading: boolean;
-  error: string | null;
-}
+import { CartItemSkeleton } from "./CartItemSkeleton";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -61,8 +23,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     loading: cartLoading,
     error: cartError,
   } = useAppSelector((state) => state.cart);
-  const [itemsWithDetails, setItemsWithDetails] = useState<CartItemWithDetails[]>([]);
-  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+
+  // Local loading states for individual items
+  const [updatingItems, setUpdatingItems] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -70,19 +35,16 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   // Initial cart restoration
   useEffect(() => {
     const restoreCart = async () => {
-      const savedCartId = localStorage.getItem('cartId');
+      const savedCartId = localStorage.getItem("cartId");
       if (savedCartId && !activeCartId) {
         try {
-          // Fetch the cart by saved ID
           await dispatch(fetchCartById(savedCartId)).unwrap();
-          // Then fetch its items
           await dispatch(fetchCartItems(savedCartId)).unwrap();
         } catch (error) {
-          console.error('Failed to restore cart:', error);
-          // If restoration fails, clean up localStorage
-          localStorage.removeItem('cartId');
-          localStorage.removeItem('cart');
-          localStorage.removeItem('cartItems');
+          console.error("Failed to restore cart:", error);
+          localStorage.removeItem("cartId");
+          localStorage.removeItem("cart");
+          localStorage.removeItem("cartItems");
         }
       }
     };
@@ -90,85 +52,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     restoreCart();
   }, [dispatch, activeCartId]);
 
-  // Fetch cart data when drawer opens
-  useEffect(() => {
-    if (isOpen && activeCartId) {
-      dispatch(fetchCartItems(activeCartId));
-    }
-  }, [isOpen, activeCartId, dispatch]);
-
-  // Fetch product and variant details when cart items change
-  useEffect(() => {
-    const fetchItemDetails = async () => {
-      if (!cartItems.length) return;
-
-      setIsLoadingDetails(true);
-
-      // Initialize array with loading states
-      const initialItemsWithDetails = cartItems.map((item) => ({
-        item,
-        product: null,
-        variant: null,
-        loading: true,
-        error: null,
-      }));
-
-      setItemsWithDetails(initialItemsWithDetails);
-      console.log("itemsWithDetails", cartItems);
-
-      // Fetch details for each item
-      const detailPromises = cartItems.map(async (item) => {
-        try {
-          // Fetch product details
-          const productDetails = await productApi.getProductById(
-            item.productId
-          );
-
-          // Fetch variant details
-          const variantDetails = await variantApi.getVariant(
-            item.productId,
-            item.variantId
-          );
-
-          // Define the result with type assertion
-          const result: CartItemWithDetails = {
-            item,
-            product: productDetails,
-            variant: variantDetails,
-            loading: false,
-            error: null,
-          };
-
-          return result;
-        } catch (error) {
-          console.error(`Error fetching details for item ${item.id}:`, error);
-
-          // Define the error result with type assertion
-          const errorResult: CartItemWithDetails = {
-            item,
-            product: null,
-            variant: null,
-            loading: false,
-            error: "Failed to load item details",
-          };
-
-          return errorResult;
-        }
-      });
-
-      // Wait for all details to be fetched
-      const results = await Promise.all(detailPromises);
-      setItemsWithDetails(results);
-      setIsLoadingDetails(false);
-    };
-
-    fetchItemDetails();
-  }, [cartItems]);
-
   const handleUpdateQuantity = async (itemId: string, newQuantity: number) => {
     if (!activeCartId || newQuantity < 1) return;
 
     try {
+      setUpdatingItems((prev) => ({ ...prev, [itemId]: true }));
       await dispatch(
         updateCartItem({
           cartId: activeCartId,
@@ -178,6 +66,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       ).unwrap();
     } catch (err) {
       console.error("Failed to update item:", err);
+    } finally {
+      setUpdatingItems((prev) => ({ ...prev, [itemId]: false }));
     }
   };
 
@@ -185,6 +75,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     if (!activeCartId) return;
 
     try {
+      setUpdatingItems((prev) => ({ ...prev, [itemId]: true }));
       await dispatch(
         removeCartItem({
           cartId: activeCartId,
@@ -203,8 +94,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
   // Calculate cart total
   const calculateTotal = () => {
-    return itemsWithDetails.reduce((total, { item, variant }) => {
-      const price = variant?.price || 0;
+    return cartItems.reduce((total, item) => {
+      const price = item.variant?.price || 0;
       return total + price * item.quantity;
     }, 0);
   };
@@ -214,8 +105,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
 
-  // Show loading state if cart is loading or we're fetching details
-  const isLoading = cartLoading || isLoadingDetails;
+  const renderSkeletons = () => {
+    return Array(3)
+      .fill(null)
+      .map((_, index) => <CartItemSkeleton key={index} />);
+  };
 
   return (
     <>
@@ -243,9 +137,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          {isLoading && (
-            <div className="flex-1 flex items-center justify-center">
-              <p>Loading your cart...</p>
+          {cartLoading && (
+            <div className="flex-1 overflow-y-auto py-4">
+              {renderSkeletons()}
             </div>
           )}
 
@@ -255,7 +149,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             </div>
           )}
 
-          {!isLoading &&
+          {!cartLoading &&
           !cartError &&
           (!cartItems || cartItems.length === 0) ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4">
@@ -272,149 +166,104 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             </div>
           ) : (
             <>
-              {/* Cart Banner */}
-              {/* <div
-                className="bg-green-50 border-b border-green-100 px-6 py-3 h-32"
-                style={{
-                  backgroundImage: 'url("https://picsum.photos/200/300")',
-                }}
-              ></div> */}
-
-              {/* Cart Items */}
               <div className="flex-1 overflow-y-auto py-4">
-                {itemsWithDetails.map(
-                  ({ item, product, variant, loading, error }) => {
-                    // Skip rendering if there was an error fetching details
-                    if (error) {
-                      return (
-                        <div
-                          key={item.id}
-                          className="px-6 py-4 border-b border-gray-200 bg-red-50"
-                        >
-                          <p className="text-sm text-red-600">
-                            Error loading item: {error}
+                {cartItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="px-6 py-4 border-b border-gray-200 last:border-0"
+                  >
+                    {updatingItems[item.id] ? (
+                      <CartItemSkeleton />
+                    ) : (
+                      <div className="flex gap-4">
+                        <img
+                          src={
+                            item.product?.images.main ||
+                            "https://picsum.photos/200/300"
+                          }
+                          alt={item.product?.name || "Product"}
+                          className="w-20 h-20 object-cover rounded-lg"
+                        />
+                        <div className="flex-1">
+                          <h3 className="font-medium text-[#2C3639]">
+                            {item.product?.name || "Product"}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {item.variant?.weight || "Variant"}
                           </p>
-                          <button
-                            onClick={() => handleRemoveItem(item.id)}
-                            className="mt-2 text-sm text-red-600 hover:underline"
-                          >
-                            Remove item
-                          </button>
-                        </div>
-                      );
-                    }
-
-                    // Show loading state for this item
-                    if (loading) {
-                      return (
-                        <div
-                          key={item.id}
-                          className="px-6 py-4 border-b border-gray-200"
-                        >
-                          <div className="animate-pulse flex space-x-4">
-                            <div className="w-20 h-20 bg-gray-200 rounded-lg"></div>
-                            <div className="flex-1 space-y-2">
-                              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                              <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div
-                        key={item.id}
-                        className="px-6 py-4 border-b border-gray-200 last:border-0"
-                      >
-                        <div className="flex gap-4">
-                          <img
-                            src={
-                              product?.images.main ||
-                              "https://picsum.photos/200/300"
-                            }
-                            alt={product?.name || "Product"}
-                            className="w-20 h-20 object-cover rounded-lg"
-                          />
-                          <div className="flex-1">
-                            <h3 className="font-medium text-[#2C3639]">
-                              {product?.name || "Product"}
-                            </h3>
-                            <p className="text-sm text-gray-500">
-                              {variant?.weight || "Variant"}
-                            </p>
-                            <div className="mt-2 flex items-center justify-between">
-                              <div className="flex items-center space-x-2">
-                                <button
-                                  onClick={() =>
-                                    handleUpdateQuantity(
-                                      item.id,
-                                      item.quantity - 1
-                                    )
-                                  }
-                                  className="p-1 hover:bg-gray-100 rounded"
-                                >
-                                  <Minus className="w-4 h-4" />
-                                </button>
-                                <span className="w-8 text-center">
-                                  {item.quantity}
-                                </span>
-                                <button
-                                  onClick={() =>
-                                    handleUpdateQuantity(
-                                      item.id,
-                                      item.quantity + 1
-                                    )
-                                  }
-                                  className="p-1 hover:bg-gray-100 rounded"
-                                >
-                                  <Plus className="w-4 h-4" />
-                                </button>
-                              </div>
+                          <div className="mt-2 flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
                               <button
-                                onClick={() => handleRemoveItem(item.id)}
-                                className="p-1 hover:bg-gray-100 rounded text-red-500"
+                                onClick={() =>
+                                  handleUpdateQuantity(
+                                    item.id,
+                                    item.quantity - 1
+                                  )
+                                }
+                                className="p-1 hover:bg-gray-100 rounded"
+                                disabled={updatingItems[item.id]}
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Minus className="w-4 h-4" />
+                              </button>
+                              <span className="w-8 text-center">
+                                {item.quantity}
+                              </span>
+                              <button
+                                onClick={() =>
+                                  handleUpdateQuantity(
+                                    item.id,
+                                    item.quantity + 1
+                                  )
+                                }
+                                className="p-1 hover:bg-gray-100 rounded"
+                                disabled={updatingItems[item.id]}
+                              >
+                                <Plus className="w-4 h-4" />
                               </button>
                             </div>
-                          </div>
-                          <div className="text-right">
-                            {variant && (
-                              <>
-                                <p className="font-medium text-[#4A5D23]">
-                                  ₹
-                                  {(
-                                    variant.price * item.quantity
-                                  ).toLocaleString("en-IN")}
-                                </p>
-                                {variant.discount! > 0 && (
-                                  <p className="text-xs text-gray-500 line-through">
-                                    ₹
-                                    {(
-                                      variant.originalPrice! * item.quantity
-                                    ).toLocaleString("en-IN")}
-                                  </p>
-                                )}
-                                {variant.discount! > 0 && (
-                                  <p className="text-xs text-green-600">
-                                    {variant.discount}% off
-                                  </p>
-                                )}
-                              </>
-                            )}
+                            <button
+                              onClick={() => handleRemoveItem(item.id)}
+                              className="p-1 hover:bg-gray-100 rounded text-red-500"
+                              disabled={updatingItems[item.id]}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </div>
                         </div>
+                        <div className="text-right">
+                          {item.variant && (
+                            <>
+                              <p className="font-medium text-[#4A5D23]">
+                                ₹
+                                {(
+                                  item.variant.price * item.quantity
+                                ).toLocaleString("en-IN")}
+                              </p>
+                              {item.variant.discount! > 0 && (
+                                <p className="text-xs text-gray-500 line-through">
+                                  ₹
+                                  {(
+                                    item.variant.originalPrice! * item.quantity
+                                  ).toLocaleString("en-IN")}
+                                </p>
+                              )}
+                              {item.variant.discount! > 0 && (
+                                <p className="text-xs text-green-600">
+                                  {item.variant.discount}% off
+                                </p>
+                              )}
+                            </>
+                          )}
+                        </div>
                       </div>
-                    );
-                  }
-                )}
+                    )}
+                  </div>
+                ))}
               </div>
             </>
           )}
 
-          {!isLoading && cartItems && cartItems.length > 0 && (
+          {!cartLoading && cartItems && cartItems.length > 0 && (
             <div className="border-t border-gray-200 px-6 py-4 space-y-4">
               <div className="flex items-center justify-between text-lg font-semibold">
                 <span>Total ({getTotalItems()} items)</span>
