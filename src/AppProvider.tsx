@@ -1,55 +1,34 @@
-// // src/AppProvider.tsx
-// import React, { useEffect } from 'react';
-// import { Provider } from 'react-redux';
-// import { store, useAppDispatch } from './store/store';
-// import { getCurrentUser } from './store/slices/authSlice';
-
-// interface AppProviderProps {
-//   children: React.ReactNode;
-// }
-
-// // AuthInitializer to handle Firebase auth state on app load
-// export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-//   const dispatch = useAppDispatch();
-  
-//   useEffect(() => {
-//     // Check for existing user session on app initialization
-//     dispatch(getCurrentUser());
-//   }, [dispatch]);
-  
-//   return <>{children}</>;
-// };
-
-// // Main App Provider to wrap the application with necessary context providers
-// const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-//   return (
-//     <Provider store={store}>
-//       <AuthInitializer>
-//         {children}
-//       </AuthInitializer>
-//     </Provider>
-//   );
-// };
-
-// export default AppProvider;
-
-// src/AppProvider.tsx
-import React, { useEffect } from 'react';
-import { Provider } from 'react-redux';
-import { store, useAppDispatch } from './store/store';
-import { setUser, resetAuth } from './store/slices/authSlice';
-import { auth } from './services/firebase/firebase';
-import * as authService from './services/api/authApi';
+import React, { useEffect } from "react";
+import { Provider } from "react-redux";
+import { store, useAppDispatch } from "./store/store";
+import { setUser, resetAuth } from "./store/slices/authSlice";
+import { initializeCart, fetchCartItems } from "./store/slices/cartSlice";
+import { auth } from "./services/firebase/firebase";
+import * as authService from "./services/api/authApi";
 
 interface AppProviderProps {
   children: React.ReactNode;
 }
 
-// AuthInitializer to handle Firebase auth state on app load
-export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// AuthInitializer to handle Firebase auth state and cart initialization
+export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const dispatch = useAppDispatch();
-  
+
   useEffect(() => {
+    const initializeApp = async () => {
+      // Initialize cart first
+      const result = await dispatch(initializeCart()).unwrap();
+
+      // If we have a cart, fetch the items with product and variant details
+      if (result.cart?.id) {
+        await dispatch(fetchCartItems(result.cart.id)).unwrap();
+      }
+    };
+
+    initializeApp();
+
     // Subscribe to Firebase auth state changes
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
@@ -57,37 +36,50 @@ export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ child
         try {
           // Get additional user data from your backend
           const userData = await authService.getCurrentUser();
-          
+
           // Dispatch the setUser action with user data
-          dispatch(setUser({
-            uid: firebaseUser.uid,
-            name: userData?.name || null,
-            email: userData?.email || null,
-            phone: firebaseUser.phoneNumber || '',
-            needsProfileCompletion: !userData
-          }));
+          dispatch(
+            setUser({
+              uid: firebaseUser.uid,
+              name: userData?.name || null,
+              email: userData?.email || null,
+              phone: firebaseUser.phoneNumber || "",
+              needsProfileCompletion: !userData,
+            })
+          );
+
+          // Re-initialize cart after user signs in to get their server-side cart with full product details
+          const result = await dispatch(initializeCart()).unwrap();
+          if (result.cart?.id) {
+            await dispatch(fetchCartItems(result.cart.id)).unwrap();
+          }
         } catch (error) {
           console.error("Error fetching user data:", error);
-          
-          // If backend fails, at least set the basic Firebase user info
-          dispatch(setUser({
-            uid: firebaseUser.uid,
-            name: null,
-            email: null,
-            phone: firebaseUser.phoneNumber || '',
-            needsProfileCompletion: true
-          }));
+
+          dispatch(
+            setUser({
+              uid: firebaseUser.uid,
+              name: null,
+              email: null,
+              phone: firebaseUser.phoneNumber || "",
+              needsProfileCompletion: true,
+            })
+          );
         }
       } else {
         // User is signed out
         dispatch(resetAuth());
+        // Re-initialize cart after sign out to get guest cart with full product details
+        const result = await dispatch(initializeCart()).unwrap();
+        if (result.cart?.id) {
+          await dispatch(fetchCartItems(result.cart.id)).unwrap();
+        }
       }
     });
-    
-    // Clean up subscription on unmount
+
     return () => unsubscribe();
   }, [dispatch]);
-  
+
   return <>{children}</>;
 };
 
@@ -95,9 +87,7 @@ export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ child
 const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   return (
     <Provider store={store}>
-      <AuthInitializer>
-        {children}
-      </AuthInitializer>
+      <AuthInitializer>{children}</AuthInitializer>
     </Provider>
   );
 };
