@@ -47,6 +47,7 @@ export interface Order {
   shipping_fee: number;
   status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
   payment_id: string;
+  payment_url?: string; // URL for payment gateway
   payment?: OrderPayment;     // Expanded payment details
   items?: OrderItem[];
   created_at: string;
