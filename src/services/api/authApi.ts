@@ -1,4 +1,4 @@
-// src/services/auth.service.ts
+//src/services/auth.service.ts
 import { User } from "../../types/user";
 import api from "./api";
 import {
@@ -216,3 +216,6 @@ export const getAuthToken = async (): Promise<string | null> => {
 export const isAuthenticated = (): boolean => {
   return !!auth.currentUser;
 };
+
+
+
