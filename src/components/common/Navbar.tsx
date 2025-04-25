@@ -18,6 +18,10 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   // console.log('user',user)
   // Get cart state from Redux
   const cart = useAppSelector(state => state.cart);
+  if (!cart) {
+    console.error("Cart is not available in the Redux store.");
+    return null; // or handle it in a way that fits your app
+  }
   const itemCount = cart.cartItems.reduce((total, item) => total + item.quantity, 0);
   
   const dispatch = useAppDispatch();
