@@ -39,6 +39,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const [quantity, setQuantity] = useState(1);
   const [showPricePopup, setShowPricePopup] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -99,7 +100,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
       }
     }
 
-    setLoading(true);
+    setAddingToCart(true);
     setError(null);
 
     try {
@@ -130,7 +131,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
       setError("Failed to add item to cart");
       console.error("Failed to add item to cart:", err);
     } finally {
-      setLoading(false);
+      setAddingToCart(false);
     }
   };
 
@@ -473,12 +474,14 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                         onClick={handleAddToCart}
                         className="flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
                         disabled={
-                          !variants[selectedVariant].inStock ||
-                          loading
+                          !variants[selectedVariant]?.inStock ||
+                          addingToCart
                         }
                       >
-                        {loading ? (
-                          "Adding..."
+                        {addingToCart ? (
+                          <div className=" flex justify-center items-center">
+                          <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white-700"></div>
+                         </div>
                         ) : (
                           <>
                             <ShoppingCart className="w-5 h-5" />
