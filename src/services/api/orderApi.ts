@@ -1,17 +1,16 @@
-// src/services/api/orderApi.ts
-import axios from 'axios';
+//src/services/api/orderApi.ts
+import api from '../api/api';
 import { getAuth } from 'firebase/auth';
 import {
   Order,
   OrderItem,
   TrackingInfo,
   CreateOrderPayload,
-  CreateOrderResponse,
   OrderListResponse,
   UpdateOrderStatusPayload
 } from '../../types/order';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 
 const getAuthToken = async () => {
   const auth = getAuth();
@@ -21,51 +20,57 @@ const getAuthToken = async () => {
 };
 
 export const orderApi = {
-  createOrder: async (payload: CreateOrderPayload): Promise<CreateOrderResponse> => {
+  createOrder: async (payload: CreateOrderPayload): Promise<Order> => {
     const token = await getAuthToken();
-    const response = await axios.post(`${API_BASE}/orders`, payload, {
+    const response = await api.post(`/orders/create`, payload, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
   },
 
-  getOrders: async (page = 1, limit = 10): Promise<OrderListResponse> => {
+  getOrders: async (): Promise<Order[]> => {
     const token = await getAuthToken();
-    const response = await axios.get(`${API_BASE}/orders`, {
-      params: { page, limit },
+    const response = await api.get(`/orders`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
   },
 
-  getOrder: async (orderId: string): Promise<Order> => {
+  getAllOrders: async (): Promise<Order[]> => {
     const token = await getAuthToken();
-    const response = await axios.get(`${API_BASE}/orders/${orderId}`, {
+    const response = await api.get(`/orders/getAllOrders`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
   },
 
-  cancelOrder: async (orderId: string, reason?: string): Promise<void> => {
+  getOrderById: async (orderId: string): Promise<Order> => {
     const token = await getAuthToken();
-    await axios.put(`${API_BASE}/orders/${orderId}/cancel`, { reason }, {
+    const response = await api.get(`/orders/getOrder/${orderId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  },
+
+  cancelOrder: async (orderId: string): Promise<void> => {
+    const token = await getAuthToken();
+    await api.put(`/orders/${orderId}/cancel`, null, {
       headers: { Authorization: `Bearer ${token}` }
     });
   },
 
   getTracking: async (orderId: string): Promise<TrackingInfo> => {
     const token = await getAuthToken();
-    const response = await axios.get(`${API_BASE}/orders/${orderId}/tracking`, {
+    const response = await api.get(`/orders/${orderId}/tracking`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
   },
 
-  updateOrderStatus: async (orderId: string, payload: UpdateOrderStatusPayload): Promise<Order> => {
+  updateOrderStatus: async (orderId: string, payload: UpdateOrderStatusPayload): Promise<void> => {
     const token = await getAuthToken();
-    const response = await axios.put(`${API_BASE}/orders/${orderId}/status`, payload, {
+    await api.put(`/orders/${orderId}/status`, payload, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    return response.data;
   }
 };

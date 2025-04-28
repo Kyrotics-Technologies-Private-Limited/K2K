@@ -153,13 +153,7 @@ const ProductDetailsPage: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Product Details</h1>
         <div className="flex space-x-3">
-          <button
-            onClick={handleEdit}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-          >
-            <PencilIcon className="w-5 h-5 mr-2" />
-            Edit Product
-          </button>
+          
           <button
             onClick={handleDelete}
             disabled={isDeleting}
@@ -285,7 +279,7 @@ const ProductDetailsPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+            {/* <div className="mb-6 p-4 bg-gray-50 rounded-lg">
               <h2 className="text-lg font-semibold text-gray-700 mb-2">
                 Ratings & Reviews
               </h2>
@@ -321,11 +315,11 @@ const ProductDetailsPage: React.FC = () => {
                   ))}
                 </div>
               </div>
-            )}
+            )}*/}
           </div>
         </div>
 
-        {/* Description Section */}
+        {/* Description Section*/}
         <div className="p-6 border-t border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Product Description
@@ -335,35 +329,35 @@ const ProductDetailsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Benefits Section */}
-        {product.benefits && product.benefits.length > 0 && (
-          <div className="p-6 border-t border-gray-200 bg-gray-50">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              Product Benefits
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {product.benefits.map((benefit, index) => (
-                <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
-                  <div className="flex items-center mb-3">
-                    {benefit.icon && (
-                      <img
-                        src={benefit.icon}
-                        alt={benefit.title}
-                        className="w-8 h-8 mr-3"
-                      />
-                    )}
-                    <h3 className="text-lg font-medium text-gray-900">
-                      {benefit.title}
-                    </h3>
-                  </div>
-                  <p className="text-gray-600">{benefit.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+       {/* Benefits Section 
+        // {product.benefits && product.benefits.length > 0 && (
+        //   <div className="p-6 border-t border-gray-200 bg-gray-50">
+        //     <h2 className="text-xl font-semibold text-gray-900 mb-6">
+        //       Product Benefits
+        //     </h2>
+        //     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        //       {product.benefits.map((benefit, index) => (
+        //         <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
+        //           <div className="flex items-center mb-3">
+        //             {benefit.icon && (
+        //               <img
+        //                 src={benefit.icon}
+        //                 alt={benefit.title}
+        //                 className="w-8 h-8 mr-3"
+        //               />
+        //             )}
+        //             <h3 className="text-lg font-medium text-gray-900">
+        //               {benefit.title}
+        //             </h3>
+        //           </div>
+        //           <p className="text-gray-600">{benefit.description}</p>
+        //         </div>
+        //       ))}
+        //     </div>
+        //   </div>
+        // )} */}
 
-        {/* Additional Images */}
+        {/* Additional Images
         {product.images.banner && (
           <div className="p-6 border-t border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
@@ -375,7 +369,7 @@ const ProductDetailsPage: React.FC = () => {
               className="w-full h-auto rounded-lg"
             />
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
