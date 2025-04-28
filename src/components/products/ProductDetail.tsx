@@ -479,10 +479,12 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                         }
                       >
                         {addingToCart ? (
+
                           <div className="flex items-center gap-2">
                             <div className="w-4 h-4 border-2 border-t-2 border-green-800 rounded-full animate-spin"></div>
                             Adding...
                           </div>
+
                         ) : (
                           <>
                             <ShoppingCart className="w-5 h-5" />
