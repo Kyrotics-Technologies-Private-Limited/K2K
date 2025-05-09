@@ -19,6 +19,7 @@ import { useAppDispatch, useAppSelector } from "../../store/store";
 import { addToCart, createCart } from "../../store/slices/cartSlice";
 import variantApi from "../../services/api/variantApi";
 import { Variant } from "../../types/variant";
+import { toast } from "react-toastify";
 
 interface ProductDetailProps {
   product: Product | undefined;
@@ -88,7 +89,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
       return;
     }
 
-    // Create a cart if one doesn't exist
     let cartId = activeCartId;
     if (!cartId) {
       try {
@@ -104,7 +104,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
     setError(null);
 
     try {
-      // Prepare item data
       const itemData = {
         productId: product.id,
         variantId: variants[selectedVariant].id,
@@ -118,12 +117,40 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
         })
       ).unwrap();
 
-      setSuccess("Item added to cart successfully!");
+      toast.success(
+        <div className="flex items-center gap-3">
+          <img 
+            src={product.images.main} 
+            alt={product.name}
+            className="w-12 h-12 object-cover rounded"
+          />
+          <div className="flex-1">
+            <h3 className="font-medium mb-2">Added to Cart!</h3>
+            <p className="text-sm text-gray-600">{product.name}</p>
+            <div className="text-sm mt-2">
+              <span className="text-green-600">{variants[selectedVariant].weight}</span>
+              <span className="mx-2">|</span>
+              <span className="text-green-600">Qty: {quantity}</span>
+              <span className="mx-2">|</span>
+              <span>₹{(variants[selectedVariant].price * quantity).toLocaleString('en-IN')}</span>
+            </div>
+          </div>
+        </div>,
+        {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        }
+      );
+
       if (onAddToCart) {
         onAddToCart();
       }
 
-      // Clear success message after 3 seconds
+      // setSuccess("Item added to cart successfully!");
       setTimeout(() => {
         setSuccess(null);
       }, 3000);
@@ -479,10 +506,12 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                         }
                       >
                         {addingToCart ? (
+
                           <div className="flex items-center gap-2">
                             <div className="w-4 h-4 border-2 border-t-2 border-green-800 rounded-full animate-spin"></div>
                             Adding...
                           </div>
+
                         ) : (
                           <>
                             <ShoppingCart className="w-5 h-5" />

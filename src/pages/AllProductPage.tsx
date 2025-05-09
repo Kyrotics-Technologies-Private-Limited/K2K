@@ -187,11 +187,14 @@ import {
 import RecognizedBy from "../components/homePageComponents/RecognizedBy";
 import { productApi } from '../services/api/productApi'
 import { Product } from "../types";
+import { useSearchParams } from "react-router-dom";
 
 const AllProductPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  const categoryParam = searchParams.get('category');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -209,7 +212,14 @@ const AllProductPage = () => {
     };
 
     fetchProducts();
-  }, []);
+  // Scroll to product grid if category is selected
+  if (categoryParam) {
+    const productGridSection = document.getElementById('product-grid-section');
+    if (productGridSection) {
+      productGridSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+}, [categoryParam]);
 
   const healthIssues = [
     {
@@ -452,7 +462,7 @@ const AllProductPage = () => {
           </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-4">
+      <div id="product-grid-section" className="max-w-7xl mx-auto px-4">
         {loading ? (
           <ProductGrid products={products} />
         ) : error ? (
