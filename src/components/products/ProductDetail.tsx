@@ -50,7 +50,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
       if (!product) return;
       try {
         setLoading(true);
-        const fetchedVariants = await variantApi.getProductVariants(product.id);
+        const fetchedVariants = await variantApi.getVariantsByProductId(product.id);
         console.log("Fetched Variants: ", fetchedVariants);
         setVariants(fetchedVariants);
         setError(null);

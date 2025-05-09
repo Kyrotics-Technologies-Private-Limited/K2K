@@ -17,8 +17,8 @@ import TermsOfService from "./pages/policyPages/TermsOfService";
 import ShippingPolicy from "./pages/policyPages/ShippingPolicy";
 import RefundPolicy from "./pages/policyPages/RefundPolicy";
 import Traceability from "./pages/Traceability";
-// import OrdersPage from "./pages/OrdersPage";
-// import OrderDetailPage from "./pages/OrderDetailPage";
+import OrdersPage  from "./pages/OrdersPage";
+import OrderDetailPage from "./pages/OrderDetailPage";
 import ForgotPasswordPage from "./pages/authPages/ForgotPassword";
 import ResetPasswordPage from "./pages/authPages/ResetPassword";
 import UserProfilePage from "./pages/authPages/ProfilePage";
@@ -37,6 +37,8 @@ import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
 import ProductListPage from "./pages/admin/ProductListPage";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminCustomers from "./pages/admin/AdminCustomers";
+import VariantDetailsPage from "./pages/admin/Variantdetailspage";
+import VariantEditPage from "./pages/admin/VariantEditPage";
 
 const PublicLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -74,8 +76,8 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
-              {/* <Route path="/orders" element={<OrdersPage/>}/> */}
-              {/* <Route path="/orders/:id" element={<OrderDetailPage/>}/> */}
+              <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/orders/:orderId" element={<OrderDetailPage />} />
               <Route path="/our-story" element={<OurStory />} />
               <Route path="/traceability" element={<Traceability />} />
               <Route path="/privacypolicy" element={<PrivacyPolicy />} />
@@ -90,6 +92,8 @@ function App() {
               <Route path="products" element={<AdminProducts />} />
               <Route path="products/:id" element={<ProductDetailsPage />} />
               <Route path="productlist" element={<ProductListPage />} />
+               <Route path="products/:productId/variants" element={<VariantDetailsPage/>} />
+               <Route path="products/:productId/variants/:variantId/edit" element={<VariantEditPage/>} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="customers" element={<AdminCustomers />} />
               {/* Add other admin routes as needed */}

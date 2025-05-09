@@ -328,7 +328,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
       try {
         setLoading(true);
         console.log("Fetching variants for product ID:", product.id);
-        const data = await VariantApi.getProductVariants(product.id);
+        const data = await VariantApi.getVariantsByProductId(product.id);
         console.log("Fetched variants:", data);
         setVariants(data);
         
