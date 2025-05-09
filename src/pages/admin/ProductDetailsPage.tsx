@@ -153,7 +153,6 @@ const ProductDetailsPage: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Product Details</h1>
         <div className="flex space-x-3">
-          
           <button
             onClick={handleDelete}
             disabled={isDeleting}
@@ -329,7 +328,7 @@ const ProductDetailsPage: React.FC = () => {
           </div>
         </div>
 
-       {/* Benefits Section 
+        {/* Benefits Section 
         // {product.benefits && product.benefits.length > 0 && (
         //   <div className="p-6 border-t border-gray-200 bg-gray-50">
         //     <h2 className="text-xl font-semibold text-gray-900 mb-6">

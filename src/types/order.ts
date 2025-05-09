@@ -105,3 +105,6 @@ export interface UpdateOrderStatusPayload {
 export interface CancelOrderPayload {
   reason?: string;
 }
+
+// Add this export if it doesn't exist
+export type OrderStatus = "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled" | "returned";

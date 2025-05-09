@@ -32,7 +32,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
     const fetchProductVariants = async () => {
       try {
         setLoading(true);
-        const data = await VariantApi.getProductVariants(product.id);
+        const data = await VariantApi.getVariantsByProductId(product.id);
         setVariants(data);
         
         if (data && data.length > 0) {

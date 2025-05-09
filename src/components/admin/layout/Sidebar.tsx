@@ -49,6 +49,7 @@ const Sidebar = () => {
         collapsed ? "w-16" : "w-64"
       } transition-all duration-300 relative`}
     >
+      {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         {!collapsed && <h1 className="text-xl font-bold">Admin Panel</h1>}
         <button
@@ -63,22 +64,26 @@ const Sidebar = () => {
         </button>
       </div>
 
+      {/* Menu */}
       <nav className="mt-4">
         <ul className="space-y-1">
           {menuItems.map((item) => (
             <li key={item.path}>
               <NavLink
                 to={item.path}
+                end // This ensures exact match for the current route
                 className={({ isActive }) =>
-                  `flex items-center p-3 mx-2 rounded transition-colors duration-200 ${
+                  `group relative flex items-center p-3 mx-2 rounded transition-colors duration-200 ${
                     isActive ? "bg-blue-600" : "hover:bg-gray-700"
                   } ${collapsed ? "justify-center" : ""}`
                 }
               >
                 <span className="flex-shrink-0">{item.icon}</span>
                 {!collapsed && <span className="ml-3">{item.name}</span>}
+
+                {/* Tooltip only when collapsed */}
                 {collapsed && (
-                  <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 rounded-md text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <span className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-800 rounded-md text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     {item.name}
                   </span>
                 )}
