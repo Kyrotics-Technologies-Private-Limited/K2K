@@ -3,7 +3,7 @@ import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { useState, useEffect } from "react";
-import { ProductCard } from "../products/ProductCard";
+import { HomeProductCard } from "../../components/homePageComponents/HomeProductCard";
 import { productApi } from '../../services/api/productApi'
 import { Product } from "../../types";
 
@@ -98,7 +98,7 @@ const ProductSection = () => {
                   className="!h-auto"
                 >
                   <div className="w-full p-1">
-                    <ProductCard product={product} />
+                    <HomeProductCard product={product} />
                   </div>
                 </SwiperSlide>
               ))}

@@ -9,6 +9,7 @@ import KishanParivar from "../components/homePageComponents/KishanParivar";
 import FarmerBanner from "../components/homePageComponents/FarmerBanner";
 import SecondFarmerBanner from "../components/homePageComponents/SecondFarmerBanner";
 
+
 const HomePage = () => {
   return (
     <div className="min-h-screen">
