@@ -112,7 +112,7 @@ const KishanParivar: React.FC = () => {
           <div className="w-12 h-1 bg-green-300 ml-3"></div>
         </div> */}
         <h1 className="text-black text-2xl md:text-3xl lg:text-4xl font-semibold">
-          The <span className="text-green-brand">Kishan Parivar</span> Advantage
+          The Kishan Parivar Advantage
         </h1>
         <p className="text-sm md:text-base text-gray-800/90 mx-auto mt-2">
           India's premier agricultural subscription program designed to empower
@@ -196,8 +196,7 @@ const KishanParivar: React.FC = () => {
               <span className="text-sm font-medium">EXCLUSIVE OFFER</span>
             </div>
             <h2 className="text-base sm:text-lg md:text-2xl font-bold text-gray-800 mb-4">
-              Elevate Your{" "}
-              <span className="text-green-brand">Farming Journey</span>
+              Elevate Your Farming Journey
             </h2>
             <p className="text-gray-600 mb-8 text-lg">
               Join India's most trusted agricultural community and unlock
@@ -255,17 +254,17 @@ const KishanParivar: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <a
                 href="/kishanParivarPage"
-                className="bg-green-brand text-white font-semibold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg flex-1 text-center"
+                className="button bg-green-brand text-white font-semibold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg flex-1 text-center"
               >
                 Apply Now - ₹499/year
               </a>
-              <button className="border-2 border-green-brand text-green-brand hover:bg-green-50 font-medium py-3 px-6 rounded-lg transition-colors flex-1 text-center">
+              <button className="button border-2 border-green-brand text-green-brand hover:bg-green-50 font-medium py-3 px-6 rounded-lg transition-colors flex-1 text-center">
                 Learn More
               </button>
             </div>
 
             <div className="mt-6 flex items-center gap-2 text-gray-500 text-sm">
-              <CheckCircle size={16} className="text-green-500" />
+              <CheckCircle size={16} className="text-green-brand" />
               <span>1,25,000+ farmers already members</span>
             </div>
           </div>

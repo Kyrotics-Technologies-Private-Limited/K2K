@@ -97,8 +97,8 @@ function App() {
               <Route path="/traceability" element={<Traceability />} />
               <Route path="/privacypolicy" element={<PrivacyPolicy />} />
               <Route path="/termsofservice" element={<TermsOfService />} />
-              <Route path="/shipping" element={<ShippingPolicy />} />
-              <Route path="/refund" element={<RefundPolicy />} />
+              <Route path="/shippinginfo" element={<ShippingPolicy />} />
+              <Route path="/refundpolicy" element={<RefundPolicy />} />
               <Route path="/profile" element={<UserProfilePage />} />
             </Route>
             {/* Admin Routes */}

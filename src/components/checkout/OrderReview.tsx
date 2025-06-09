@@ -114,13 +114,13 @@ export const OrderReview = () => {
       <div className="flex justify-between mt-8">
         <button
           onClick={handleBack}
-          className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+          className="button px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
         >
           Back to Selection
         </button>
         <button
           onClick={handleContinue}
-          className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+          className="button px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
         >
           Continue to Payment
         </button>

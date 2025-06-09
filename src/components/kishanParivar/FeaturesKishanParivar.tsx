@@ -130,7 +130,7 @@ const FeaturesKishanParivar: React.FC<FeaturesKishanParivarProps> = ({ scrollToT
               <div className="pt-6"> {/* Increased padding-top */}
                 <button 
                   onClick={scrollToTarget} 
-                  className="inline-flex items-center group justify-center px-8 py-3 font-medium text-green-800 bg-white rounded-lg shadow hover:shadow-md hover:bg-green-50 transition-colors"
+                  className="button inline-flex items-center group justify-center px-8 py-3 font-medium text-green-800 bg-white rounded-lg shadow hover:shadow-md hover:bg-green-50 transition-colors"
                 >
                   <span className="font-semibold">Become a Member</span>
                   <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />

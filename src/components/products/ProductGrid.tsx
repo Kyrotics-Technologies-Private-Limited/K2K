@@ -63,7 +63,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
             <button
               key={category}
               onClick={() => handleCategoryClick(category)}
-              className={`px-6 py-2 rounded-full border-2 border-green-700 transition-all ${
+              className={`button px-6 py-2 rounded-full border-2 border-green-700 transition-all ${
                 activeCategory === category
                   ? 'bg-[#0d6b1e] text-[#FFD87D]'
                   : 'bg-white hover:bg-gray-50'
