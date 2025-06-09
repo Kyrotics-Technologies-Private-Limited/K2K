@@ -254,7 +254,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
               </button>
             </div>
 
-            <div className="flex gap-2 overflow-x-auto pb-2">
+            <div className="flex gap-2 overflow-x-auto p-2">
               {product.images.gallery.map((image, index) => (
                 <button
                   key={index}
@@ -313,7 +313,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                     <button
                       key={variant.id}
                       onClick={() => setSelectedVariant(index)}
-                      className={`flex flex-col items-start p-3 rounded-lg w-full ${
+                      className={`button flex flex-col items-start p-3 rounded-lg w-full ${
                         selectedVariant === index
                           ? "bg-green-800 text-white"
                           : "bg-gray-50 hover:bg-gray-100"
@@ -392,7 +392,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                       <div className="relative">
                         <button
                           onClick={() => setShowPricePopup(true)}
-                          className="flex items-center gap-2 pt-2 hover:text-green-800"
+                          className="button flex items-center gap-2 pt-2 hover:text-green-800"
                         >
                           Know your price
                           <Info />
@@ -401,7 +401,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                           <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg p-4 w-64 z-50">
                             <button
                               onClick={() => setShowPricePopup(false)}
-                              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                              className="button absolute top-2 right-2 text-gray-500 hover:text-gray-700"
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -469,7 +469,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   <div className="flex border border-gray-300 rounded-xl">
                     <button
                       onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                      className="w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
+                      className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
                       disabled={loading}
                     >
                       -
@@ -479,7 +479,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                     </span>
                     <button
                       onClick={() => setQuantity((prev) => prev + 1)}
-                      className="w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
+                      className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
                       disabled={loading}
                     >
                       +
@@ -499,7 +499,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                     <>
                       <button
                         onClick={handleAddToCart}
-                        className="flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
+                        className="button flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
                         disabled={
                           !variants[selectedVariant]?.inStock ||
                           addingToCart
@@ -521,7 +521,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                       </button>
                       <button
                         onClick={handleBuyNow}
-                        className="flex-1 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
+                        className="button flex-1 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
                         disabled={
                           !variants[selectedVariant].inStock ||
                           loading

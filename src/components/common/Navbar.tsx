@@ -68,12 +68,12 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-4 xl:space-x-8">
             <div className="relative group">
               <div className="flex items-center">
                 <Link
                   to="/all-products"
-                  className="text-gray-500 hover:text-black transition"
+                  className="text-gray-500 hover:text-black transition text-sm xl:text-base"
                 >
                   All Products
                 </Link>
@@ -102,7 +102,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               <Link
                 key={path}
                 to={`/${path}`}
-                className="text-gray-500 hover:text-black transition"
+                className="text-gray-500 hover:text-black transition text-sm xl:text-base"
               >
                 {label}
               </Link>
@@ -110,13 +110,13 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
           </div>
 
           {/* Right-side Icons */}
-          <div className="flex items-center space-x-4">
-            <Search className="h-5 w-5 text-gray-700 hover:text-green-600 cursor-pointer" />
+          <div className="flex items-center">
+            <Search className="h-7 w-7 mr-4 text-gray-700 hover:text-green-600 cursor-pointer" />
 
             {/* User Authentication Section */}
             {isAuthenticated ? (
               <div className="relative group">
-                <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center cursor-pointer">
+                <div className="w-7 h-7 mr-2 rounded-full bg-green-600 text-white flex items-center justify-center cursor-pointer">
                   {displayName.charAt(0).toUpperCase()}
                 </div>
                 <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg py-2 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-50">
@@ -156,9 +156,9 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             {/* Cart Button */}
             <button
               onClick={onCartClick}
-              className="relative p-2"
+              className="button relative p-2"
             >
-              <ShoppingCart className="text-gray-700 w-6 h-6" />
+              <ShoppingCart className="text-gray-700 w-6 h-8" />
               {itemCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-green-600 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
                   {itemCount > 99 ? '99+' : itemCount}
@@ -168,7 +168,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
           </div>
 
           {/* Mobile Menu Icon */}
-          <div className="md:hidden flex items-center space-x-3">
+          <div className="lg:hidden flex items-center space-x-3">
             <button onClick={() => setIsOpen(!isOpen)} aria-label={isOpen ? "Close menu" : "Open menu"}>
               {isOpen ? (
                 <X className="h-6 w-6" />
@@ -182,7 +182,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden bg-white px-4 py-3 space-y-2">
+        <div className="lg:hidden bg-white px-4 py-3 space-y-2">
           {[
             ["/", "Home"],
             ["/all-products", "All Products"],

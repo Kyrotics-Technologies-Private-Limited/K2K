@@ -21,7 +21,7 @@
 // export default Banner;
 
 import React from "react";
-import { Leaf, MapPin, Award } from "lucide-react";
+import { MapPin, Award } from "lucide-react";
 
 const NatureTraceBanner: React.FC = () => {
   const handleRedirect = () => {
@@ -71,7 +71,7 @@ const NatureTraceBanner: React.FC = () => {
           <div className="flex justify-center space-x-6 mb-16">
             <button 
               onClick={handleRedirect}
-              className="flex items-center justify-center px-10 py-5 bg-white text-green-800 font-bold rounded-full 
+              className="button flex items-center justify-center px-10 py-5 bg-white text-green-800 font-bold rounded-full 
                          hover:bg-green-100 transition-all duration-300 
                          transform hover:-translate-y-2 shadow-2xl hover:shadow-xl"
             >

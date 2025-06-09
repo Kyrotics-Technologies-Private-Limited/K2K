@@ -106,7 +106,7 @@ const KishanParivarHero: React.FC<HeroKishanParivarProps> = ({ scrollToTarget })
           </div>
 
           {/* Single CTA Button */}
-          <button onClick={scrollToTarget} className="w-full py-3 bg-green-brand hover:scale-[1.01] text-white font-medium rounded-lg shadow hover:shadow-md flex items-center justify-center gap-2">
+          <button onClick={scrollToTarget} className="button w-full py-3 bg-green-brand hover:scale-[1.01] text-white font-medium rounded-lg shadow hover:shadow-md flex items-center justify-center gap-2">
             Apply Now
           </button>
         </div>

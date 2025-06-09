@@ -187,10 +187,11 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
   const discountedPrice = selectedVariant?.price || 0;
 
   return (
+    <div className="group bg-white border-0.5 border-grey-50 rounded-md shadow-md overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md relative w-full">
     <Link
       to={`/product/${product.id}`}
       onClick={handleProductClick}
-      className="group bg-white border-0.5 border-grey-50 rounded-md shadow-md overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md relative w-full"
+      
     >
       <div className="aspect-[39/37] overflow-hidden relative">
         <img
@@ -297,5 +298,6 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
         </div> */}
       </div>
     </Link>
+    </div>
   );
 };

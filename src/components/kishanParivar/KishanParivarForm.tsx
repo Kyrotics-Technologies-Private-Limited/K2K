@@ -204,7 +204,7 @@
 import React, { RefObject } from 'react';
 
 interface KishanParivarFormProps {
-  targetRef: RefObject<HTMLDivElement>;
+  targetRef: RefObject<HTMLDivElement | null>;
 }
 
 const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
@@ -393,7 +393,7 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
         <div className="flex justify-center mt-10">
           <button 
             type="submit" 
-            className="relative overflow-hidden px-8 py-3 bg-green-brand text-white font-medium rounded-lg shadow-md hover:shadow-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 transform hover:-translate-y-1"
+            className="button relative overflow-hidden px-8 py-3 bg-green-brand text-white font-medium rounded-lg shadow-md hover:shadow-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 transform hover:-translate-y-1"
           >
             <span className="relative z-10">Submit Application</span>
             <span className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity duration-300"></span>

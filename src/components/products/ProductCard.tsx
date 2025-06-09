@@ -210,7 +210,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
           )}
         </div>
 
-        <div className="absolute bottom-1.5 right-1.5 bg-white shadow rounded-md p-0.5 flex items-center gap-0.5 z-10">
+        {/* <div className="absolute bottom-1.5 right-1.5 bg-white shadow rounded-md p-0.5 flex items-center gap-0.5 z-10">
           <button
             onClick={handleQuantityDecrement}
             className="w-5 h-5 flex items-center justify-center hover:bg-gray-100"
@@ -226,7 +226,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
           >
             <Plus className="w-2.5 h-2.5 text-[#4A5D23]" />
           </button>
-        </div>
+        </div> */}
       </div>
 
       <div className="px-3 py-4">
@@ -273,7 +273,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
             <>
               <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-white border border-[#0d6b1e] text-green-800 py-1.5 rounded hover:bg-green-800 hover:text-white transition-colors text-xs flex items-center justify-center gap-0.5"
+                className="button flex-1 bg-white border border-[#0d6b1e] text-green-800 py-1.5 rounded hover:bg-green-800 hover:text-white transition-colors text-xs flex items-center justify-center gap-0.5"
               >
                 {isAddingToCart ? (
                   <span className="animate-pulse">Adding...</span>
@@ -287,7 +287,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
               <button
                 onClick={handleBuyNow}
                 disabled={isAddingToCart || !activeCartId}
-                className="flex-1 bg-[#0d6b1e] text-white py-1.5 rounded hover:bg-[#3A4D13] transition-colors text-xs flex items-center justify-center gap-0.5"
+                className="button flex-1 bg-[#0d6b1e] text-white py-1.5 rounded hover:bg-[#3A4D13] transition-colors text-xs flex items-center justify-center gap-0.5"
               >
                 <CreditCard className="w-4 h-4" />
                 Buy

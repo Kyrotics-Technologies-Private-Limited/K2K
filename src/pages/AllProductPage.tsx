@@ -183,6 +183,7 @@ import {
   Battery,
   Moon,
   Shield,
+  LucideMoveLeft,
 } from "lucide-react";
 import RecognizedBy from "../components/homePageComponents/RecognizedBy";
 import { productApi } from '../services/api/productApi'
@@ -366,7 +367,7 @@ const AllProductPage = () => {
                 traditional farming.
               </p>
               <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4">
-                <div className="bg-white/20 backdrop-blur-sm rounded-xl p-2 md:p-3 text-center transform transition duration-300 hover:scale-105 hover:shadow-lg">
+                <div className="button bg-white/20 backdrop-blur-sm rounded-xl p-2 md:p-3 text-center transform transition duration-300 hover:scale-105 hover:shadow-lg">
                   <div className="bg-green-500/30 rounded-full p-2 md:p-3 inline-block mb-2">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -389,7 +390,7 @@ const AllProductPage = () => {
                     No artificial additives
                   </p>
                 </div>
-                <div className="bg-white/20 backdrop-blur-sm rounded-xl p-2 md:p-3 text-center transform transition duration-300 hover:scale-105 hover:shadow-lg">
+                <div className="button bg-white/20 backdrop-blur-sm rounded-xl p-2 md:p-3 text-center transform transition duration-300 hover:scale-105 hover:shadow-lg">
                   <div className="bg-amber-500/30 rounded-full p-2 md:p-3 inline-block mb-2">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -419,7 +420,7 @@ const AllProductPage = () => {
                     Direct from local farms
                   </p>
                 </div>
-                <div className="bg-white/20 backdrop-blur-sm rounded-xl p-2 md:p-3 text-center transform transition duration-300 hover:scale-105 hover:shadow-lg">
+                <div className="button bg-white/20 backdrop-blur-sm rounded-xl p-2 md:p-3 text-center transform transition duration-300 hover:scale-105 hover:shadow-lg">
                   <div className="bg-blue-500/30 rounded-full p-2 md:p-3 inline-block mb-2">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
