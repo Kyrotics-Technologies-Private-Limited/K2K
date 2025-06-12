@@ -17,7 +17,7 @@ import { HealthBenefits } from "./HealthBenefits";
 import RecognizedBy from "../homePageComponents/RecognizedBy";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { addToCart, createCart } from "../../store/slices/cartSlice";
-import variantApi from "../../services/api/variantApi";
+import VariantApi from "../../services/api/variantApi";
 import { Variant } from "../../types/variant";
 import { toast } from "react-toastify";
 
@@ -45,13 +45,16 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  // console.log("Selected variant index:", selectedVariant);
+  // console.log("slected variant:", variants[selectedVariant]);
+
   // Fetch variants when product changes
   useEffect(() => {
     const fetchVariants = async () => {
       if (!product) return;
       try {
         setLoading(true);
-        const fetchedVariants = await variantApi.getVariantsByProductId(product.id);
+        const fetchedVariants = await VariantApi.getVariantsByProductId(product.id);
         console.log("Fetched Variants: ", fetchedVariants);
         setVariants(fetchedVariants);
         setError(null);
