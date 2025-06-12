@@ -50,7 +50,7 @@ async function fetchItemDetails(item: CartItem): Promise<CartItemWithDetails> {
   try {
     const [product, variant] = await Promise.all([
       productApi.getProductById(item.productId),
-      variantApi.getVariant(item.productId, item.variantId),
+      variantApi.getVariantById(item.productId, item.variantId),
     ]);
 
     return {

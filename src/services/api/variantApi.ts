@@ -1,13 +1,10 @@
-import axios from 'axios';
-import { Variant } from './../../types/variant'; // Adjust the import path based on your project structure
-
-// Define the base URL for the API
-const API_URL = "http://localhost:5566/api/variants";
+import api from './api';
+import { Variant } from './../../types/variant';
 
 // Fetch all variants
-export const getVariants = async (): Promise<Variant[]> => {
+export const getVariants = async (productId:string): Promise<Variant[]> => {
   try {
-    const response = await axios.get(API_URL);
+    const response = await api.get(`/variants/${productId}/getVariants`);
     return response.data;
   } catch (error) {
     console.error(error); // Log the error for easier debugging
@@ -16,20 +13,20 @@ export const getVariants = async (): Promise<Variant[]> => {
 };
 
 // Fetch a single variant by ID
-export const getVariantById = async (id: string): Promise<Variant> => {
+export const getVariantById = async (productId: string, variantId: string): Promise<Variant> => {
   try {
-    const response = await axios.get(`${API_URL}/${id}`);
+    const response = await api.get(`/variants/${productId}/getVariant/${variantId}`);
     return response.data;
   } catch (error) {
     console.error(error); // Log the error for easier debugging
-    throw new Error(`Error fetching variant with id ${id}`);
+    throw new Error(`Error fetching variant with id ${variantId}`);
   }
 };
 
 // Create a new variant
 export const createVariant = async (productId: string, variant: Variant): Promise<Variant> => {
   try {
-    const response = await axios.post(`${API_URL}/${productId}/createVariant`, variant);
+    const response = await api.post(`/variants/${productId}/createVariant`, variant);
     return response.data;
   } catch (error) {
     console.error(error); // Log the error for easier debugging
@@ -40,7 +37,7 @@ export const createVariant = async (productId: string, variant: Variant): Promis
 // Update an existing variant
 export const updateVariant = async (productId: string, variantId: string) => {
   try {
-    const res = await axios.put(`/api/variants/${productId}/updateVariant/${variantId}`);
+    const res = await api.put(`/api/variants/${productId}/updateVariant/${variantId}`);
     return res.data;
   } catch (error) {
     console.error('Update error:', error);
@@ -56,7 +53,7 @@ export const deleteVariant = async (
   variantId: string
 ): Promise<void> => {
   try {
-    await axios.delete(`${API_URL}/${productId}/deleteVariant/${variantId}`);
+    await api.delete(`/variants/${productId}/deleteVariant/${variantId}`);
   } catch (error) {
     console.error(error); // Log the error for easier debugging
     throw new Error(`Error deleting variant with id ${variantId}`);
@@ -67,7 +64,7 @@ export const deleteVariant = async (
 // Example of a function to get all variants for a specific product
 export const getVariantsByProductId = async (productId: string): Promise<Variant[]> => {
   try {
-    const response = await axios.get(`${API_URL}/${productId}/getVariants`, {
+    const response = await api.get(`/variants/${productId}/getVariants`, {
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
