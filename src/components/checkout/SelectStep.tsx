@@ -187,7 +187,7 @@ export const SelectStep = () => {
                   </h2>
                   <button
                     onClick={handleAddNewAddress}
-                    className="flex items-center text-green-600 hover:text-green-700"
+                    className="button flex items-center text-green-600 hover:text-green-700"
                   >
                     <PlusCircle className="w-5 h-5 mr-1" />
                     Add New Address
@@ -358,13 +358,13 @@ export const SelectStep = () => {
                   <button
                     type="button"
                     onClick={() => dispatch(setIsAddingNewAddress(false))}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                    className="button px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                    className="button px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
                   >
                     Save Address
                   </button>
@@ -403,7 +403,7 @@ export const SelectStep = () => {
                             onClick={() =>
                               handleUpdateQuantity(item.id, item.quantity - 1)
                             }
-                            className="p-1 rounded-md hover:bg-gray-100"
+                            className="button p-1 rounded-md hover:bg-gray-100"
                             disabled={itemLoading[item.id]}
                           >
                             <Minus className="w-4 h-4" />
@@ -415,14 +415,14 @@ export const SelectStep = () => {
                             onClick={() =>
                               handleUpdateQuantity(item.id, item.quantity + 1)
                             }
-                            className="p-1 rounded-md hover:bg-gray-100"
+                            className="button p-1 rounded-md hover:bg-gray-100"
                             disabled={itemLoading[item.id]}
                           >
                             <Plus className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleRemoveItem(item.id)}
-                            className="p-1 text-red-500 hover:bg-red-50 rounded-md ml-2"
+                            className="button p-1 text-red-500 hover:bg-red-50 rounded-md ml-2"
                             disabled={itemLoading[item.id]}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -486,7 +486,7 @@ export const SelectStep = () => {
         <div className="mt-8 flex justify-end">
           <button
             onClick={handleContinue}
-            className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            className="button px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
           >
             Continue to Review
           </button>

@@ -314,7 +314,7 @@ const Footer: FC = () => {
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-green-brand hover:bg-green-700 text-white p-1.5 sm:p-2 rounded-md transition-all flex items-center justify-center shadow-lg hover:shadow-green-500/20"
                 aria-label="Subscribe"
               >
-                <Mail className="h-4 w-4 sm:h-5 sm:w-5" />
+                <Mail className="button h-4 w-4 sm:h-5 sm:w-5" />
               </button>
             </div>
             <p className="mt-2 sm:mt-3 text-xs text-green-200/80">

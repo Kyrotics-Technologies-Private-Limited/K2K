@@ -104,10 +104,10 @@ export const Payment = () => {
                 name="payment"
                 checked={paymentMethod === "cod"}
                 onChange={() => handlePaymentMethodChange("cod")}
-                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                className="button h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
               />
               <div className="ml-3">
-                <label className="font-medium text-gray-900">
+                <label className="button font-medium text-gray-900">
                   Cash on Delivery
                 </label>
                 <p className="text-gray-500 text-sm">
@@ -132,10 +132,10 @@ export const Payment = () => {
                 name="payment"
                 checked={paymentMethod === "online"}
                 onChange={() => handlePaymentMethodChange("online")}
-                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                className="button h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
               />
               <div className="ml-3">
-                <label className="font-medium text-gray-900">
+                <label className="button font-medium text-gray-900">
                   Online Payment
                 </label>
                 <p className="text-gray-500 text-sm">

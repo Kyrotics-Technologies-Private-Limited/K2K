@@ -172,7 +172,7 @@ const TestimonialsSection = () => {
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-green-brand">
           Customer Stories
         </h2>
-        <p className="text-sm md:text-base text-gray-800/90 max-w-lg mx-auto mt-2">
+        <p className="text-sm md:text-base text-gray-800/90 max-w-lg mx-auto mt-2 mb-2">
           Hear from those who've experienced our products
         </p>
 
@@ -236,7 +236,7 @@ const TestimonialsSection = () => {
             ))}
           </Swiper>
 
-          <div className="testimonial-pagination absolute bottom-4 left-0 right-0 z-10 flex justify-center" />
+          <div className="testimonial-pagination mt-3 bottom-4 left-0 right-0 z-10 flex justify-center" />
         </div>
       </div>
     </section>

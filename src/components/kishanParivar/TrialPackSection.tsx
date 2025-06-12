@@ -9,7 +9,7 @@ const TrialPackSection = () => {
                             EXCLUSIVE OFFER
                         </div>
                         <h1 className="mb-4 text-3xl sm:text-4xl font-bold leading-tight">
-                            Explore <span className="text-green-brand">1200+ Trial Packs</span> with Kishan Parivar
+                            Explore 1200+ Trial Packs with Kishan Parivar
                         </h1>
                         
                         <div className="space-y-3 mb-6">
@@ -46,10 +46,10 @@ const TrialPackSection = () => {
                         </div>
                         
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <button className="px-6 py-3 bg-green-brand text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                            <button className="button px-6 py-3 bg-green-brand text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
                                 Get Your Card Now
                             </button>
-                            <button className="px-6 py-3 border-2 border-green-brand text-green-brand hover:bg-green-50 font-medium rounded-lg transition-all duration-300">
+                            <button className="button px-6 py-3 border-2 border-green-brand text-green-brand hover:bg-green-50 font-medium rounded-lg transition-all duration-300">
                                 Browse Trial Packs
                             </button>
                         </div>
