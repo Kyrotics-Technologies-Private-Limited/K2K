@@ -56,17 +56,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
     navigate(`/product/${product.id}`);
   };
 
-  const handleQuantityDecrement = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setQuantity(prev => Math.max(1, prev - 1));
-  };
+  // const handleQuantityDecrement = (e: React.MouseEvent) => {
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  //   setQuantity(prev => Math.max(1, prev - 1));
+  // };
 
-  const handleQuantityIncrement = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setQuantity(prev => prev + 1);
-  };
+  // const handleQuantityIncrement = (e: React.MouseEvent) => {
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  //   setQuantity(prev => prev + 1);
+  // };
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
