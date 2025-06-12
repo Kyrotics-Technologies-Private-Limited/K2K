@@ -159,10 +159,10 @@ export const Payment = () => {
             <span>Subtotal</span>
             <span>₹{orderSummary.subtotal.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between">
+          {/* <div className="flex justify-between">
             <span>GST (18%)</span>
             <span>₹{orderSummary.tax.toFixed(2)}</span>
-          </div>
+          </div> */}
           <div className="flex justify-between">
             <span>Shipping</span>
             <span>

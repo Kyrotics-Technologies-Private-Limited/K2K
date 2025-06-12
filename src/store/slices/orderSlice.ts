@@ -20,8 +20,19 @@ const initialState: OrderState = {
 export const createOrder = createAsyncThunk(
   'order/createOrder',
   async (payload: CreateOrderPayload) => {
-    const response = await orderApi.createOrder(payload);
-    return response;
+    type CreateOrderResponse = { order?: Order; id?: string };
+    const response = await orderApi.createOrder(payload) as CreateOrderResponse;
+    // Map or fetch the created order details to match the Order type
+    // If response contains the order object, return it directly
+    // Otherwise, fetch the order by ID or map the response accordingly
+    if ('order' in response && response.order) {
+      return response.order as Order;
+    }
+    // If response contains the order ID, fetch the order details
+    if ('id' in response && response.id) {
+      return await orderApi.getOrderById(response.id) as Order;
+    }
+    throw new Error('Invalid createOrder response');
   }
 );
 
@@ -29,7 +40,7 @@ export const createOrder = createAsyncThunk(
 export const fetchOrders = createAsyncThunk(
   'order/fetchOrders',
   async () => {
-    return await orderApi.getOrders();
+    return await orderApi.getUserOrders();
   }
 );
 
@@ -45,8 +56,8 @@ export const fetchOrderById = createAsyncThunk(
 export const updateOrderStatus = createAsyncThunk(
   'order/updateStatus',
   async ({ orderId, status }: { orderId: string; status: UpdateOrderStatusPayload['status'] }) => {
-    await orderApi.updateOrderStatus(orderId, { status });
-    return { orderId, status };
+    const response = await orderApi.updateOrderStatus(orderId, { status });
+    return { orderId, status, message: response.message };
   }
 );
 
@@ -54,8 +65,8 @@ export const updateOrderStatus = createAsyncThunk(
 export const cancelOrder = createAsyncThunk(
   'order/cancelOrder',
   async (orderId: string) => {
-    await orderApi.cancelOrder(orderId);
-    return orderId;
+    const response = await orderApi.cancelOrder(orderId);
+    return { orderId, message: response.message };
   }
 );
 
@@ -147,10 +158,10 @@ const orderSlice = createSlice({
       .addCase(cancelOrder.fulfilled, (state, action) => {
         state.loading = false;
         // Update status to cancelled in both current order and orders list
-        if (state.currentOrder?.id === action.payload) {
+        if (state.currentOrder?.id === action.payload.orderId) {
           state.currentOrder.status = 'cancelled';
         }
-        const orderIndex = state.orders.findIndex(order => order.id === action.payload);
+        const orderIndex = state.orders.findIndex(order => order.id === action.payload.orderId);
         if (orderIndex !== -1) {
           state.orders[orderIndex].status = 'cancelled';
         }
