@@ -549,10 +549,10 @@ const mockFetchOrders = (): Promise<Order[]> => {
           quantity: 1,
           unit_price: 99.99,
           created_at: "2023-05-15T10:30:00Z",
-          name: "Wireless Headphones",
+          name: "Ghee",
           image:
-            "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80",
-          variant_name: "Black",
+            "https://media.istockphoto.com/id/1413268611/photo/ghee-butter-oil.jpg?s=2048x2048&w=is&k=20&c=K18ttyAf75d02uDCoKWe7R8-AleXS-BxsvsRqthxRbA=",
+          variant_name: "200gm",
         },
         {
           id: "item_2",
@@ -561,9 +561,9 @@ const mockFetchOrders = (): Promise<Order[]> => {
           quantity: 2,
           unit_price: 12.99,
           created_at: "2023-05-15T10:30:00Z",
-          name: "USB-C Cable",
+          name: "Honey",
           image:
-            "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80",
+            "https://media.istockphoto.com/id/1093966722/photo/honey-jar-with-honey-dipper-shot-on-rustic-wooden-table.jpg?s=612x612&w=is&k=20&c=HZ-eIz4KEaS7J1h72xmzt8sOtKNlNCgjhOJt8nBj2G0=",
         },
         {
           id: "item_3",
@@ -572,9 +572,9 @@ const mockFetchOrders = (): Promise<Order[]> => {
           quantity: 1,
           unit_price: 24.99,
           created_at: "2023-05-14T14:45:00Z",
-          name: "Smartphone Case",
+          name: "Organic Ghee",
           image:
-            "https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80",
+            "https://media.istockphoto.com/id/1413268611/photo/ghee-butter-oil.jpg?s=2048x2048&w=is&k=20&c=K18ttyAf75d02uDCoKWe7R8-AleXS-BxsvsRqthxRbA=",
           variant_name: "Clear",
         },
       ];
