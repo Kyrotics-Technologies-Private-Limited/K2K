@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Menu, X, ShoppingCart, Search, ChevronDown, User as UserIcon } from "lucide-react";
+import {
+  Menu,
+  X,
+  ShoppingCart,
+  Search,
+  ChevronDown,
+  User as UserIcon,
+} from "lucide-react";
 import { RootState, useAppDispatch, useAppSelector } from "../../store/store";
 import { Link, useNavigate } from "react-router-dom";
 import PhoneAuth from "../authComponents/PhoneAuth";
@@ -12,23 +19,28 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  
+
   // Get auth state from Redux
-  const { user, isAuthenticated, loading } = useAppSelector(state => state.auth);
+  const { user, isAuthenticated, loading } = useAppSelector(
+    (state) => state.auth
+  );
   // console.log('user',user)
   // Get cart state from Redux
-  const cart = useAppSelector(state => state.cart);
+  const cart = useAppSelector((state) => state.cart);
   if (!cart) {
     console.error("Cart is not available in the Redux store.");
     return null; // or handle it in a way that fits your app
   }
-  const itemCount = cart.cartItems.reduce((total, item) => total + item.quantity, 0);
-  
+  const itemCount = cart.cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  
+
   const [isSigningOut, setIsSigningOut] = useState(false);
-  
+
   // Get user's name or display a default
   const displayName = user?.name || "User";
 
@@ -83,7 +95,11 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                 {["oils", "ghee", "honey", "natural"].map((type) => (
                   <Link
                     key={type}
-                    to={type === "natural" ? "/all-products" : `/all-products?category=${type}`}
+                    to={
+                      type === "natural"
+                        ? "/all-products"
+                        : `/all-products?category=${type}`
+                    }
                     className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600"
                   >
                     {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -154,14 +170,11 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             )}
 
             {/* Cart Button */}
-            <button
-              onClick={onCartClick}
-              className="button relative p-2"
-            >
+            <button onClick={onCartClick} className="button relative p-2">
               <ShoppingCart className="text-gray-700 w-6 h-8" />
               {itemCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-green-600 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
-                  {itemCount > 99 ? '99+' : itemCount}
+                  {itemCount > 99 ? "99+" : itemCount}
                 </span>
               )}
             </button>
@@ -169,7 +182,10 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
           {/* Mobile Menu Icon */}
           <div className="lg:hidden flex items-center space-x-3">
-            <button onClick={() => setIsOpen(!isOpen)} aria-label={isOpen ? "Close menu" : "Open menu"}>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+            >
               {isOpen ? (
                 <X className="h-6 w-6" />
               ) : (
@@ -243,7 +259,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
       )}
 
       {/* Login Modal */}
-       {showLoginModal && (
+      {showLoginModal && (
         <div className="fixed inset-0 z-50 bg-black/40 flex justify-center items-center p-4 sm:p-8">
           <div className="relative bg-green-50 rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-gray-100 animate-fade-in">
             <button

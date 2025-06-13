@@ -1,76 +1,88 @@
-//src/services/api/orderApi.ts
-import api from '../api/api';
-import { getAuth } from 'firebase/auth';
+// src/api/orderapi.ts
+
+import api from './api';
 import {
   Order,
-  OrderItem,
-  TrackingInfo,
   CreateOrderPayload,
-  OrderListResponse,
-  UpdateOrderStatusPayload
+  CreateOrderResponse,
+  CancelOrderPayload,
+  UpdateOrderStatusPayload,
+  TrackingInfo,
 } from '../../types/order';
-
-
+import { getAuth } from "firebase/auth";
 
 const getAuthToken = async () => {
   const auth = getAuth();
   const user = auth.currentUser;
-  if (!user) throw new Error('User not authenticated');
-  return await user.getIdToken();
+  if (!user) {
+    throw new Error("User not authenticated. Please sign in to continue.");
+  }
+  return await user.getIdToken(true); // Force refresh to ensure token is valid
 };
 
+// Helper to create authenticated request config
+const createAuthConfig = async () => {
+  const token = await getAuthToken();
+  return {
+    headers: { Authorization: `Bearer ${token}` }
+  };
+};
 export const orderApi = {
-  createOrder: async (payload: CreateOrderPayload): Promise<Order> => {
-    const token = await getAuthToken();
-    const response = await api.post(`/orders/create`, payload, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
+// ✅ Create an order
+createOrder: async (
+  payload: CreateOrderPayload
+): Promise<CreateOrderResponse> => {
+  const config = await createAuthConfig();
+  const response = await api.post<CreateOrderResponse>('/orders', payload, config);
+  return response.data;
+},
 
-  getOrders: async (): Promise<Order[]> => {
-    const token = await getAuthToken();
-    const response = await api.get(`/orders`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
+// ✅ Get all orders of the current user
+getUserOrders : async (): Promise<Order[]> => {
+  const config = await createAuthConfig();
+  const response = await api.get<Order[]>('/orders', config);
+  return response.data;
+},
 
-  getAllOrders: async (): Promise<Order[]> => {
-    const token = await getAuthToken();
-    const response = await api.get(`/orders/getAllOrders`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
+// ✅ Get a single order by ID
+getOrderById : async (orderId: string): Promise<Order> => {
+  const config = await createAuthConfig();
+  const response = await api.get<Order>(`/orders/${orderId}`, config);
+  return response.data;
+},
 
-  getOrderById: async (orderId: string): Promise<Order> => {
-    const token = await getAuthToken();
-    const response = await api.get(`/orders/getOrder/${orderId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
+// ✅ Cancel an order
+cancelOrder : async (
+  orderId: string,
+  payload?: CancelOrderPayload
+): Promise<{ message: string }> => {
+  const config = await createAuthConfig();
+  const response = await api.put<{ message: string }>(
+    `/orders/${orderId}/cancel`,
+    payload || {},
+    config
+  );
+  return response.data;
+},
 
-  cancelOrder: async (orderId: string): Promise<void> => {
-    const token = await getAuthToken();
-    await api.put(`/orders/${orderId}/cancel`, null, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-  },
+// ✅ Update order status (for user if allowed)
+updateOrderStatus : async (
+  orderId: string,
+  payload: UpdateOrderStatusPayload
+): Promise<{ message: string }> => {
+  const config = await createAuthConfig();
+  const response = await api.put<{ message: string }>(
+    `/orders/${orderId}/status`,
+    payload,
+    config
+  );
+  return response.data;
+},
 
-  getTracking: async (orderId: string): Promise<TrackingInfo> => {
-    const token = await getAuthToken();
-    const response = await api.get(`/orders/${orderId}/tracking`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
-
-  updateOrderStatus: async (orderId: string, payload: UpdateOrderStatusPayload): Promise<void> => {
-    const token = await getAuthToken();
-    await api.put(`/orders/${orderId}/status`, payload, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-  }
+// ✅ Track order
+trackOrder : async (orderId: string): Promise<TrackingInfo> => {
+  const config = await createAuthConfig();
+  const response = await api.get<TrackingInfo>(`/orders/${orderId}/track`, config);
+  return response.data;
+}
 };
