@@ -40,6 +40,8 @@ import AdminCustomers from "./pages/admin/AdminCustomers";
 import { ToastContainer, Bounce } from 'react-toastify';
 import VariantDetailsPage from "./pages/admin/Variantdetailspage";
 import VariantEditPage from "./pages/admin/VariantEditPage";
+import BlogPage from "./pages/BlogPage";
+import BlogDetailPage from "./pages/BlogDetailPage";
 
 const PublicLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -99,7 +101,8 @@ function App() {
               <Route path="/termsofservice" element={<TermsOfService />} />
               <Route path="/shippinginfo" element={<ShippingPolicy />} />
               <Route path="/refundpolicy" element={<RefundPolicy />} />
-              <Route path="/profile" element={<UserProfilePage />} />
+              <Route path="/profile" element={<UserProfilePage />} />          <Route path="/Blog" element={<BlogPage />} />
+          <Route path="/Blog/:blogId" element={<BlogDetailPage />} />
             </Route>
             {/* Admin Routes */}
             <Route path="/admin" element={<Layout />}>

@@ -108,12 +108,11 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               </div>
             </div>
 
-            {[
-              ["samples", "Try Our Sample"],
+            {[              ["samples", "Try Our Sample"],
               ["kishanParivarPage", "Kishan Parivar"],
               ["traceability", "Traceability"],
               ["our-story", "Our Story"],
-              ["blog", "Blog"],
+              ["Blog", "Blog"],
             ].map(([path, label]) => (
               <Link
                 key={path}
@@ -127,7 +126,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
           {/* Right-side Icons */}
           <div className="flex items-center">
-            <Search className="h-7 w-7 mr-4 text-gray-700 hover:text-green-600 cursor-pointer" />
+            {/* <Search className="h-7 w-7 mr-4 text-gray-700 hover:text-green-600 cursor-pointer" /> */}
 
             {/* User Authentication Section */}
             {isAuthenticated ? (
@@ -199,14 +198,13 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="lg:hidden bg-white px-4 py-3 space-y-2">
-          {[
-            ["/", "Home"],
+          {[            ["/", "Home"],
             ["/all-products", "All Products"],
             ["/samples", "Try Our Sample"],
             ["/kishanParivarPage", "Kishan Parivar"],
             ["/traceability", "Traceability"],
             ["/our-story", "Our Story"],
-            ["/blog", "Blog"],
+            ["/Blog", "Blog"],
           ].map(([path, label]) => (
             <Link
               key={path}

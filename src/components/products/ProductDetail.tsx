@@ -20,6 +20,7 @@ import { addToCart, createCart } from "../../store/slices/cartSlice";
 import VariantApi from "../../services/api/variantApi";
 import { Variant } from "../../types/variant";
 import { toast } from "react-toastify";
+import { CartItem } from "@/types/cart";
 
 interface ProductDetailProps {
   product: Product | undefined;
@@ -54,8 +55,10 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
       if (!product) return;
       try {
         setLoading(true);
-        const fetchedVariants = await VariantApi.getVariantsByProductId(product.id);
-        console.log("Fetched Variants: ", fetchedVariants);
+        const fetchedVariants = await VariantApi.getVariantsByProductId(
+          product.id
+        );
+        // console.log("Fetched Variants: ", fetchedVariants);
         setVariants(fetchedVariants);
         setError(null);
       } catch (err) {
@@ -107,23 +110,31 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
     setError(null);
 
     try {
-      const itemData = {
+      // const itemData = {
+      //   productId: product.id,
+      //   variantId: variants[selectedVariant].id,
+      //   quantity: quantity,
+      // };
+
+      // await dispatch(
+      //   addToCart({
+      //     // cartId: activeCartId!,
+      //     ...itemData,
+      //   })
+      // ).unwrap();
+
+      const itemData: Partial<CartItem> = {
         productId: product.id,
         variantId: variants[selectedVariant].id,
-        quantity: quantity,
+        quantity,
       };
 
-      await dispatch(
-        addToCart({
-          cartId: activeCartId!,
-          itemData,
-        })
-      ).unwrap();
+      const result = await dispatch(addToCart(itemData)).unwrap();
 
       toast.success(
         <div className="flex items-center gap-3">
-          <img 
-            src={product.images.main} 
+          <img
+            src={product.images.main}
             alt={product.name}
             className="w-12 h-12 object-cover rounded"
           />
@@ -131,11 +142,18 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
             <h3 className="font-medium mb-2">Added to Cart!</h3>
             <p className="text-sm text-gray-600">{product.name}</p>
             <div className="text-sm mt-2">
-              <span className="text-green-600">{variants[selectedVariant].weight}</span>
+              <span className="text-green-600">
+                {variants[selectedVariant].weight}
+              </span>
               <span className="mx-2">|</span>
               <span className="text-green-600">Qty: {quantity}</span>
               <span className="mx-2">|</span>
-              <span>₹{(variants[selectedVariant].price * quantity).toLocaleString('en-IN')}</span>
+              <span>
+                ₹
+                {(variants[selectedVariant].price * quantity).toLocaleString(
+                  "en-IN"
+                )}
+              </span>
             </div>
           </div>
         </div>,
@@ -187,8 +205,8 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
       // Add to cart first
       await dispatch(
         addToCart({
-          cartId: activeCartId,
-          itemData,
+          // cartId: activeCartId,
+          ...itemData,
         })
       ).unwrap();
 
@@ -307,8 +325,12 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
               <h2 className="text-xl font-semibold mb-4">Select Variant</h2>
               {variants.length === 0 ? (
                 <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-gray-600 text-center">No variants available for this product.</p>
-                  <p className="text-sm text-gray-500 text-center mt-1">Please check back later or contact us for availability.</p>
+                  <p className="text-gray-600 text-center">
+                    No variants available for this product.
+                  </p>
+                  <p className="text-sm text-gray-500 text-center mt-1">
+                    Please check back later or contact us for availability.
+                  </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
@@ -349,8 +371,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                           </span>
                           {variant.originalPrice && (
                             <span className="text-sm font-semibold text-gray-500 line-through">
-                              ₹
-                              {variant.originalPrice.toLocaleString("en-IN")}
+                              ₹{variant.originalPrice.toLocaleString("en-IN")}
                             </span>
                           )}
                           {variant.discount && (
@@ -379,18 +400,21 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                     <div className="flex flex-row gap-4 relative">
                       <span className="text-4xl font-bold text-black">
                         ₹
-                        {variants[
-                          selectedVariant
-                        ].price.toLocaleString("en-IN")}
+                        {variants[selectedVariant].price.toLocaleString(
+                          "en-IN"
+                        )}
                       </span>
                       <span className="text-lg font-bold text-gray-500 line-through pt-2">
                         ₹
-                        {(
-                        variants[selectedVariant].originalPrice!
-                        ).toLocaleString("en-IN")}
+                        {variants[
+                          selectedVariant
+                        ].originalPrice!.toLocaleString("en-IN")}
                       </span>
                       <span className="text-lg font-bold text-gray-500 pt-2">
-                        <p className="text-green-800"> save {variants[selectedVariant].discount}% off</p>
+                        <p className="text-green-800">
+                          {" "}
+                          save {variants[selectedVariant].discount}% off
+                        </p>
                       </span>
                       <div className="relative">
                         <button
@@ -421,8 +445,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                                 <span className="text-sm font-semibold text-gray-500 line-through">
                                   ₹
                                   {(
-                                    variants[selectedVariant].price *
-                                    1.2
+                                    variants[selectedVariant].price * 1.2
                                   ).toLocaleString("en-IN")}
                                 </span>
                               </div>
@@ -471,7 +494,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                 <div className="flex items-center space-x-3">
                   <div className="flex border border-gray-300 rounded-xl">
                     <button
-                      onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                      onClick={() =>
+                        setQuantity((prev) => Math.max(1, prev - 1))
+                      }
                       className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
                       disabled={loading}
                     >
@@ -504,17 +529,14 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                         onClick={handleAddToCart}
                         className="button flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
                         disabled={
-                          !variants[selectedVariant]?.inStock ||
-                          addingToCart
+                          !variants[selectedVariant]?.inStock || addingToCart
                         }
                       >
                         {addingToCart ? (
-
                           <div className="flex items-center gap-2">
                             <div className="w-4 h-4 border-2 border-t-2 border-green-800 rounded-full animate-spin"></div>
                             Adding...
                           </div>
-
                         ) : (
                           <>
                             <ShoppingCart className="w-5 h-5" />
@@ -525,10 +547,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                       <button
                         onClick={handleBuyNow}
                         className="button flex-1 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
-                        disabled={
-                          !variants[selectedVariant].inStock ||
-                          loading
-                        }
+                        disabled={!variants[selectedVariant].inStock || loading}
                       >
                         {loading ? (
                           "Processing..."

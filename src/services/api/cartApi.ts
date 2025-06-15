@@ -163,7 +163,7 @@ export const cartApi = {
       if (!cartId) {
         const cart = await cartApi.getUserCart();
         cartId = cart.id;
-        localStorage.setItem('user_cart_id', cartId);
+        localStorage.setItem('cartId', cartId);
       }
       console.log('cartId', cartId);
 

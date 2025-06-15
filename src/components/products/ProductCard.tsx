@@ -78,6 +78,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
     }
 
     let cartId = activeCartId;
+    console.log("Active Cart ID:", cartId);
     if (!cartId) {
       try {
         const newCart = await dispatch(createCart()).unwrap();
@@ -98,8 +99,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
 
       const result = await dispatch(
         addToCart({
-          cartId: activeCartId!,
-          itemData
+          // cartId: activeCartId!,
+          ...itemData
         })
       ).unwrap();
 
@@ -160,8 +161,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
     
     dispatch(
       addToCart({
-        cartId: activeCartId,
-        itemData
+        // cartId: activeCartId,
+        ...itemData
       })
     );
     navigate("/checkout");
