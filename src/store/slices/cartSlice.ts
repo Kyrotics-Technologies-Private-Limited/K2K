@@ -6,6 +6,7 @@ import { productApi } from "../../services/api/productApi";
 import variantApi from "../../services/api/variantApi";
 import { Product } from "@/types/index";
 import { Variant } from "@/types/variant";
+import { RootState } from "../store";
 
 interface CartItemWithDetails extends CartItem {
   product?: Product;
@@ -110,6 +111,8 @@ const initialState: CartState = {
 // Create a new cart
 export const createCart = createAsyncThunk("cart/createCart", async () => {
   const cart = await cartApi.createCart();
+  // activeCartId = cart.id;
+  console.log("cartId", cart.id)
   // Save to localStorage
   localStorage.setItem("cartId", cart.id);
   localStorage.setItem("cart", JSON.stringify(cart));
@@ -155,19 +158,39 @@ export const fetchCartItems = createAsyncThunk(
 );
 
 // Modify addToCart to include product and variant details
-export const addToCart = createAsyncThunk(
-  "cart/addItem",
-  async ({
-    cartId,
-    itemData,
-  }: {
-    cartId: string;
-    itemData: Partial<CartItem>;
-  }) => {
+// export const addToCart = createAsyncThunk(
+//   "cart/addItem",
+//   async ({
+//     cartId,
+//     itemData,
+//   }: {
+//     cartId: string;
+//     itemData: Partial<CartItem>;
+//   }) => {
+//     const newItem = await cartApi.addCartItem(cartId, itemData);
+//     return await fetchItemDetails(newItem);
+//   }
+// );
+
+export const addToCart = createAsyncThunk<
+  CartItemWithDetails,
+  Partial<CartItem>,
+  { state: RootState }
+>(
+  'cart/addItem',
+  async (itemData, { getState, dispatch }) => {
+    let cartId = getState().cart.activeCartId;
+    if (!cartId) {
+      const cart = await dispatch(fetchUserCart()).unwrap();
+      cartId = cart.id;
+    }
     const newItem = await cartApi.addCartItem(cartId, itemData);
-    return await fetchItemDetails(newItem);
+    return fetchItemDetails(newItem);
   }
 );
+
+
+
 
 // Update cart item
 export const updateCartItem = createAsyncThunk(
