@@ -16,11 +16,12 @@ import { BenefitsBanner } from "./InformationBanner";
 import { HealthBenefits } from "./HealthBenefits";
 import RecognizedBy from "../homePageComponents/RecognizedBy";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { addToCart, createCart } from "../../store/slices/cartSlice";
+import { addToCart, createCart, setBuyNowItem, clearBuyNowItem } from "../../store/slices/cartSlice";
 import VariantApi from "../../services/api/variantApi";
 import { Variant } from "../../types/variant";
 import { toast } from "react-toastify";
 import { CartItem } from "@/types/cart";
+import { resetCheckout } from "@/store/slices/checkoutSlice";
 
 interface ProductDetailProps {
   product: Product | undefined;
@@ -186,7 +187,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const handleBuyNow = async (e: React.MouseEvent) => {
     e.preventDefault();
 
-    if (!product || !variants[selectedVariant] || !activeCartId) {
+    if (!product || !variants[selectedVariant]) {
       setError("Cannot proceed: Missing required information");
       return;
     }
@@ -195,22 +196,30 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
     setError(null);
 
     try {
-      // Prepare item data
-      const itemData = {
+      // Prepare item data for buy now
+      const buyNowItem = {
+        id: `${product.id}_${variants[selectedVariant].id}_${Date.now()}`,
         productId: product.id,
         variantId: variants[selectedVariant].id,
         quantity: quantity,
+        product: product,
+        variant: variants[selectedVariant],
       };
-
-      // Add to cart first
-      await dispatch(
-        addToCart({
-          // cartId: activeCartId,
-          ...itemData,
-        })
-      ).unwrap();
-
-      // Then navigate to checkout
+      // Add to cart as well (option A)
+      await dispatch(addToCart({
+        productId: product.id,
+        variantId: variants[selectedVariant].id,
+        quantity: quantity,
+      }));
+      // Clear any previous buy now session
+      dispatch(clearBuyNowItem());
+      // Reset checkout state (step, address, payment, etc.)
+      dispatch(resetCheckout());
+      // Set the new buy now item
+      dispatch(setBuyNowItem(buyNowItem));
+      // Store info in sessionStorage for removal after order (option C)
+      sessionStorage.setItem('buyNowRemoveFromCart', JSON.stringify({ productId: product.id, variantId: variants[selectedVariant].id }));
+      // Navigate to checkout
       navigate("/checkout");
     } catch (err) {
       setError("Failed to process buy now request");
@@ -297,7 +306,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
           {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">
+              <h1 className="text-3xl font-bold text-gray-800">div
                 {product.name}
               </h1>
               <div className="flex items-center mt-2 space-x-2">

@@ -19,6 +19,7 @@ interface CartState {
   activeCartId: string | null;
   loading: boolean;
   error: string | null;
+  buyNowItem?: CartItemWithDetails | null; // <-- add this
 }
 
 // //Load initial state from localStorage
@@ -106,6 +107,7 @@ const initialState: CartState = {
   activeCartId: null,
   loading: false,
   error: null,
+  buyNowItem: null, // <-- add this
 };
 
 // Create a new cart
@@ -235,6 +237,12 @@ const cartSlice = createSlice({
     setActiveCart: (state, action) => {
       state.activeCartId = action.payload;
       localStorage.setItem("cartId", action.payload);
+    },
+    setBuyNowItem: (state, action) => {
+      state.buyNowItem = action.payload;
+    },
+    clearBuyNowItem: (state) => {
+      state.buyNowItem = null;
     },
   },
   extraReducers: (builder) => {
@@ -404,5 +412,5 @@ const cartSlice = createSlice({
   },
 });
 
-export const { setActiveCart } = cartSlice.actions;
+export const { setActiveCart, setBuyNowItem, clearBuyNowItem } = cartSlice.actions;
 export default cartSlice.reducer;

@@ -20,8 +20,8 @@ const CartContext = createContext<{
 // Helper function to calculate total price
 const calculateTotal = (items: CartItem[]): number => {
   return items.reduce((sum, item) => {
-    const variantPrice = item.price.variants[item.selectedVariant].price;
-    return sum + variantPrice * item.quantity;
+    const itemPrice = item.price.amount;
+    return sum + itemPrice * item.quantity;
   }, 0);
 };
 

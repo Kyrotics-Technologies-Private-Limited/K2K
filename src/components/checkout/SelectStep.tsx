@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import {
   setSelectedAddress,
   setAddresses,
   setStep,
   setIsAddingNewAddress,
-  updateOrderSummary,
 } from "../../store/slices/checkoutSlice";
 import { updateCartItem, removeCartItem } from "../../store/slices/cartSlice";
 import { Address } from "../../types/address";
@@ -14,9 +13,12 @@ import { PlusCircle, Trash2, Plus, Minus } from "lucide-react";
 
 export const SelectStep = () => {
   const dispatch = useAppDispatch();
-  const { addresses, selectedAddress, isAddingNewAddress, orderSummary } =
-    useAppSelector((state) => state.checkout);
-  const { cartItems, activeCartId } = useAppSelector((state) => state.cart);
+  const { addresses, selectedAddress, isAddingNewAddress } = useAppSelector(
+    (state) => state.checkout
+  );
+  const { buyNowItem, cartItems, activeCartId } = useAppSelector(
+    (state) => state.cart
+  );
   const { user } = useAppSelector((state) => state.auth);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,6 +38,27 @@ export const SelectStep = () => {
     pincode: "",
     isDefault: false,
   });
+
+  // Memoize itemsToCheckout to prevent infinite update loop
+  const itemsToCheckout = useMemo(
+    () => (buyNowItem ? [buyNowItem] : cartItems),
+    [buyNowItem, cartItems]
+  );
+
+  // Local order summary calculation for itemsToCheckout
+  const localOrderSummary = useMemo(() => {
+    const subtotal = itemsToCheckout.reduce((total, item) => {
+      return total + (item.variant?.price || 0) * item.quantity;
+    }, 0);
+    const tax = 0; // GST removed
+    const shipping = subtotal > 500 ? 0 : 40;
+    return {
+      subtotal,
+      tax,
+      shipping,
+      total: subtotal + shipping,
+    };
+  }, [itemsToCheckout]);
 
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -57,25 +80,6 @@ export const SelectStep = () => {
 
     fetchAddresses();
   }, [dispatch]);
-
-  // Calculate order summary whenever cart items change
-  useEffect(() => {
-    const subtotal = cartItems.reduce((total, item) => {
-      return total + (item.variant?.price || 0) * item.quantity;
-    }, 0);
-
-    const tax = subtotal * 0.18; // 18% GST
-    const shipping = subtotal > 500 ? 0 : 40; // Free shipping above ₹500
-
-    dispatch(
-      updateOrderSummary({
-        subtotal,
-        tax,
-        shipping,
-        total: subtotal + tax + shipping,
-      })
-    );
-  }, [cartItems, dispatch]);
 
   const handleSelectAddress = (address: Address) => {
     dispatch(setSelectedAddress(address));
@@ -158,10 +162,11 @@ export const SelectStep = () => {
       setError("Please select a delivery address");
       return;
     }
-    if (cartItems.length === 0) {
-      setError("Your cart is empty");
+    if (itemsToCheckout.length === 0) {
+      setError("No items to checkout");
       return;
     }
+    // Always go to the first review step (step 2)
     dispatch(setStep(2));
   };
 
@@ -379,7 +384,7 @@ export const SelectStep = () => {
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-xl font-semibold mb-4">Review Items</h2>
             <div className="space-y-4">
-              {cartItems.map((item) => (
+              {itemsToCheckout.map((item) => (
                 <div
                   key={item.id}
                   className="flex items-start gap-4 py-4 border-b last:border-0"
@@ -399,46 +404,48 @@ export const SelectStep = () => {
                           </p>
                         )}
                         <div className="mt-2 flex items-center gap-2">
-                          <button
-                            onClick={() =>
-                              handleUpdateQuantity(item.id, item.quantity - 1)
-                            }
-                            className="button p-1 rounded-md hover:bg-gray-100"
-                            disabled={itemLoading[item.id]}
-                          >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                          <span className="w-8 text-center">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() =>
-                              handleUpdateQuantity(item.id, item.quantity + 1)
-                            }
-                            className="button p-1 rounded-md hover:bg-gray-100"
-                            disabled={itemLoading[item.id]}
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleRemoveItem(item.id)}
-                            className="button p-1 text-red-500 hover:bg-red-50 rounded-md ml-2"
-                            disabled={itemLoading[item.id]}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          {/* Quantity controls only for cart checkout */}
+                          {!buyNowItem && (
+                            <>
+                              <button
+                                onClick={() =>
+                                  handleUpdateQuantity(item.id, item.quantity - 1)
+                                }
+                                className="button p-1 rounded-md hover:bg-gray-100"
+                                disabled={itemLoading[item.id]}
+                              >
+                                <Minus className="w-4 h-4" />
+                              </button>
+                              <span className="w-8 text-center">{item.quantity}</span>
+                              <button
+                                onClick={() =>
+                                  handleUpdateQuantity(item.id, item.quantity + 1)
+                                }
+                                className="button p-1 rounded-md hover:bg-gray-100"
+                                disabled={itemLoading[item.id]}
+                              >
+                                <Plus className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleRemoveItem(item.id)}
+                                className="button p-1 text-red-500 hover:bg-red-50 rounded-md ml-2"
+                                disabled={itemLoading[item.id]}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="font-medium">
                           ₹{(item.variant?.price || 0) * item.quantity}
                         </p>
-                        {item.variant?.discount &&
-                          item.variant.discount > 0 && (
-                            <p className="text-sm text-green-600">
-                              {item.variant.discount}% off
-                            </p>
-                          )}
+                        {item.variant?.discount && item.variant.discount > 0 && (
+                          <p className="text-sm text-green-600">
+                            {item.variant.discount}% off
+                          </p>
+                        )}
                       </div>
                     </>
                   )}
@@ -452,24 +459,24 @@ export const SelectStep = () => {
             <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span>₹{orderSummary.subtotal.toFixed(2)}</span>
+                <span>Subtotal <span className="text-xs ">(including GST)</span></span>
+                <span>₹{localOrderSummary.subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
+              {/* <div className="flex justify-between">
                 <span>GST (18%)</span>
-                <span>₹{orderSummary.tax.toFixed(2)}</span>
-              </div>
+                <span>₹{localOrderSummary.tax.toFixed(2)}</span>
+              </div> */}
               <div className="flex justify-between">
                 <span>Shipping</span>
                 <span>
-                  {orderSummary.shipping === 0
+                  {localOrderSummary.shipping === 0
                     ? "Free"
-                    : `₹${orderSummary.shipping.toFixed(2)}`}
+                    : `₹${localOrderSummary.shipping.toFixed(2)}`}
                 </span>
               </div>
               <div className="flex justify-between font-semibold text-lg pt-2 border-t">
                 <span>Total</span>
-                <span>₹{orderSummary.total.toFixed(2)}</span>
+                <span>₹{localOrderSummary.total.toFixed(2)}</span>
               </div>
             </div>
           </div>

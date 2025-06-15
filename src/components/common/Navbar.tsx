@@ -8,7 +8,7 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { RootState, useAppDispatch, useAppSelector } from "../../store/store";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import PhoneAuth from "../authComponents/PhoneAuth";
 import { signOut } from "../../store/slices/authSlice";
 
@@ -19,6 +19,7 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const location = useLocation();
 
   // Get auth state from Redux
   const { user, isAuthenticated, loading } = useAppSelector(
@@ -77,15 +78,14 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             <span className="logoFont ml-2 lg:text-3xl md:text-2xl sm:text-xl font-semibold text-green-800">
               Kishan2Kitchen
             </span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-4 xl:space-x-8">
-            <div className="relative group">
-              <div className="flex items-center">
-                <Link
-                  to="/all-products"
-                  className="text-gray-500 hover:text-black transition text-sm xl:text-base"
+          </Link>          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-stretch space-x-4 xl:space-x-8 h-16">
+            <div className="relative group"><div className="flex items-center h-16">                <Link
+                  to="/all-products"                  className={`text-sm xl:text-base transition px-4 flex items-center h-full ${
+                    location.pathname === '/all-products' || location.pathname.startsWith('/product/')
+                      ? 'bg-green-100 text-green-800 font-medium'
+                      : 'text-gray-500 hover:text-black'
+                  }`}
                 >
                   All Products
                 </Link>
@@ -108,16 +108,19 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               </div>
             </div>
 
-            {[              ["samples", "Try Our Sample"],
+            { [
+              ["samples", "Try Our Sample"],
               ["kishanParivarPage", "Kishan Parivar"],
               ["traceability", "Traceability"],
               ["our-story", "Our Story"],
               ["Blog", "Blog"],
-            ].map(([path, label]) => (
-              <Link
-                key={path}
+            ].map(([path, label]) => (              <Link                key={path}
                 to={`/${path}`}
-                className="text-gray-500 hover:text-black transition text-sm xl:text-base"
+                className={`text-sm xl:text-base transition px-4 flex items-center h-16 ${
+                  location.pathname === `/${path}` 
+                    ? 'bg-green-100 text-green-800 font-medium' 
+                    : 'text-gray-500 hover:text-black'
+                }`}
               >
                 {label}
               </Link>
@@ -197,62 +200,57 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="lg:hidden bg-white px-4 py-3 space-y-2">
-          {[            ["/", "Home"],
-            ["/all-products", "All Products"],
-            ["/samples", "Try Our Sample"],
-            ["/kishanParivarPage", "Kishan Parivar"],
-            ["/traceability", "Traceability"],
-            ["/our-story", "Our Story"],
-            ["/Blog", "Blog"],
-          ].map(([path, label]) => (
-            <Link
-              key={path}
-              to={path}
-              className="block text-gray-500 hover:text-black py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              {label}
-            </Link>
-          ))}
-          {isAuthenticated ? (
-            <>
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200">
+          <div className="px-4 py-2">
+            <div className="space-y-1">
               <Link
-                to="/profile"
-                className="block text-gray-500 hover:text-black py-2"
+                to="/all-products"                className={`block py-2 px-3 rounded-md ${
+                  location.pathname === '/all-products' || location.pathname.startsWith('/product/')
+                    ? 'bg-green-100 text-green-700 font-medium'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
                 onClick={() => setIsOpen(false)}
               >
-                My Profile
+                All Products
               </Link>
-              <Link
-                to="/orders"
-                className="block text-gray-500 hover:text-black py-2"
-                onClick={() => setIsOpen(false)}
-              >
-                My Orders
-              </Link>
-              <button
-                onClick={() => {
-                  logout();
-                  setIsOpen(false);
-                }}
-                disabled={isSigningOut}
-                className="block w-full text-left text-gray-500 hover:text-black py-2"
-              >
-                {isSigningOut ? "Logging out..." : "Logout"}
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                setShowLoginModal(true);
-              }}
-              className="block w-full text-left text-gray-500 hover:text-black py-2"
-            >
-              Login
-            </button>
-          )}
+              {["oils", "ghee", "honey", "natural"].map((type) => (
+                <Link
+                  key={type}
+                  to={
+                    type === "natural"
+                      ? "/all-products"
+                      : `/all-products?category=${type}`
+                  }                  className={`block py-2 px-3 pl-6 text-sm rounded-md ${
+                    location.pathname === '/all-products' && location.search === `?category=${type}`
+                      ? 'bg-green-100 text-green-700 font-medium'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </Link>
+              ))}
+              { [
+                ["samples", "Try Our Sample"],
+                ["kishanParivarPage", "Kishan Parivar"],
+                ["traceability", "Traceability"],
+                ["our-story", "Our Story"],
+                ["Blog", "Blog"],
+              ].map(([path, label]) => (
+                <Link
+                  key={path}
+                  to={`/${path}`}                  className={`block py-2 px-3 rounded-md ${
+                    location.pathname === `/${path}` 
+                      ? 'bg-green-100 text-green-700 font-medium' 
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 

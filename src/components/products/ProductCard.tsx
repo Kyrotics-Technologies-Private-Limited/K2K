@@ -5,7 +5,8 @@ import { Product } from "../../types";
 import { Variant } from "../../types/variant";
 import { CartItem } from "../../types/cart";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { addToCart, createCart } from "../../store/slices/cartSlice";
+import { addToCart, createCart, setBuyNowItem, clearBuyNowItem } from "../../store/slices/cartSlice";
+import { resetCheckout } from "../../store/slices/checkoutSlice";
 import VariantApi from "../../services/api/variantApi";
 import { toast } from "react-toastify";
 
@@ -143,28 +144,41 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
     }
   };
 
-  const handleBuyNow = (e: React.MouseEvent) => {
+  const handleBuyNow = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    if (!selectedVariant || !activeCartId) {
-      console.error("Cannot buy now: No variant selected or no active cart");
+
+    if (!selectedVariant) {
+      console.error("Cannot buy now: No variant selected");
       return;
     }
-    
-    const itemData = {
+
+    // Prepare buy now item (ensure all required fields)
+    const buyNowItem = {
+      id: `${product.id}_${selectedVariant.id}_${Date.now()}`,
       productId: product.id,
       variantId: selectedVariant.id,
       quantity: quantity,
-      price: selectedVariant.price
+      product: product,
+      variant: selectedVariant,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
-    
-    dispatch(
-      addToCart({
-        // cartId: activeCartId,
-        ...itemData
-      })
-    );
+    // Add to cart as well
+    await dispatch(addToCart({
+      productId: product.id,
+      variantId: selectedVariant.id,
+      quantity: quantity,
+    }));
+    // Clear any previous buy now session
+    dispatch(clearBuyNowItem());
+    // Reset checkout state (step, address, payment, etc.)
+    dispatch(resetCheckout());
+    // Set the new buy now item
+    dispatch(setBuyNowItem(buyNowItem));
+    // Store info in sessionStorage for removal after order
+    sessionStorage.setItem('buyNowRemoveFromCart', JSON.stringify({ productId: product.id, variantId: selectedVariant.id }));
+    // Navigate to checkout
     navigate("/checkout");
   };
 
@@ -287,7 +301,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
               </button>
               <button
                 onClick={handleBuyNow}
-                disabled={isAddingToCart || !activeCartId}
+                disabled={isAddingToCart || !selectedVariant}
                 className="button flex-1 bg-[#0d6b1e] text-white py-1.5 rounded hover:bg-[#3A4D13] transition-colors text-xs flex items-center justify-center gap-0.5"
               >
                 <CreditCard className="w-4 h-4" />
