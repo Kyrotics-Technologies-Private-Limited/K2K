@@ -11,7 +11,7 @@ export const CheckoutPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { currentStep } = useAppSelector((state) => state.checkout);
-  const { cartItems } = useAppSelector((state) => state.cart);
+  const { buyNowItem, cartItems } = useAppSelector((state) => state.cart);
   const { user } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
@@ -20,30 +20,30 @@ export const CheckoutPage = () => {
       return;
     }
 
-    if (cartItems.length === 0) {
+    // If both cart and buyNowItem are empty, redirect
+    if (cartItems.length === 0 && !buyNowItem) {
       navigate("/all-products");
       return;
     }
 
-    // Calculate order summary
-    const subtotal = cartItems.reduce((total, item) => {
+    // If buyNowItem exists, calculate summary for it, else for cart
+    const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
+    const subtotal = itemsToCheckout.reduce((total, item) => {
       return total + (item.variant?.price || 0) * item.quantity;
     }, 0);
-
     const tax = subtotal * 0.18; // 18% GST
     const shipping = subtotal > 500 ? 0 : 40; // Free shipping above ₹500
-
     dispatch(
       updateOrderSummary({
         subtotal,
         tax,
         shipping,
-        total: subtotal + tax + shipping,
+        total: subtotal + shipping,
       })
     );
-  }, [cartItems, dispatch, navigate, user]);
+  }, [cartItems, buyNowItem, dispatch, navigate, user]);
 
-  if (cartItems.length === 0) {
+  if (cartItems.length === 0 && !buyNowItem) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-3xl mx-auto py-16 px-4">

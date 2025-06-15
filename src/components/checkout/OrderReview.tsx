@@ -1,12 +1,27 @@
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { setStep } from "../../store/slices/checkoutSlice";
+import { useMemo } from "react";
 
 export const OrderReview = () => {
   const dispatch = useAppDispatch();
-  const { selectedAddress, orderSummary } = useAppSelector(
-    (state) => state.checkout
-  );
-  const { cartItems } = useAppSelector((state) => state.cart);
+  const { selectedAddress } = useAppSelector((state) => state.checkout);
+  const { buyNowItem, cartItems } = useAppSelector((state) => state.cart);
+  const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
+
+  // Local order summary calculation for itemsToCheckout
+  const localOrderSummary = useMemo(() => {
+    const subtotal = itemsToCheckout.reduce((total, item) => {
+      return total + (item.variant?.price || 0) * item.quantity;
+    }, 0);
+    const tax = 0; // GST removed
+    const shipping = subtotal > 500 ? 0 : 40;
+    return {
+      subtotal,
+      tax,
+      shipping,
+      total: subtotal + shipping,
+    };
+  }, [itemsToCheckout]);
 
   const handleBack = () => {
     dispatch(setStep(1));
@@ -43,7 +58,7 @@ export const OrderReview = () => {
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-lg font-semibold mb-4">Order Items</h2>
         <div className="space-y-4">
-          {cartItems.map((item) => (
+          {itemsToCheckout.map((item) => (
             <div
               key={item.id}
               className="flex items-start gap-4 py-4 border-b last:border-0"
@@ -88,24 +103,24 @@ export const OrderReview = () => {
         <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span>Subtotal</span>
-            <span>₹{orderSummary.subtotal.toFixed(2)}</span>
+            <span>Subtotal <span className="text-xs ">(including GST)</span></span>
+            <span>₹{localOrderSummary.subtotal.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between">
+          {/* <div className="flex justify-between">
             <span>GST (18%)</span>
-            <span>₹{orderSummary.tax.toFixed(2)}</span>
-          </div>
+            <span>₹{localOrderSummary.tax.toFixed(2)}</span>
+          </div> */}
           <div className="flex justify-between">
             <span>Shipping</span>
             <span>
-              {orderSummary.shipping === 0
+              {localOrderSummary.shipping === 0
                 ? "Free"
-                : `₹${orderSummary.shipping.toFixed(2)}`}
+                : `₹${localOrderSummary.shipping.toFixed(2)}`}
             </span>
           </div>
           <div className="flex justify-between font-semibold text-lg pt-2 border-t">
             <span>Total</span>
-            <span>₹{orderSummary.total.toFixed(2)}</span>
+            <span>₹{localOrderSummary.total.toFixed(2)}</span>
           </div>
         </div>
       </div>

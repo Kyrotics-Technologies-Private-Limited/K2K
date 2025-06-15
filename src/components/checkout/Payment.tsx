@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import {
@@ -8,14 +8,31 @@ import {
   resetCheckout,
 } from "../../store/slices/checkoutSlice";
 import { orderApi } from "../../services/api/orderApi";
-import { deleteCart } from "../../store/slices/cartSlice";
+import { deleteCart, removeCartItem } from "../../store/slices/cartSlice";
 
 export const Payment = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { selectedAddress, orderSummary, paymentMethod, isProcessing } =
+  const { selectedAddress, paymentMethod, isProcessing } =
     useAppSelector((state) => state.checkout);
-  const { activeCartId, cartItems } = useAppSelector((state) => state.cart);
+  const { activeCartId, cartItems, buyNowItem } = useAppSelector((state) => state.cart);
+  const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
+
+  // Local order summary calculation for itemsToCheckout
+  const localOrderSummary = useMemo(() => {
+    const subtotal = itemsToCheckout.reduce((total, item) => {
+      return total + (item.variant?.price || 0) * item.quantity;
+    }, 0);
+    const tax = 0; // GST removed
+    const shipping = subtotal > 500 ? 0 : 40;
+    return {
+      subtotal,
+      tax,
+      shipping,
+      total: subtotal + shipping,
+    };
+  }, [itemsToCheckout]);
+
   const [error, setLocalError] = useState<string | null>(null);
 
   const handleBack = () => {
@@ -33,7 +50,7 @@ export const Payment = () => {
       return;
     }
 
-    if (!selectedAddress || !activeCartId) {
+    if (!selectedAddress) {
       setLocalError("Missing required information");
       return;
     }
@@ -45,13 +62,13 @@ export const Payment = () => {
       // Create order payload
       const orderPayload = {
         address_id: selectedAddress.userId!,
-        items: cartItems.map((item) => ({
+        items: itemsToCheckout.map((item) => ({
           product_id: item.productId,
           variant_id: item.variantId,
           quantity: item.quantity,
         })),
         payment_id: "asdasdlfkjlkasdfioeklj",
-        total_amount: orderSummary.total,
+        total_amount: localOrderSummary.total,
         payment_method: paymentMethod,
       };
 
@@ -60,11 +77,29 @@ export const Payment = () => {
       // Place order
       const response = await orderApi.createOrder(orderPayload);
 
-      // Clear cart
-      if (activeCartId) {
+      // Remove buy now item from cart if needed (option C)
+      if (buyNowItem) {
+        const removeInfo = sessionStorage.getItem('buyNowRemoveFromCart');
+        if (removeInfo && activeCartId) {
+          const { productId, variantId } = JSON.parse(removeInfo);
+          // Find the cart item with matching productId and variantId
+          const cartItem = cartItems.find(
+            (item) => item.productId === productId && item.variantId === variantId
+          );
+          if (cartItem) {
+            await dispatch(removeCartItem({
+              cartId: activeCartId,
+              itemId: cartItem.id,
+            })).unwrap();
+          }
+          sessionStorage.removeItem('buyNowRemoveFromCart');
+        }
+      }
+
+      // Clear cart only if not buy now
+      if (!buyNowItem && activeCartId) {
         await dispatch(deleteCart(activeCartId)).unwrap();
       }
-        console.log("Order response:", response);
       // Reset checkout state
       dispatch(resetCheckout());
 
@@ -77,7 +112,7 @@ export const Payment = () => {
       }
     } catch (err) {
       setLocalError("Failed to place order. Please try again.");
-        console.error("Order placement error:", err);
+      console.error("Order placement error:", err);
       dispatch(setProcessing(false));
     }
   };
@@ -153,27 +188,23 @@ export const Payment = () => {
         <div className="space-y-2">
           <div className="flex justify-between">
             <span>Total Items</span>
-            <span>{cartItems.length}</span>
+            <span>{itemsToCheckout.length}</span>
           </div>
           <div className="flex justify-between">
             <span>Subtotal</span>
-            <span>₹{orderSummary.subtotal.toFixed(2)}</span>
+            <span>₹{localOrderSummary.subtotal.toFixed(2)}</span>
           </div>
-          {/* <div className="flex justify-between">
-            <span>GST (18%)</span>
-            <span>₹{orderSummary.tax.toFixed(2)}</span>
-          </div> */}
           <div className="flex justify-between">
             <span>Shipping</span>
             <span>
-              {orderSummary.shipping === 0
+              {localOrderSummary.shipping === 0
                 ? "Free"
-                : `₹${orderSummary.shipping.toFixed(2)}`}
+                : `₹${localOrderSummary.shipping.toFixed(2)}`}
             </span>
           </div>
           <div className="flex justify-between font-semibold text-lg pt-2 border-t">
-            <span>Total Amount</span>
-            <span>₹{orderSummary.total.toFixed(2)}</span>
+            <span>Total</span>
+            <span>₹{localOrderSummary.total.toFixed(2)}</span>
           </div>
         </div>
 
@@ -225,7 +256,7 @@ export const Payment = () => {
               Processing...
             </>
           ) : (
-            `Place Order (₹${orderSummary.total.toFixed(2)})`
+            `Place Order (₹${localOrderSummary.total.toFixed(2)})`
           )}
         </button>
       </div>

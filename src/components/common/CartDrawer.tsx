@@ -7,6 +7,7 @@ import {
   updateCartItem,
   removeCartItem,
   fetchCartById,
+  clearBuyNowItem,
 } from "../../store/slices/cartSlice";
 import { CartItemSkeleton } from "./CartItemSkeleton";
 
@@ -88,6 +89,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   };
 
   const handleCheckout = () => {
+    // Clear any previous buy now session before cart checkout
+    dispatch(clearBuyNowItem());
+    // Also reset checkout state to ensure step is 1 and no previous session remains
+    dispatch({ type: 'checkout/resetCheckout' });
     onClose();
     navigate("/checkout");
   };
