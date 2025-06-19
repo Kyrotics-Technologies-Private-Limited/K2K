@@ -6,15 +6,15 @@ import 'swiper/css/pagination';
 const slides = [
   {
     image: "/assets/images/BANNER IMAGE 1.png",
-    link: "/all-products"  // Example link
+    link: "/all-products?category=ghee"
   },
   {
     image: "/assets/images/BANNER IMAGE 2.png",
-    link: "/all-products" 
+    link: "/all-products?category=oils" 
   }, 
   {
     image: "/assets/images/BANNER IMAGE 3.png",
-    link: "/all-products"
+    link: "/all-products?category=honey"
   },
   {
     image: "/assets/images/BANNER IMAGE 4.png",
