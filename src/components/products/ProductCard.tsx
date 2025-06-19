@@ -5,7 +5,7 @@ import { Product } from "../../types";
 import { Variant } from "../../types/variant";
 import { CartItem } from "../../types/cart";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { addToCart, createCart, setBuyNowItem, clearBuyNowItem } from "../../store/slices/cartSlice";
+import { addToCart, setBuyNowItem, clearBuyNowItem } from "../../store/slices/cartSlice";
 import { resetCheckout } from "../../store/slices/checkoutSlice";
 import VariantApi from "../../services/api/variantApi";
 import { toast } from "react-toastify";
@@ -14,7 +14,7 @@ interface ProductCardProps {
   product: Product;
   cartItem?: CartItem | null;
   variant?: Variant;
-  onAddToCart?: () => void; // New prop to handle cart drawer opening
+  onAddToCart?: () => void; 
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
@@ -81,13 +81,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
     let cartId = activeCartId;
     console.log("Active Cart ID:", cartId);
     if (!cartId) {
-      try {
-        const newCart = await dispatch(createCart()).unwrap();
-        activeCartId = newCart.id;
-      } catch (error) {
-        console.error("Failed to create cart:", error);
-        return;
-      }
+
+      toast.success('Please Refresh the browser')
+
     }
 
     setIsAddingToCart(true);
@@ -261,7 +257,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
               <span className="text-xs line-through text-gray-500">
                 ₹{basePrice.toLocaleString("en-IN")}
               </span>
-              <span className="text-xs text-green-800">{selectedVariant?.discount} off</span>
+              <span className="text-xs text-green-800">{selectedVariant?.discount}% off</span>
             </div>
             {product.stockStatus === "out_of_stock" && (
               <span className="text-[10px] text-red-500 font-medium">
