@@ -44,6 +44,9 @@ export const Payment = () => {
     setLocalError(null);
   };
 
+      console.log("cartItems:", cartItems);
+
+
   const handlePlaceOrder = async () => {
     if (!paymentMethod) {
       setLocalError("Please select a payment method");
@@ -62,15 +65,17 @@ export const Payment = () => {
       // Create order payload
       const orderPayload = {
         address_id: selectedAddress.userId!,
-        items: itemsToCheckout.map((item) => ({
-          product_id: item.productId,
-          variant_id: item.variantId,
-          quantity: item.quantity,
-        })),
+        // items: itemsToCheckout.map((item) => ({
+        //   product_id: item.productId,
+        //   variant_id: item.variantId,
+        //   quantity: item.quantity,
+        // })),
+        items: itemsToCheckout,
         payment_id: "asdasdlfkjlkasdfioeklj",
         total_amount: localOrderSummary.total,
         payment_method: paymentMethod,
       };
+
 
       console.log("Order payload:", orderPayload);
 
@@ -116,6 +121,7 @@ export const Payment = () => {
       dispatch(setProcessing(false));
     }
   };
+  
 
   return (
     <div className="max-w-4xl mx-auto p-4">
