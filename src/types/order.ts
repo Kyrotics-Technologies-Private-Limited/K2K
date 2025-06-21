@@ -1,5 +1,8 @@
 // src/types/order.ts
 
+import { CartItem } from "./cart";
+import { CartItemWithDetails } from "./cart";
+
 export interface OrderItem {
   id: string;
   order_id: string;
@@ -87,11 +90,12 @@ export interface OrderListResponse {
 // For order creation payload
 export interface CreateOrderPayload {
   address_id: string;
-  items: Array<{
-    product_id: string;
-    variant_id?: string;
-    quantity: number;
-  }>;
+  // items: Array<{
+  //   product_id: string;
+  //   variant_id?: string;
+  //   quantity: number;
+  // }>;
+  items: CartItemWithDetails[];
   payment_method?: string;
 }
 

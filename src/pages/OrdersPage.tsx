@@ -47,13 +47,41 @@ const OrdersPage = () => {
     }
   };
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+  // const formatDate = (date: string) => {
+  //   return new Date(date).toLocaleDateString("en-IN", {
+  //     day: "numeric",
+  //     month: "long",
+  //     year: "numeric",
+  //   });
+  // };
+  // Helper functions for date and time formatting
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return "-";
+    try {
+      // Handle Firestore Timestamp
+      if (timestamp?.seconds) {
+        const date = new Date(timestamp.seconds * 1000);
+        return date.toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+      }
+      // Handle ISO string or number
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) return "-";
+      return date.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "-";
+    }
   };
+
+  
 
   if (loading) {
     return (
@@ -133,14 +161,13 @@ const OrdersPage = () => {
                   <p className="text-sm font-medium text-gray-500">
                     Total Amount
                   </p>
-                  <p className="text-sm">
-                    ₹{order.total_amount}
-                  </p>
+                  <p className="text-sm">₹{order.total_amount}</p>
                 </div>
                 <div className="flex items-center justify-end gap-2">
                   <Button
                     variant="outline"
                     size="sm"
+                    className="button"
                     onClick={() => handleViewOrder(order.id)}
                   >
                     <PackageOpen className="w-4 h-4 mr-1" />
