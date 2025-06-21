@@ -138,7 +138,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="button w-5 h-5" />
             </button>
           </div>
 
@@ -208,7 +208,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                                 className="p-1 hover:bg-gray-100 rounded"
                                 disabled={updatingItems[item.id]}
                               >
-                                <Minus className="w-4 h-4" />
+                                <Minus className="button w-4 h-4" />
                               </button>
                               <span className="w-8 text-center">
                                 {item.quantity}
@@ -223,7 +223,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                                 className="p-1 hover:bg-gray-100 rounded"
                                 disabled={updatingItems[item.id]}
                               >
-                                <Plus className="w-4 h-4" />
+                                <Plus className="button w-4 h-4" />
                               </button>
                             </div>
                             <button
@@ -231,7 +231,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                               className="p-1 hover:bg-gray-100 rounded text-red-500"
                               disabled={updatingItems[item.id]}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="button w-4 h-4" />
                             </button>
                           </div>
                         </div>
@@ -278,7 +278,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               </div>
               <button
                 onClick={handleCheckout}
-                className="w-full bg-green-800 text-white py-3 rounded-lg hover:bg-[#3A4D13] transition-colors"
+                className="button w-full bg-green-800 text-white py-3 rounded-lg hover:bg-[#3A4D13] transition-colors"
               >
                 Proceed to Checkout
               </button>

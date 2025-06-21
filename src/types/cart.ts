@@ -1,4 +1,8 @@
 // Add to your types or cartApi.ts
+
+import { Variant } from "../types/variant";
+import { Product } from "../types/index";
+
 export interface CartItem {
   id: string;
   productId: string;
@@ -6,6 +10,11 @@ export interface CartItem {
   quantity: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CartItemWithDetails extends CartItem {
+  product?: Product;
+  variant?: Variant;
 }
 
 export interface Cart {
