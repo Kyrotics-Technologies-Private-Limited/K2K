@@ -306,7 +306,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
           {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">div
+              <h1 className="text-3xl font-bold text-gray-800">
                 {product.name}
               </h1>
               <div className="flex items-center mt-2 space-x-2">
