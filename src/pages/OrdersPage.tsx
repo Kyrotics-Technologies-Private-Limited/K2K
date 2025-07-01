@@ -178,6 +178,7 @@ const OrdersPage = () => {
                       variant="destructive"
                       size="sm"
                       onClick={() => handleCancelOrder(order.id)}
+                      className="button"
                     >
                       Cancel Order
                     </Button>
