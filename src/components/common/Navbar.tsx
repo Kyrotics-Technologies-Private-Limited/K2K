@@ -143,20 +143,20 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                   </div>
                   <button
                     onClick={() => handleNavigation("/profile")}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="button w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     My Profile
                   </button>
                   <button
                     onClick={() => handleNavigation("/orders")}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="button w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     My Orders
                   </button>
                   <button
                     onClick={logout}
                     disabled={isSigningOut}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="button w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     {isSigningOut ? "Logging out..." : "Logout"}
                   </button>

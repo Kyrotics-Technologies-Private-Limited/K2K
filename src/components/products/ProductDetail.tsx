@@ -47,8 +47,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // console.log("Selected variant index:", selectedVariant);
-  // console.log("slected variant:", variants[selectedVariant]);
+
 
   // Fetch variants when product changes
   useEffect(() => {
@@ -98,31 +97,14 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 
     let cartId = activeCartId;
     if (!cartId) {
-      try {
-        const newCart = await dispatch(createCart()).unwrap();
-        activeCartId = newCart.id;
-      } catch (error) {
-        setError("Failed to create cart");
-        return;
-      }
+      toast.success('Please Refresh the browser')
     }
 
     setAddingToCart(true);
     setError(null);
 
     try {
-      // const itemData = {
-      //   productId: product.id,
-      //   variantId: variants[selectedVariant].id,
-      //   quantity: quantity,
-      // };
-
-      // await dispatch(
-      //   addToCart({
-      //     // cartId: activeCartId!,
-      //     ...itemData,
-      //   })
-      // ).unwrap();
+   
 
       const itemData: Partial<CartItem> = {
         productId: product.id,

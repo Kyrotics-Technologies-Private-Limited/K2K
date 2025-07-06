@@ -1,175 +1,13 @@
-// //import React from 'react';
-// import { Leaf, Mail, Instagram, Facebook, Twitter } from 'lucide-react';
-
-// const Footer = () => {
-//   return (
-//     <footer className="bg-green-900 text-white">
-//       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-//         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-//           {/* Brand Section */}
-//           <div className="md:col-span-1">
-//             <div className="flex items-center mb-4">
-//               <Leaf className="h-8 w-8 text-green-400" />
-//               <span className="ml-2 text-xl font-semibold">Kishan2Kitchen</span>
-//             </div>
-//             <p className="text-gray-300 mb-4">
-//               Bringing nature's finest organic products to your doorstep.
-//             </p>
-//             <div className="flex space-x-4">
-//               <a href="#" className="text-gray-300 hover:text-white transition">
-//                 <Instagram className="h-5 w-5" />
-//               </a>
-//               <a href="#" className="text-gray-300 hover:text-white transition">
-//                 <Facebook className="h-5 w-5" />
-//               </a>
-//               <a href="#" className="text-gray-300 hover:text-white transition">
-//                 <Twitter className="h-5 w-5" />
-//               </a>
-//             </div>
-//           </div>
-
-//           {/* Quick Links */}
-//           <div>
-//             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-//             <ul className="space-y-2">
-//               <li>
-//                 <a
-//                   href="#"
-//                   className="text-gray-300 hover:text-white transition"
-//                 >
-//                   Shop
-//                 </a>
-//               </li>
-//               <li>
-//                 <a
-//                   href="#"
-//                   className="text-gray-300 hover:text-white transition"
-//                 >
-//                   About Us
-//                 </a>
-//               </li>
-//               <li>
-//                 <a
-//                   href="#"
-//                   className="text-gray-300 hover:text-white transition"
-//                 >
-//                   Blog
-//                 </a>
-//               </li>
-//               <li>
-//                 <a
-//                   href="#"
-//                   className="text-gray-300 hover:text-white transition"
-//                 >
-//                   Contact
-//                 </a>
-//               </li>
-//             </ul>
-//           </div>
-
-//           {/* Categories */}
-//           <div>
-//             <h3 className="text-lg font-semibold mb-4">Categories</h3>
-//             <ul className="space-y-2">
-//               <li>
-//                 <a
-//                   href="#"
-//                   className="text-gray-300 hover:text-white transition"
-//                 >
-//                   Honey
-//                 </a>
-//               </li>
-//               <li>
-//                 <a
-//                   href="#"
-//                   className="text-gray-300 hover:text-white transition"
-//                 >
-//                   Essential Oils
-//                 </a>
-//               </li>
-//               <li>
-//                 <a
-//                   href="#"
-//                   className="text-gray-300 hover:text-white transition"
-//                 >
-//                   Herbal Products
-//                 </a>
-//               </li>
-//               <li>
-//                 <a
-//                   href="#"
-//                   className="text-gray-300 hover:text-white transition"
-//                 >
-//                   Skincare
-//                 </a>
-//               </li>
-//             </ul>
-//           </div>
-
-//           {/* Newsletter */}
-//           <div>
-//             <h3 className="text-lg font-semibold mb-4">Stay Updated</h3>
-//             <p className="text-gray-300 mb-4">
-//               Subscribe to our newsletter for the latest products and organic
-//               living tips.
-//             </p>
-//             <div className="flex">
-//               <input
-//                 type="email"
-//                 placeholder="Enter your email"
-//                 className="px-4 py-2 rounded-l-lg w-full focus:outline-none focus:ring-2 focus:ring-green-400 text-gray-900"
-//               />
-//               <button className="bg-green-600 px-4 py-2 rounded-r-lg hover:bg-green-700 transition">
-//                 <Mail className="h-5 w-5" />
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-
-//         <div className="border-t border-green-800 mt-12 pt-8">
-//           <div className="flex flex-col md:flex-row justify-between items-center">
-//             <p className="text-gray-300 text-sm">
-//               © 2025 Kishan2Kitchen. All rights reserved.
-//             </p>
-//             <div className="flex space-x-6 mt-4 md:mt-0">
-//               <a
-//                 href="/privacypolicy"
-//                 className="text-gray-300 hover:text-white text-sm transition"
-//               >
-//                 Privacy Policy
-//               </a>
-//               <a
-//                 href="/termsofservice"
-//                 className="text-gray-300 hover:text-white text-sm transition"
-//               >
-//                 Terms of Service
-//               </a>
-//               <a
-//                 href="/shipping"
-//                 className="text-gray-300 hover:text-white text-sm transition"
-//               >
-//                 Shipping Info
-//               </a>
-
-//               <a
-//                 href="/refund"
-//                 className="text-gray-300 hover:text-white text-sm transition"
-//               >
-//                 Refund Policy
-//               </a>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </footer>
-//   );
-// };
-
-// export default Footer;
-
-import { Mail, Instagram, Facebook, Twitter, Linkedin, Youtube } from "lucide-react";
+import {
+  Mail,
+  Instagram,
+  Facebook,
+  Twitter,
+  Linkedin,
+  Youtube,
+} from "lucide-react";
 import { FC } from "react";
-import { Link  } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface SocialLink {
   icon: React.ComponentType<{ className?: string }>;
@@ -179,35 +17,45 @@ interface SocialLink {
 
 const Footer: FC = () => {
   const socialLinks: SocialLink[] = [
-    { 
-      icon: Instagram, 
+    {
+      icon: Instagram,
       name: "Instagram",
-      url: "https://www.instagram.com/kishan2kitchen/" 
+      url: "https://www.instagram.com/kishan2kitchen/",
     },
-    { 
-      icon: Facebook, 
+    {
+      icon: Facebook,
       name: "Facebook",
-      url: "https://www.facebook.com/profile.php?id=100091401806538" 
+      url: "https://www.facebook.com/profile.php?id=100091401806538",
     },
-    { 
-      icon: Twitter, 
+    {
+      icon: Twitter,
       name: "Twitter",
-      url: "https://twitter.com/Kishan2Kitchen" 
+      url: "https://twitter.com/Kishan2Kitchen",
     },
-    { 
-      icon: Linkedin, 
+    {
+      icon: Linkedin,
       name: "Linkedin",
-      url: "https://www.linkedin.com/company/kishan2kitchen/" 
+      url: "https://www.linkedin.com/company/kishan2kitchen/",
     },
-    { 
-      icon: Youtube, 
+    {
+      icon: Youtube,
       name: "Youtube",
-      url: "https://www.youtube.com/channel/UCIxVSJfOKPV95EmOL3g3jSw" 
-    }
+      url: "https://www.youtube.com/channel/UCIxVSJfOKPV95EmOL3g3jSw",
+    },
   ];
 
-  const quickLinks = ["Shop", "About Us", "Blog", "Contact"];
-  const categories = ["Honey", "Essential Oils", "Herbal Products", "Skincare"];
+  const quickLinks = [
+    { name: "Shop", path: "/all-products" },
+    { name: "Our Story", path: "/our-story" },
+    { name: "Blog", path: "/Blog" },
+    { name: "Traceability", path: "/traceability" },
+  ];
+  const categories = [
+    { name: "Honey", path: "/all-products?category=honey" },
+    { name: "Essential Oils", path: "/all-products?category=oils" },
+    { name: "Ghee", path: "/all-products?category=ghee" },
+    { name: "Natural Products", path: "/all-products" },
+  ];
   const policyLinks = [
     { name: "Privacy Policy", path: "/privacypolicy" },
     { name: "Terms of Service", path: "/termsofservice" },
@@ -264,13 +112,13 @@ const Footer: FC = () => {
             </h3>
             <ul className="space-y-2 sm:space-y-3">
               {quickLinks.map((item) => (
-                <li key={item}>
-                  <a
-                    href="#"
+                <li key={item.path}>
+                  <Link
+                    to={item.path}
                     className="text-green-100 hover:text-white text-sm sm:text-base transition-all hover:underline hover:underline-offset-4"
                   >
-                    {item}
-                  </a>
+                    {item.name}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -282,16 +130,18 @@ const Footer: FC = () => {
               Categories
             </h3>
             <ul className="space-y-2 sm:space-y-3">
-              {categories.map((item) => (
-                <li key={item}>
-                  <a
-                    href="#"
-                    className="text-green-100 hover:text-white text-sm sm:text-base transition-all hover:underline hover:underline-offset-4"
-                  >
-                    {item}
-                  </a>
-                </li>
-              ))}
+              {categories.map((item) =>
+                item.path ? (
+                  <li key={item.path}>
+                    <Link
+                      to={item.path}
+                      className="text-green-100 hover:text-white text-sm sm:text-base transition-all hover:underline hover:underline-offset-4"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ) : null
+              )}
             </ul>
           </div>
 

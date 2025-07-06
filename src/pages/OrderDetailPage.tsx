@@ -252,7 +252,7 @@ const OrderDetailPage = () => {
                 </div>
                 <div className="flex justify-between py-2 font-medium">
                   <span>Total</span>
-                  <span>₹{order.total_amount}</span>
+                  <span>₹{order.total_amount }</span>
                 </div>
 
                 {/* Payment Information */}
