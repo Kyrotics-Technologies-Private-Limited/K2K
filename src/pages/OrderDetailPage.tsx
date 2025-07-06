@@ -83,6 +83,14 @@ const OrderDetailPage = () => {
     });
   };
 
+  // Calculate subtotal and shipping locally as fallback
+  const calculatedSubtotal =
+    order?.items?.reduce(
+      (sum, item) => sum + (item.unit_price || 0) * (item.quantity || 0),
+      0
+    ) || 0;
+  const calculatedShipping = calculatedSubtotal > 500 ? 0 : 40;
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -148,18 +156,15 @@ const OrderDetailPage = () => {
                       />
                     )}
                     <div className="flex-1">
-                      <h3 className="font-medium">{item.name}</h3>
+                      <h3 className="font-medium">{item.name || "Product"}</h3>
+                      <p className="text-sm text-gray-600">
+                        Variant: {item.variant_name || "-"}
+                      </p>
                       <p className="text-sm text-gray-600">
                         Quantity: {item.quantity}
                       </p>
-                      {item.variant_name && (
-                        <p className="text-sm text-gray-600">
-                          Variant: {item.variant_name}
-                        </p>
-                      )}
                       <p className="text-sm font-medium">
-                        ₹
-                        {(item.quantity * item.unit_price)}
+                        ₹{(item.quantity * (item.unit_price || 0))}
                       </p>
                     </div>
                   </div>
@@ -172,21 +177,37 @@ const OrderDetailPage = () => {
           {order.address && (
             <Card>
               <CardHeader>
-                <CardTitle>Delivery Address</CardTitle>
+                <CardTitle>Delivered to</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <p className="font-medium">
-                    {order.address.first_name} {order.address.last_name}
-                  </p>
-                  <p className="text-gray-600">{order.address.street}</p>
-                  <p className="text-gray-600">
-                    {order.address.city}, {order.address.state}{" "}
-                    {order.address.postal_code}
-                  </p>
-                  <p className="text-gray-600">{order.address.phone}</p>
-                  {order.address.email && (
-                    <p className="text-gray-600">{order.address.email}</p>
+                  {/* Support both legacy and new address formats */}
+                  {order.address.name ? (
+                    <>
+                      <p className="font-medium">{order.address.name}</p>
+                      <p className="text-gray-600">{order.address.phone}</p>
+                      <p className="text-gray-600">{order.address.appartment}</p>
+                      <p className="text-gray-600">{order.address.adress}</p>
+                      <p className="text-gray-600">
+                        {order.address.state}, {order.address.country} -{" "}
+                        {order.address.pincode}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-medium">
+                        {order.address.first_name} {order.address.last_name}
+                      </p>
+                      <p className="text-gray-600">{order.address.phone}</p>
+                      <p className="text-gray-600">{order.address.street}</p>
+                      <p className="text-gray-600">
+                        {order.address.city}, {order.address.state}{" "}
+                        {order.address.postal_code}
+                      </p>
+                      {order.address.email && (
+                        <p className="text-gray-600">{order.address.email}</p>
+                      )}
+                    </>
                   )}
                 </div>
               </CardContent>
@@ -223,17 +244,11 @@ const OrderDetailPage = () => {
                 </div>
                 <div className="flex justify-between py-2 border-b">
                   <span className="text-gray-600">Subtotal</span>
-                  <span>₹{order.subtotal}</span>
+                  <span>₹{calculatedSubtotal}</span>
                 </div>
-                {order.tax > 0 && (
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="text-gray-600">Tax</span>
-                    <span>₹{order.tax}</span>
-                  </div>
-                )}
                 <div className="flex justify-between py-2 border-b">
                   <span className="text-gray-600">Shipping</span>
-                  <span>₹{order.shipping_fee}</span>
+                  <span>₹{calculatedShipping}</span>
                 </div>
                 <div className="flex justify-between py-2 font-medium">
                   <span>Total</span>

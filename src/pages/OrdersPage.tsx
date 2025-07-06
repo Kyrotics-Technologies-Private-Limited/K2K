@@ -55,6 +55,13 @@ const OrdersPage = () => {
     });
   };
 
+  // Sort orders by created_at descending (latest first)
+  const sortedOrders = [...(orders || [])].sort((a, b) => {
+    const dateA = new Date(a.created_at || 0).getTime();
+    const dateB = new Date(b.created_at || 0).getTime();
+    return dateB - dateA;
+  });
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -103,7 +110,7 @@ const OrdersPage = () => {
       </div>
 
       <div className="grid gap-6">
-        {orders.map((order) => (
+        {sortedOrders.map((order) => (
           <Card key={order.id}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
