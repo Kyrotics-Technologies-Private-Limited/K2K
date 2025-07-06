@@ -25,6 +25,10 @@ export interface OrderAddress {
   country: string;
   phone: string;
   email: string;
+  appartment?: string;        // Optional field for apartment/suite
+  name?: string;            // Optional field for full name
+  address: string;         // Optional field for full address
+  pincode: string;         // Optional field for postal code
 }
 
 export interface OrderPayment {

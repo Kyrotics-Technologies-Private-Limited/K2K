@@ -187,7 +187,7 @@ const OrderDetailPage = () => {
                       <p className="font-medium">{order.address.name}</p>
                       <p className="text-gray-600">{order.address.phone}</p>
                       <p className="text-gray-600">{order.address.appartment}</p>
-                      <p className="text-gray-600">{order.address.adress}</p>
+                      <p className="text-gray-600">{order.address.address}</p>
                       <p className="text-gray-600">
                         {order.address.state}, {order.address.country} -{" "}
                         {order.address.pincode}

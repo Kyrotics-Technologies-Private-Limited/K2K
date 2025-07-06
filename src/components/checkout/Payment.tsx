@@ -61,6 +61,7 @@ export const Payment = () => {
 
       // Create order payload
       const orderPayload = {
+        address_id: selectedAddress.userId!,
         address: selectedAddress, // Send full address object
         items: itemsToCheckout.map((item) => ({
           product_id: item.productId,
@@ -70,6 +71,7 @@ export const Payment = () => {
           image: item.product?.images?.main || '',
           variant_name: item.variant?.weight || '',
           unit_price: item.variant?.price || 0,
+        
         })),
         payment_id: "asdasdlfkjlkasdfioeklj",
         total_amount: localOrderSummary.total,
