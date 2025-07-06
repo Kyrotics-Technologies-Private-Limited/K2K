@@ -15,6 +15,10 @@ export interface CartItem {
 export interface CartItemWithDetails extends CartItem {
   product?: Product;
   variant?: Variant;
+  name?: string; // Optional, can be used for display purposes
+  image?: string; // Optional, can be used for display purposes
+  variant_name?: string; // Optional, can be used for display purposes
+  unit_price?: number; // Optional, can be used for display purposes
 }
 
 export interface Cart {
