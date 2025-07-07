@@ -83,6 +83,14 @@ const OrderDetailPage = () => {
     });
   };
 
+  // Calculate subtotal and shipping locally as fallback
+  const calculatedSubtotal =
+    order?.items?.reduce(
+      (sum, item) => sum + (item.unit_price || 0) * (item.quantity || 0),
+      0
+    ) || 0;
+  const calculatedShipping = calculatedSubtotal > 500 ? 0 : 40;
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -134,61 +142,33 @@ const OrderDetailPage = () => {
               <CardTitle>Items</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {order.items?.map((item: any, idx: number) => {
-                  // Try to get the image and name from possible new locations
-                  const productImage =
-                    item.product?.images?.main || null;
-                  const productName = item.name || item.product?.name || "Product";
-                  return (
-                    <div
-                      key={item.id || idx}
-                      className="flex gap-4 p-4 rounded-lg border bg-gray-50 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex-shrink-0">
-                        {productImage ? (
-                          <img
-                            src={productImage}
-                            alt={productName}
-                            className="w-24 h-24 object-cover rounded-md border"
-                          />
-                        ) : (
-                          <div className="w-24 h-24 flex items-center justify-center bg-gray-200 rounded-md text-gray-400 border">
-                            No Image
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 flex flex-col justify-between">
-                        <div>
-                          <h3 className="font-semibold text-lg text-gray-900 mb-1">
-                            {productName}
-                          </h3>
-                          {item.variant && (
-                            <p className="text-xs text-gray-500 mb-1">
-                              {item.variant?.weight}
-                            </p>
-                          )}
-                          <p className="text-xs text-gray-500 mb-1">
-                            Quantity:{" "}
-                            <span className="font-medium text-gray-700">
-                              {item.quantity}
-                            </span>
-                          </p>
-                        </div>
-                        <div className="mt-2">
-                          <span className="text-base font-bold text-green-700">
-                            ₹{item.quantity * item.variant?.price}
-                          </span>
-                          {item.variant?.price && (
-                            <span className="ml-2 text-xs text-gray-400">
-                              (₹{item.variant?.price} each)
-                            </span>
-                          )}
-                        </div>
-                      </div>
+              <div className="space-y-4">
+                {order.items?.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex gap-4 py-4 border-b last:border-0"
+                  >
+                    {item.image && (
+                      <img
+                        src={item.image}
+                        alt={item.name || "Product"}
+                        className="w-20 h-20 object-cover rounded-md"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <h3 className="font-medium">{item.name || "Product"}</h3>
+                      <p className="text-sm text-gray-600">
+                        Variant: {item.variant_name || "-"}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Quantity: {item.quantity}
+                      </p>
+                      <p className="text-sm font-medium">
+                        ₹{(item.quantity * (item.unit_price || 0))}
+                      </p>
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -197,21 +177,37 @@ const OrderDetailPage = () => {
           {order.address && (
             <Card>
               <CardHeader>
-                <CardTitle>Delivery Address</CardTitle>
+                <CardTitle>Delivered to</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <p className="font-medium">
-                    {order.address.first_name} {order.address.last_name}
-                  </p>
-                  <p className="text-gray-600">{order.address.street}</p>
-                  <p className="text-gray-600">
-                    {order.address.city}, {order.address.state}{" "}
-                    {order.address.postal_code}
-                  </p>
-                  <p className="text-gray-600">{order.address.phone}</p>
-                  {order.address.email && (
-                    <p className="text-gray-600">{order.address.email}</p>
+                  {/* Support both legacy and new address formats */}
+                  {order.address.name ? (
+                    <>
+                      <p className="font-medium">{order.address.name}</p>
+                      <p className="text-gray-600">{order.address.phone}</p>
+                      <p className="text-gray-600">{order.address.appartment}</p>
+                      <p className="text-gray-600">{order.address.address}</p>
+                      <p className="text-gray-600">
+                        {order.address.state}, {order.address.country} -{" "}
+                        {order.address.pincode}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-medium">
+                        {order.address.first_name} {order.address.last_name}
+                      </p>
+                      <p className="text-gray-600">{order.address.phone}</p>
+                      <p className="text-gray-600">{order.address.street}</p>
+                      <p className="text-gray-600">
+                        {order.address.city}, {order.address.state}{" "}
+                        {order.address.postal_code}
+                      </p>
+                      {order.address.email && (
+                        <p className="text-gray-600">{order.address.email}</p>
+                      )}
+                    </>
                   )}
                 </div>
               </CardContent>
@@ -248,17 +244,11 @@ const OrderDetailPage = () => {
                 </div>
                 <div className="flex justify-between py-2 border-b">
                   <span className="text-gray-600">Subtotal</span>
-                  <span>₹{order.total_amount}</span>
+                  <span>₹{calculatedSubtotal}</span>
                 </div>
-                {order.tax > 0 && (
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="text-gray-600">Tax</span>
-                    <span>₹{order.tax}</span>
-                  </div>
-                )}
                 <div className="flex justify-between py-2 border-b">
                   <span className="text-gray-600">Shipping</span>
-                  <span>₹{order.shipping_fee}</span>
+                  <span>₹{calculatedShipping}</span>
                 </div>
                 <div className="flex justify-between py-2 font-medium">
                   <span>Total</span>
