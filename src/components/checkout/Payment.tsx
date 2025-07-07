@@ -65,12 +65,33 @@ export const Payment = () => {
       // Create order payload
       const orderPayload = {
         address_id: selectedAddress.userId!,
-        // items: itemsToCheckout.map((item) => ({
-        //   product_id: item.productId,
-        //   variant_id: item.variantId,
-        //   quantity: item.quantity,
-        // })),
-        items: itemsToCheckout,
+        address: {
+          id: selectedAddress.id || "",
+          user_id: selectedAddress.userId || "",
+          first_name: selectedAddress.name || "",
+          last_name: "", // You can split name if needed
+          street: selectedAddress.appartment || "",
+          city: "", // Fill if you have city
+          state: selectedAddress.state,
+          postal_code: selectedAddress.pincode,
+          country: selectedAddress.country,
+          phone: selectedAddress.phone,
+          email: "", // Fill if you have email
+          appartment: selectedAddress.appartment,
+          name: selectedAddress.name,
+          address: selectedAddress.adress,
+          pincode: selectedAddress.pincode,
+        },
+        items: itemsToCheckout.map((item) => ({
+          product_id: item.productId,
+          variant_id: item.variantId,
+          quantity: item.quantity,
+          name: item.product?.name || '',
+          image: item.product?.images?.main || '',
+          variant_name: item.variant?.weight || '',
+          unit_price: item.variant?.price || 0,
+        
+        })),
         payment_id: "asdasdlfkjlkasdfioeklj",
         total_amount: localOrderSummary.total,
         payment_method: paymentMethod,

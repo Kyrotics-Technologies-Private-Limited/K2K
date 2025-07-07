@@ -289,7 +289,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-800">
-                {product.name}
+                {product.name.replace(/^div/i, "").trim()}
               </h1>
               <div className="flex items-center mt-2 space-x-2">
                 <div className="flex items-center">
