@@ -143,9 +143,9 @@ const OrderDetailPage = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {order.items?.map((item) => (
+                {order.items?.map((item, idx) => (
                   <div
-                    key={item.id}
+                    key={item.id || idx}
                     className="flex gap-4 py-4 border-b last:border-0"
                   >
                     {item.image && (

@@ -45,7 +45,7 @@ export const OrderSuccess = () => {
           <div className="mt-8 border-t border-gray-200 pt-6">
             <dl className="space-y-4">
               <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">Order Total</dt>
+                <dt className="text-sm text-gray-600">Subtotal</dt>
                 <dd className="text-sm font-medium text-gray-900">
                   ₹{localOrderSummary.subtotal.toFixed(2)}
                 </dd>

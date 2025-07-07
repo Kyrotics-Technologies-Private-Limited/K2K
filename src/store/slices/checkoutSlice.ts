@@ -45,7 +45,7 @@ const checkoutSlice = createSlice({
     setAddresses: (state, action: PayloadAction<Address[]>) => {
       state.addresses = action.payload;
     },
-    setSelectedAddress: (state, action: PayloadAction<Address>) => {
+    setSelectedAddress: (state, action: PayloadAction<Address | null>) => {
       state.selectedAddress = action.payload;
     },
     setIsAddingNewAddress: (state, action: PayloadAction<boolean>) => {

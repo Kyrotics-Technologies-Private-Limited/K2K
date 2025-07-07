@@ -1,5 +1,5 @@
 export interface Address {
-    id?: string;
+    id: string; // Now required for uniqueness
     userId?: string;
     name: string;
     phone: string;
@@ -11,4 +11,3 @@ export interface Address {
     isDefault?: boolean;
     createdAt?: string;
   }
-  
