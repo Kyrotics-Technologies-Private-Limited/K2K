@@ -9,7 +9,7 @@ import {
 import { updateCartItem, removeCartItem } from "../../store/slices/cartSlice";
 import { Address } from "../../types/address";
 import { addressApi } from "../../services/api/addressApi";
-import { PlusCircle, Trash2, Plus, Minus } from "lucide-react";
+import { PlusCircle, Trash2, Plus, Minus, Pencil } from "lucide-react";
 
 export const SelectStep = () => {
   const dispatch = useAppDispatch();
@@ -25,6 +25,9 @@ export const SelectStep = () => {
   const [itemLoading, setItemLoading] = useState<{ [key: string]: boolean }>(
     {}
   );
+  const [editAddress, setEditAddress] = useState<Address | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState<Address | null>(null);
 
   const [formData, setFormData] = useState<
     Omit<Address, "id" | "userId" | "createdAt">
@@ -121,10 +124,11 @@ export const SelectStep = () => {
   };
 
   const handleAddNewAddress = () => {
+    setEditAddress(null);
     dispatch(setIsAddingNewAddress(true));
     setFormData({
-      name: user?.name || "",
-      phone: user?.phone || "",
+      name: "",
+      phone: "",
       appartment: "",
       adress: "",
       state: "",
@@ -146,9 +150,22 @@ export const SelectStep = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const newAddress = await addressApi.create(formData);
-      dispatch(setAddresses([...addresses, newAddress]));
-      dispatch(setSelectedAddress(newAddress));
+      if (editAddress) {
+        // Edit mode: update address
+        await addressApi.update(editAddress.id, formData);
+        // Refetch addresses to get updated list
+        const updatedAddresses = await addressApi.getAll();
+        dispatch(setAddresses(updatedAddresses));
+        // Set selected address to the updated one
+        const updated = updatedAddresses.find((a) => a.id === editAddress.id);
+        if (updated) dispatch(setSelectedAddress(updated));
+        setEditAddress(null);
+      } else {
+        // Add mode: create new address
+        const newAddress = await addressApi.create(formData);
+        dispatch(setAddresses([...addresses, newAddress]));
+        dispatch(setSelectedAddress(newAddress));
+      }
       dispatch(setIsAddingNewAddress(false));
     } catch (err) {
       setError("Failed to save address");
@@ -156,6 +173,15 @@ export const SelectStep = () => {
       setLoading(false);
     }
   };
+
+  // When switching to add/edit, prefill formData accordingly
+  useEffect(() => {
+    if (isAddingNewAddress && editAddress) {
+      setFormData(editAddress);
+    } else if (!isAddingNewAddress) {
+      setEditAddress(null);
+    }
+  }, [isAddingNewAddress, editAddress]);
 
   const handleContinue = () => {
     if (!selectedAddress) {
@@ -169,6 +195,17 @@ export const SelectStep = () => {
     // Always go to the first review step (step 2)
     dispatch(setStep(2));
   };
+
+  useEffect(() => {
+    if (showDeleteModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showDeleteModal]);
 
   if (loading) {
     return (
@@ -202,20 +239,54 @@ export const SelectStep = () => {
                 <div className="space-y-4">
                   {addresses.map((address) => (
                     <div
-                      key={address.adress}
+                      key={address.id}
                       className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                        selectedAddress?.adress === address.adress
+                        selectedAddress?.id === address.id
                           ? "border-green-500 bg-green-50"
                           : "border-gray-200 hover:border-green-300"
                       }`}
                       onClick={() => handleSelectAddress(address)}
                     >
-                      <div className="flex justify-between">
+                      <div className="flex justify-between items-start gap-2">
                         <div>
                           <h3 className="font-medium">{address.name}</h3>
-                          <p className="text-sm text-gray-600">
-                            {address.phone}
-                          </p>
+                          <p className="text-sm text-gray-600">{address.phone}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            className="text-blue-600 p-1 hover:bg-blue-50 rounded"
+                            title="Edit"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFormData({
+                                name: address.name,
+                                phone: address.phone,
+                                appartment: address.appartment,
+                                adress: address.adress,
+                                state: address.state,
+                                country: address.country,
+                                pincode: address.pincode,
+                                isDefault: address.isDefault,
+                              });
+                              setEditAddress(address);
+                              dispatch(setIsAddingNewAddress(true));
+                            }}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            className="text-red-600 p-1 hover:bg-red-50 rounded"
+                            title="Delete"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setAddressToDelete(address);
+                              setShowDeleteModal(true);
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                         {address.isDefault && (
                           <span className="text-sm text-green-600 font-medium">
@@ -237,7 +308,9 @@ export const SelectStep = () => {
               </>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
-                <h2 className="text-xl font-semibold mb-4">Add New Address</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  {editAddress ? "Edit Address" : "Add New Address"}
+                </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -362,7 +435,10 @@ export const SelectStep = () => {
                 <div className="flex justify-end space-x-4">
                   <button
                     type="button"
-                    onClick={() => dispatch(setIsAddingNewAddress(false))}
+                    onClick={() => {
+                      dispatch(setIsAddingNewAddress(false));
+                      setEditAddress(null);
+                    }}
                     className="button px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                   >
                     Cancel
@@ -371,7 +447,7 @@ export const SelectStep = () => {
                     type="submit"
                     className="button px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
                   >
-                    Save Address
+                    {editAddress ? "Update Address" : "Save Address"}
                   </button>
                 </div>
               </form>
@@ -459,7 +535,10 @@ export const SelectStep = () => {
             <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span>Subtotal <span className="text-xs ">(including GST)</span></span>
+                <span>
+                  Subtotal{" "}
+                  <span className="text-xs ">(including GST)</span>
+                </span>
                 <span>₹{localOrderSummary.subtotal.toFixed(2)}</span>
               </div>
               {/* <div className="flex justify-between">
@@ -497,6 +576,46 @@ export const SelectStep = () => {
           >
             Continue to Review
           </button>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && addressToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 backdrop-blur-sm" style={{ zIndex: 49 }} />
+          <div className="relative bg-green-100 rounded-lg shadow-lg p-6 w-full max-w-sm z-50">
+            <h4 className="text-lg font-semibold mb-4">
+              Would you like to delete this address?
+            </h4>
+            <div className="flex justify-end gap-4">
+              <button
+                className="px-4 py-2 bg-white rounded border border-green-800 hover:bg-green-800 hover:text-white transition-colors"
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setAddressToDelete(null);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-green-800 text-white rounded border border-green-800 hover:bg-red-700 hover:border-red-700 transition-colors"
+                onClick={async () => {
+                  if (addressToDelete) {
+                    await addressApi.remove(addressToDelete.id);
+                    const updatedAddresses = await addressApi.getAll();
+                    dispatch(setAddresses(updatedAddresses));
+                    if (selectedAddress?.id === addressToDelete.id) {
+                      dispatch(setSelectedAddress(null));
+                    }
+                  }
+                  setShowDeleteModal(false);
+                  setAddressToDelete(null);
+                }}
+              >
+                Yes
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
