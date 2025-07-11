@@ -935,7 +935,7 @@ const AdminProductPage: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            {product.images.main ? (
+                            {product.images.main && product.images.main.trim() !== "" ? (
                               <img
                                 className="h-10 w-10 rounded-md object-cover"
                                 src={product.images.main}

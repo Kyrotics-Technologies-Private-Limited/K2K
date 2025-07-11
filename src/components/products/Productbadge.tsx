@@ -13,6 +13,7 @@ import cold from '/assets/productbadgeimg/COLD PRESSED.png';
 import refined from '/assets/productbadgeimg/NON REFINED.png';
 import { Product } from '../../types';
 
+
 interface ProductBadgeProps {
   product: Product;
 }
@@ -42,7 +43,7 @@ export const ProductBadges: React.FC<ProductBadgeProps> = ({ product }) => {
         >
           <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-2 transform transition-transform group-hover:scale-110">
             <img 
-              src={badgeIcons[badge.text]} 
+              src={badge.image || badgeIcons[badge.text]} 
               alt={badge.text} 
               className="w-16 h-16" 
             />
