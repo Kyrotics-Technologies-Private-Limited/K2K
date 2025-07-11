@@ -22,6 +22,7 @@ export interface Product {
     reviews: number;
     badges: {
       text: string;
+      image: string;
       type: "organic" | "natural" | "premium" | "limited";
     }[];
     benefits: {

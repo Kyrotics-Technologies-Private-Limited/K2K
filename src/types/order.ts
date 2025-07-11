@@ -28,6 +28,10 @@ export interface OrderAddress {
   country: string;
   phone: string;
   email: string;
+  appartment?: string;        // Optional field for apartment/suite
+  name?: string;            // Optional field for full name
+  address: string;         // Optional field for full address
+  pincode: string;         // Optional field for postal code
 }
 
 export interface OrderPayment {
@@ -88,14 +92,22 @@ export interface OrderListResponse {
 }
 
 // For order creation payload
+export interface OrderItemPayload {
+  product_id: string;
+  variant_id?: string;
+  quantity: number;
+  name?: string;
+  image?: string;
+  variant_name?: string;
+  unit_price?: number;
+}
+
 export interface CreateOrderPayload {
   address_id: string;
-  // items: Array<{
-  //   product_id: string;
-  //   variant_id?: string;
-  //   quantity: number;
-  // }>;
-  items: CartItemWithDetails[];
+  address?: OrderAddress;
+  items: OrderItemPayload[];
+  payment_id?: string;
+  total_amount?: number;
   payment_method?: string;
 }
 

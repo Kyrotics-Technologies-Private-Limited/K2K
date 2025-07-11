@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Menu,
   X,
@@ -19,18 +19,19 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
 
   // Get auth state from Redux
   const { user, isAuthenticated, loading } = useAppSelector(
     (state) => state.auth
   );
-  // console.log('user',user)
+
   // Get cart state from Redux
   const cart = useAppSelector((state) => state.cart);
   if (!cart) {
     console.error("Cart is not available in the Redux store.");
-    return null; // or handle it in a way that fits your app
+    return null;
   }
   const itemCount = cart.cartItems.reduce(
     (total, item) => total + item.quantity,
@@ -49,6 +50,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const handleNavigation = (path: string) => {
     navigate(path);
     setIsOpen(false); // Close mobile menu when navigating
+    setShowUserMenu(false); // Close user menu when navigating
   };
 
   // Handle logout
@@ -61,7 +63,13 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
       console.error("Logout failed:", error);
     } finally {
       setIsSigningOut(false);
+      setShowUserMenu(false);
     }
+  };
+
+  // Toggle user menu for mobile
+  const toggleUserMenu = () => {
+    setShowUserMenu(!showUserMenu);
   };
 
   return (
@@ -78,13 +86,19 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             <span className="logoFont ml-2 lg:text-3xl md:text-2xl sm:text-xl font-semibold text-green-800">
               Kishan2Kitchen
             </span>
-          </Link>          {/* Desktop Navigation */}
+          </Link>
+
+          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-stretch space-x-4 xl:space-x-8 h-16">
-            <div className="relative group"><div className="flex items-center h-16">                <Link
-                  to="/all-products"                  className={`text-sm xl:text-base transition px-4 flex items-center h-full ${
-                    location.pathname === '/all-products' || location.pathname.startsWith('/product/')
-                      ? 'bg-green-100 text-green-800 font-medium'
-                      : 'text-gray-500 hover:text-black'
+            <div className="relative group">
+              <div className="flex items-center h-16">
+                <Link
+                  to="/all-products"
+                  className={`text-sm xl:text-base transition px-4 flex items-center h-full ${
+                    location.pathname === "/all-products" ||
+                    location.pathname.startsWith("/product/")
+                      ? "bg-green-100 text-green-800 font-medium"
+                      : "text-gray-500 hover:text-black"
                   }`}
                 >
                   All Products
@@ -108,18 +122,20 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               </div>
             </div>
 
-            { [
+            {[
               ["samples", "Try Our Sample"],
               ["kishanParivarPage", "Kishan Parivar"],
               ["traceability", "Traceability"],
               ["our-story", "Our Story"],
               ["Blog", "Blog"],
-            ].map(([path, label]) => (              <Link                key={path}
+            ].map(([path, label]) => (
+              <Link
+                key={path}
                 to={`/${path}`}
                 className={`text-sm xl:text-base transition px-4 flex items-center h-16 ${
-                  location.pathname === `/${path}` 
-                    ? 'bg-green-100 text-green-800 font-medium' 
-                    : 'text-gray-500 hover:text-black'
+                  location.pathname === `/${path}`
+                    ? "bg-green-100 text-green-800 font-medium"
+                    : "text-gray-500 hover:text-black"
                 }`}
               >
                 {label}
@@ -129,11 +145,9 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
           {/* Right-side Icons */}
           <div className="flex items-center">
-            {/* <Search className="h-7 w-7 mr-4 text-gray-700 hover:text-green-600 cursor-pointer" /> */}
-
             {/* User Authentication Section */}
             {isAuthenticated ? (
-              <div className="relative group">
+              <div className="relative group hidden lg:block">
                 <div className="w-7 h-7 mr-2 rounded-full bg-green-600 text-white flex items-center justify-center cursor-pointer">
                   {displayName.charAt(0).toUpperCase()}
                 </div>
@@ -165,7 +179,24 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             ) : (
               <button
                 onClick={() => setShowLoginModal(true)}
-                className="text-gray-700 hover:text-green-600 transition"
+                className="text-gray-700 hover:text-green-600 transition hidden lg:block"
+              >
+                <UserIcon className="w-6 h-6" />
+              </button>
+            )}
+
+            {/* Mobile User Profile Button */}
+            {isAuthenticated ? (
+              <button
+                onClick={toggleUserMenu}
+                className="lg:hidden w-7 h-7 mr-2 rounded-full bg-green-600 text-white flex items-center justify-center cursor-pointer"
+              >
+                {displayName.charAt(0).toUpperCase()}
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className="text-gray-700 hover:text-green-600 transition lg:hidden"
               >
                 <UserIcon className="w-6 h-6" />
               </button>
@@ -204,10 +235,12 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
           <div className="px-4 py-2">
             <div className="space-y-1">
               <Link
-                to="/all-products"                className={`block py-2 px-3 rounded-md ${
-                  location.pathname === '/all-products' || location.pathname.startsWith('/product/')
-                    ? 'bg-green-100 text-green-700 font-medium'
-                    : 'text-gray-700 hover:bg-gray-50'
+                to="/all-products"
+                className={`block py-2 px-3 rounded-md ${
+                  location.pathname === "/all-products" ||
+                  location.pathname.startsWith("/product/")
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-700 hover:bg-gray-50"
                 }`}
                 onClick={() => setIsOpen(false)}
               >
@@ -220,17 +253,19 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                     type === "natural"
                       ? "/all-products"
                       : `/all-products?category=${type}`
-                  }                  className={`block py-2 px-3 pl-6 text-sm rounded-md ${
-                    location.pathname === '/all-products' && location.search === `?category=${type}`
-                      ? 'bg-green-100 text-green-700 font-medium'
-                      : 'text-gray-600 hover:bg-gray-50'
+                  }
+                  className={`block py-2 px-3 pl-6 text-sm rounded-md ${
+                    location.pathname === "/all-products" &&
+                    location.search === `?category=${type}`
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-50"
                   }`}
                   onClick={() => setIsOpen(false)}
                 >
                   {type.charAt(0).toUpperCase() + type.slice(1)}
                 </Link>
               ))}
-              { [
+              {[
                 ["samples", "Try Our Sample"],
                 ["kishanParivarPage", "Kishan Parivar"],
                 ["traceability", "Traceability"],
@@ -239,10 +274,11 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               ].map(([path, label]) => (
                 <Link
                   key={path}
-                  to={`/${path}`}                  className={`block py-2 px-3 rounded-md ${
-                    location.pathname === `/${path}` 
-                      ? 'bg-green-100 text-green-700 font-medium' 
-                      : 'text-gray-700 hover:bg-gray-50'
+                  to={`/${path}`}
+                  className={`block py-2 px-3 rounded-md ${
+                    location.pathname === `/${path}`
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-700 hover:bg-gray-50"
                   }`}
                   onClick={() => setIsOpen(false)}
                 >
@@ -250,6 +286,48 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                 </Link>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile User Menu */}
+      {showUserMenu && (
+        <div className="lg:hidden fixed inset-0 z-30">
+          <div className="absolute top-16 right-4 bg-white rounded-md shadow-lg py-2 w-48 z-40 animate-fade-in">
+            <div className="px-4 py-2 text-sm font-semibold border-b text-gray-800">
+              Hello, {displayName.split(" ")[0]}
+            </div>
+            <button
+              onClick={() => {
+                handleNavigation("/profile");
+                setShowUserMenu(false);
+              }}
+              className="button w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              My Profile
+            </button>
+            <button
+              onClick={() => {
+                handleNavigation("/orders");
+                setShowUserMenu(false);
+              }}
+              className="button w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              My Orders
+            </button>
+            <button
+              onClick={logout}
+              disabled={isSigningOut}
+              className="button w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              {isSigningOut ? "Logging out..." : "Logout"}
+            </button>
+            <button
+              onClick={() => setShowUserMenu(false)}
+              className="button w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-t"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
