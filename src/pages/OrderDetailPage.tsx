@@ -177,7 +177,7 @@ const OrderDetailPage = () => {
           {order.address && (
             <Card>
               <CardHeader>
-                <CardTitle>Delivered to</CardTitle>
+                <CardTitle>Delivery Address</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">

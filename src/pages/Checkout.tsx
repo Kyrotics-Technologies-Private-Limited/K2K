@@ -14,6 +14,11 @@ export const CheckoutPage = () => {
   const { buyNowItem, cartItems } = useAppSelector((state) => state.cart);
   const { user } = useAppSelector((state) => state.auth);
 
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
+
   useEffect(() => {
     if (!user) {
       navigate("/");

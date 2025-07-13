@@ -42,6 +42,8 @@ import VariantDetailsPage from "./pages/admin/Variantdetailspage";
 import VariantEditPage from "./pages/admin/VariantEditPage";
 import BlogPage from "./pages/BlogPage";
 import BlogDetailPage from "./pages/BlogDetailPage";
+import ScrollToTop from './components/common/ScrollToTop';
+
 
 const PublicLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -73,10 +75,12 @@ const PublicLayout = () => {
   );
 };
 
+
 function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
+        <ScrollToTop />
         <AppProvider>
           <Routes>
             <Route element={<PublicLayout />}>
