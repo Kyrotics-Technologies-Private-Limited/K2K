@@ -12,7 +12,10 @@ import {
   CheckCircle2,
   AlertTriangle,
   Ban,
+  FileDown,
 } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const OrderDetailPage = () => {
   const { orderId } = useParams();
@@ -63,7 +66,6 @@ const OrderDetailPage = () => {
 
   const handleCancelOrder = async () => {
     if (!order) return;
-
     if (window.confirm("Are you sure you want to cancel this order?")) {
       try {
         await dispatch(cancelOrder(order.id)).unwrap();
@@ -83,13 +85,157 @@ const OrderDetailPage = () => {
     });
   };
 
-  // Calculate subtotal and shipping locally as fallback
   const calculatedSubtotal =
     order?.items?.reduce(
       (sum, item) => sum + (item.unit_price || 0) * (item.quantity || 0),
       0
     ) || 0;
   const calculatedShipping = calculatedSubtotal > 500 ? 0 : 40;
+
+  const handleDownloadInvoice = () => {
+    if (!order) return;
+
+    const doc = new jsPDF();
+
+    // Correct logo path
+    const logoUrl = `${window.location.origin}/images/K2K%20Logo.png`;
+
+    const addInvoiceData = (imageData?: string) => {
+      //  Logo
+      if (imageData) {
+        doc.addImage(imageData, "PNG", 14, 10, 30, 30); // (x, y, width, height)
+      }
+
+      //  Company Info
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text("Kishan2Kitchen (K2K)", 50, 18);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text("www.kishan2kitchen.com", 50, 24);
+      doc.text("Email: support@kishan2kitchen.com", 50, 29);
+      doc.text("Phone: +91-9876543210", 50, 34);
+      doc.text("GSTIN: 27AABCU9603R1Z2", 50, 39);
+
+      // Invoice Title
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("TAX INVOICE", 160, 20);
+
+      // Order Info
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Order ID: ${order.id}`, 14, 50);
+      doc.text(`Order Date: ${formatDate(order.created_at)}`, 14, 56);
+      doc.text(`Order Status: ${order.status}`, 14, 62);
+
+      // Shipping Address
+      const addressLines = order.address?.name
+        ? [
+            order.address.name,
+            order.address.phone,
+            order.address.appartment,
+            order.address.address,
+            `${order.address.state}, ${order.address.country} - ${order.address.pincode}`,
+          ]
+        : order.address
+        ? [
+            `${order.address.first_name} ${order.address.last_name}`,
+            order.address.phone,
+            order.address.street,
+            `${order.address.city}, ${order.address.state} ${order.address.postal_code}`,
+            order.address.email,
+          ]
+        : ["Address not available"];
+
+      doc.setFontSize(12);
+      doc.text("Shipping Address:", 14, 72);
+      doc.setFontSize(10);
+      addressLines.forEach((line, idx) =>
+        doc.text(line || "-", 14, 78 + idx * 6)
+      );
+
+      //  Items Table
+      const tableStartY = 78 + addressLines.length * 6 + 10;
+      const tableBody =
+        order.items?.map((item, index) => [
+          index + 1,
+          item.name || "Unknown Product",
+          item.variant_name || "-",
+          item.quantity || 0,
+          `₹${item.unit_price || 0}`,
+          `₹${(item.unit_price || 0) * (item.quantity || 0)}`,
+        ]) || [];
+
+      autoTable(doc, {
+        startY: tableStartY,
+        head: [["#", "Product", "Variant", "Qty", "Unit Price", "Total"]],
+        body: tableBody,
+      });
+
+      const finalY = (doc as any).lastAutoTable.finalY || tableStartY + 20;
+
+      //  Summary
+      doc.setFontSize(11);
+      doc.text(`Subtotal: ₹${calculatedSubtotal}`, 14, finalY + 10);
+      doc.text(`Shipping: ₹${calculatedShipping}`, 14, finalY + 16);
+      doc.text(`Total Amount: ₹${order.total_amount}`, 14, finalY + 22);
+
+      // Payment Info
+      // if (order.payment) {
+      //   doc.text("Payment Info:", 14, finalY + 32);
+      //   doc.text(`Method: ${order.payment.method}`, 14, finalY + 38);
+      //   doc.text(`Status: ${order.payment.status}`, 14, finalY + 44);
+      //   if (order.payment.transaction_id) {
+      //     doc.text(
+      //       `Transaction ID: ${order.payment.transaction_id}`,
+      //       14,
+      //       finalY + 50
+      //     );
+      //   }
+      // }
+
+      // Static fallback transaction ID
+      const transactionId = order.payment?.transaction_id || "TXN_K2K_123456";
+
+      doc.text(`Transaction ID: ${transactionId}`, 14, finalY + 50);
+
+      // Thank-you Footer
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(
+        "Thank you for shopping with Kishan2Kitchen. For any queries, contact our support.",
+        14,
+        285
+      );
+      doc.text(
+        "This is a system-generated invoice. No signature required.",
+        14,
+        290
+      );
+
+      doc.save(`Invoice_${order.id.slice(-6)}.pdf`);
+    };
+
+    // ✅ Load logo image
+    const img = new Image();
+    img.src = logoUrl;
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(img, 0, 0);
+        const imageData = canvas.toDataURL("image/png");
+        addInvoiceData(imageData);
+      }
+    };
+    img.onerror = () => {
+      console.warn("Logo failed to load, generating without image.");
+      addInvoiceData(); // fallback
+    };
+  };
 
   if (loading) {
     return (
@@ -164,7 +310,7 @@ const OrderDetailPage = () => {
                         Quantity: {item.quantity}
                       </p>
                       <p className="text-sm font-medium">
-                        ₹{(item.quantity * (item.unit_price || 0))}
+                        ₹{item.quantity * (item.unit_price || 0)}
                       </p>
                     </div>
                   </div>
@@ -186,7 +332,9 @@ const OrderDetailPage = () => {
                     <>
                       <p className="font-medium">{order.address.name}</p>
                       <p className="text-gray-600">{order.address.phone}</p>
-                      <p className="text-gray-600">{order.address.appartment}</p>
+                      <p className="text-gray-600">
+                        {order.address.appartment}
+                      </p>
                       <p className="text-gray-600">{order.address.address}</p>
                       <p className="text-gray-600">
                         {order.address.state}, {order.address.country} -{" "}
@@ -215,7 +363,6 @@ const OrderDetailPage = () => {
           )}
         </div>
 
-        {/* Order Summary */}
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -252,7 +399,7 @@ const OrderDetailPage = () => {
                 </div>
                 <div className="flex justify-between py-2 font-medium">
                   <span>Total</span>
-                  <span>₹{order.total_amount }</span>
+                  <span>₹{order.total_amount}</span>
                 </div>
 
                 {/* Payment Information */}
@@ -286,7 +433,6 @@ const OrderDetailPage = () => {
                   </div>
                 )}
               </div>
-
               {order.status.toLowerCase() === "processing" && (
                 <Button
                   variant="destructive"
@@ -296,6 +442,15 @@ const OrderDetailPage = () => {
                   Cancel Order
                 </Button>
               )}
+
+              <Button
+                variant="outline"
+                className="w-full mt-2 bg-green-600 text-white hover:bg-green-700"
+                onClick={handleDownloadInvoice}
+              >
+                <FileDown className="h-4 w-4 mr-2" />
+                Download Invoice
+              </Button>
             </CardContent>
           </Card>
         </div>
