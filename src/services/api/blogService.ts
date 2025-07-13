@@ -1,56 +1,40 @@
 import { Blog } from '../../types/blog';
-import { sampleBlogs } from '../../mockData/SampleBlogs';
+import mockData from '../../mockData/blogs.json';
 
-const BASE_URL = '/api/blogs'; // Replace with your actual API endpoint when backend is ready
+// Type assertion function to ensure blog data matches Blog type
+const validateBlog = (blog: any): Blog => {
+  // Validate category
+  if (!['products', 'company', 'farming', 'health'].includes(blog.category)) {
+    throw new Error(`Invalid category: ${blog.category}`);
+  }
+  
+  return {
+    ...blog,
+    category: blog.category as Blog['category']
+  };
+};
 
 export const blogService = {
   // Get all blogs with optional category filter
   async getBlogs(category?: string): Promise<Blog[]> {
-    // In development, return the sample data
-    if (process.env.NODE_ENV === 'development') {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
       
-      if (category && category !== 'all') {
-        return sampleBlogs.filter(blog => blog.category === category);
-      }
-      return sampleBlogs;
-    }
-
-    // In production, use the API
-    const url = category && category !== 'all'
-      ? `${BASE_URL}?category=${category}`
-      : BASE_URL;
+    const blogs = mockData.blogs.map(validateBlog);
     
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch blogs');
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching blogs:', error);
-      throw error;
+    if (category && category !== 'all') {
+      return blogs.filter(blog => blog.category === category);
     }
+    return blogs;
   },
+
   // Get a single blog by ID
   async getBlogById(id: string): Promise<Blog> {
-    // In development, return from sample data
-    if (process.env.NODE_ENV === 'development') {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
       
-      const blog = sampleBlogs.find(b => b.id === id);
-      if (!blog) throw new Error('Blog not found');
-      return blog;
-    }
-
-    // In production, use the API
-    try {
-      const response = await fetch(`${BASE_URL}/${id}`);
-      if (!response.ok) throw new Error('Failed to fetch blog');
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching blog:', error);
-      throw error;
-    }
+    const blog = mockData.blogs.find(b => b.id === id);
+    if (!blog) throw new Error('Blog not found');
+    return validateBlog(blog);
   }
 };

@@ -17,12 +17,12 @@ import {
   sendOTP,
   verifyOTP,
   saveUserInfo,
-  getCurrentUser,
-  signOut,
+  // getCurrentUser,
+  // signOut,
   clearError,
   clearConfirmationResult,
   setPhone,
-  resetAuth
+  // resetAuth
 } from "../../store/slices/authSlice";
 
 const PhoneAuth: React.FC = () => {
@@ -87,15 +87,17 @@ const PhoneAuth: React.FC = () => {
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setPhone(e.target.value));
+    // Only allow numbers and limit to 10 digits
+    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+    dispatch(setPhone(value));
   };
 
   const handleSendOtp = async () => {
     dispatch(clearError());
 
-    if (!phone || phone.trim().length < 10) {
+    if (!phone || phone.trim().length !== 10) {
       // Set error in Redux state
-      dispatch({ type: "auth/setError", payload: "Please enter a valid phone number" });
+      dispatch({ type: "auth/setError", payload: "Please enter a valid 10-digit phone number" });
       return;
     }
 
@@ -111,10 +113,13 @@ const PhoneAuth: React.FC = () => {
       return;
     }
 
+    // Add +91 prefix before sending to backend
+    const fullPhoneNumber = `+91${phone}`;
+    
     // Dispatch sendOTP action
     dispatch(
       sendOTP({
-        phone,
+        phone: fullPhoneNumber,
         recaptchaVerifier: recaptchaVerifierRef.current,
       })
     );
@@ -170,17 +175,17 @@ const PhoneAuth: React.FC = () => {
     });
   };
 
-  const handleSignOut = () => {
-    dispatch(signOut() as any);
-    resetLocalForm();
-  };
+  // const handleSignOut = () => {
+  //   dispatch(signOut() as any);
+  //   resetLocalForm();
+  // };
 
-  const resetLocalForm = () => {
-    setOtp("");
-    setName("");
-    setEmail("");
-    setShowUserInfoModal(false);
-  };
+  // const resetLocalForm = () => {
+  //   setOtp("");
+  //   setName("");
+  //   setEmail("");
+  //   setShowUserInfoModal(false);
+  // };
 
   const handleChangePhone = () => {
     dispatch(clearConfirmationResult());
@@ -220,16 +225,20 @@ const PhoneAuth: React.FC = () => {
       {!confirmationResult ? (
         <div className="space-y-4">
           <div className="flex">
-            <div className="flex items-center justify-center bg-gray-100 rounded-l-md px-2 border border-gray-300 border-r-0">
-              <span className="text-gray-600 mr-2">🇮🇳</span>
+            <div className="flex items-center justify-center bg-gray-100 rounded-l-md px-3 border border-gray-300 border-r-0">
+              <span className="text-gray-600">🇮🇳</span>
+              <span className="text-gray-600 ml-2 font-medium">+91</span>
             </div>
             <Input
               type="tel"
               value={phone}
               onChange={handlePhoneChange}
-              placeholder="10-digit phone number"
+              placeholder="Enter 10-digit number"
               className="rounded-l-none focus-visible:ring-0"
               disabled={loading}
+              pattern="[0-9]*"
+              inputMode="numeric"
+              maxLength={10}
             />
           </div>
 

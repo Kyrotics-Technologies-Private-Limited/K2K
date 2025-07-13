@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Blog } from '../types/blog';
 import { blogService } from '../services/api/blogService';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import { sampleBlogs } from '../mockData/SampleBlogs';
 
 const BlogDetailPage: React.FC = () => {
   const { blogId } = useParams<{ blogId: string }>();
@@ -22,11 +21,8 @@ const BlogDetailPage: React.FC = () => {
         const data = await blogService.getBlogById(blogId);
         setBlog(data);
       } catch (err) {
-        setError('Failed to load blog post. Please try again later.');
-        // Fallback to sample data in development
-        if (process.env.NODE_ENV === 'development') {
-          setBlog(sampleBlogs.find(b => b.id === blogId) || null);
-        }
+        setError('Blog post not found or failed to load. Please try again later.');
+        setBlog(null);
       } finally {
         setLoading(false);
       }
@@ -103,7 +99,9 @@ const BlogDetailPage: React.FC = () => {
           </div>
         </div>
 
-        <hr className="my-8 border-gray-200" />        <div 
+        <hr className="my-8 border-gray-200" />
+
+        <div 
           className="blog-content prose prose-lg prose-green max-w-none mx-auto prose-h2:text-2xl prose-h2:font-bold prose-h2:text-gray-800 prose-p:text-gray-600 prose-p:leading-relaxed prose-li:text-gray-600 prose-strong:text-gray-800 prose-img:rounded-lg"
           dangerouslySetInnerHTML={{ __html: blog.content }}
         />

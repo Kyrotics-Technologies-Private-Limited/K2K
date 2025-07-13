@@ -1,0 +1,64 @@
+{
+  "blogs": [
+    {
+      "id": "1",
+      "title": "The Benefits of Pure Cow Ghee in Your Daily Diet",
+      "excerpt": "Discover why traditional cow ghee is a superfood and how it can enhance your health and cooking.",
+      "content": "<article class=\"prose lg:prose-lg mx-auto\"><p class=\"lead\">Pure cow ghee has been a staple of Indian cuisine and Ayurvedic medicine for thousands of years. Not just a cooking medium, it's a superfood that carries profound health benefits and cultural significance.</p><figure class=\"my-8\"><img src=\"/assets/images/ghee-benefits.jpg\" alt=\"Traditional ghee making process\" class=\"rounded-lg shadow-lg\"/><figcaption class=\"text-center text-sm mt-2\">Traditional method of ghee preparation at Kishan2Kitchen</figcaption></figure><h2>Rich in Essential Nutrients</h2><p>Our pure cow ghee is a powerhouse of nutrients that are essential for maintaining good health:</p><ul><li><strong>Fat-Soluble Vitamins:</strong> Rich in Vitamins A, D, E, and K</li><li><strong>Essential Fatty Acids:</strong> Contains Omega-3 and Omega-6 in optimal ratios</li><li><strong>Butyric Acid:</strong> A short-chain fatty acid that supports gut health and reduces inflammation</li><li><strong>CLA (Conjugated Linoleic Acid):</strong> Known for its potential anti-cancer properties</li></ul></article>",
+      "coverImage": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=1200&auto=format&fit=crop",
+      "category": "products",
+      "author": {
+        "name": "Dr. Sharma",
+        "avatar": "/assets/images/founder1.jpg"
+      },
+      "publishedAt": "2025-06-01",
+      "readTime": "5 min read",
+      "tags": ["ghee", "health", "traditional"]
+    },
+    {
+      "id": "2",
+      "title": "From Farm to Kitchen: Our Journey",
+      "excerpt": "Learn about our process of working directly with farmers to bring you the purest ingredients.",
+      "content": "<article class=\"prose lg:prose-lg mx-auto\"><p class=\"lead\">At Kishan2Kitchen, our journey begins in the fertile fields of India's heartland. We've built strong partnerships with farming communities to ensure that every product that reaches your kitchen is of the highest quality and ethically sourced.</p><figure class=\"my-8\"><img src=\"https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=1200\" alt=\"Farmers in field\" class=\"rounded-lg shadow-lg\"/><figcaption class=\"text-center text-sm mt-2\">Our partner farmers working in organic fields</figcaption></figure><h2>Our Farmer Partnership Program</h2><p>We believe that sustainable farming starts with empowered farmers.</p></article>",
+      "coverImage": "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=1200&auto=format&fit=crop",
+      "category": "company",
+      "author": {
+        "name": "Rajesh Kumar",
+        "avatar": "/assets/images/founder2.jpg"
+      },
+      "publishedAt": "2025-05-28",
+      "readTime": "7 min read",
+      "tags": ["farming", "sustainability", "community"]
+    },
+    {
+      "id": "3",
+      "title": "Understanding Cold-Pressed Oils: A Guide to Better Health",
+      "excerpt": "Discover the benefits of cold-pressed oils and why they are superior to refined oils for your cooking needs.",
+      "content": "<article class=\"prose lg:prose-lg mx-auto\"><p>Cold-pressed oils have been a cornerstone of traditional Indian cooking for centuries. Today, we will explore why these oils are making a comeback in modern kitchens and why they should be your first choice for healthy cooking.</p><h2>What is Cold Pressing?</h2><p>Cold pressing is a natural method of oil extraction that maintains the oil's nutrients and benefits.</p></article>",
+      "coverImage": "/assets/bannerimg/GheeBanner.png",
+      "category": "products",
+      "author": {
+        "name": "Anita Kumar",
+        "avatar": "/assets/images/founder3.jpg"
+      },
+      "publishedAt": "2025-06-10",
+      "readTime": "6 min read",
+      "tags": ["oils", "health", "cooking", "traditional"]
+    },
+    {
+      "id": "4",
+      "title": "The Sweet Truth About Pure Honey",
+      "excerpt": "Learn how to identify pure honey and its incredible health benefits. Our guide to understanding what makes honey truly special.",
+      "content": "<article class=\"prose lg:prose-lg mx-auto\"><p>Pure honey is nature's miracle food, packed with health benefits and natural goodness. Let's explore what makes pure honey special and how to identify it.</p><h2>Signs of Pure Honey</h2><p>Here's how you can identify pure honey.</p></article>",
+      "coverImage": "/assets/bannerimg/HoneyBanner.png",
+      "category": "products",
+      "author": {
+        "name": "Dr. Sharma",
+        "avatar": "/assets/images/founder1.jpg"
+      },
+      "publishedAt": "2025-06-05",
+      "readTime": "5 min read",
+      "tags": ["honey", "health", "natural", "pure"]
+    }
+  ]
+}
