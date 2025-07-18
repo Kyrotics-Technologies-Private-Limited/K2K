@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Star, ShoppingCart, CreditCard, Minus, Plus } from "lucide-react";
+import { Star } from "lucide-react";
 import { Product } from "../../types";
 import { Variant } from "../../types/variant";
 import { CartItem } from "../../types/cart";
-import { useAppDispatch, useAppSelector } from "../../store/store";
-import { addToCart, setBuyNowItem, clearBuyNowItem } from "../../store/slices/cartSlice";
-import { resetCheckout } from "../../store/slices/checkoutSlice";
+// import { useAppDispatch, useAppSelector } from "../../store/store";
+// import { addToCart, setBuyNowItem, clearBuyNowItem } from "../../store/slices/cartSlice";
+// import { resetCheckout } from "../../store/slices/checkoutSlice";
 import VariantApi from "../../services/api/variantApi";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 
 interface ProductCardProps {
   product: Product;
@@ -17,17 +17,17 @@ interface ProductCardProps {
   onAddToCart?: () => void; 
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  let { activeCartId } = useAppSelector(state => state.cart);
+  // const dispatch = useAppDispatch();
+  // let { activeCartId } = useAppSelector(state => state.cart);
   
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  // const [, setIsAddingToCart] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [variants, setVariants] = useState<Variant[]>([]);
-  const [quantity, setQuantity] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
+  // const [quantity, setQuantity] = useState(1);
+  // const [setSelectedVariant] = useState<Variant | null>(null);
 
   useEffect(() => {
     const fetchProductVariants = async () => {
@@ -36,9 +36,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
         const data = await VariantApi.getVariantsByProductId(product.id);
         setVariants(data);
         
-        if (data && data.length > 0) {
-          setSelectedVariant(data[0]);
-        }
+        // if (data && data.length > 0) {
+        //   setSelectedVariant(data[0]);
+        // }
         
         setError(null);
       } catch (err) {
@@ -69,114 +69,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
   //   setQuantity(prev => prev + 1);
   // };
 
-  const handleAddToCart = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!selectedVariant) {
-      console.error("Cannot add to cart: No variant selected");
-      return;
-    }
-
-    let cartId = activeCartId;
-    console.log("Active Cart ID:", cartId);
-    if (!cartId) {
-
-      toast.success('Please Refresh the browser')
-
-    }
-
-    setIsAddingToCart(true);
-    try {
-      const itemData = {
-        productId: product.id,
-        variantId: selectedVariant.id,
-        quantity: quantity,
-      };
-
-      const result = await dispatch(
-        addToCart({
-          // cartId: activeCartId!,
-          ...itemData
-        })
-      ).unwrap();
-
-      toast.success(
-        <div className="flex items-center gap-3">
-          <img 
-            src={product.images.main} 
-            alt={product.name}
-            className="w-12 h-12 object-cover rounded"
-          />
-          <div className="flex-1">
-            <h3 className="font-medium mb-2">Added to Cart!</h3>
-            <p className="text-sm text-gray-600">{product.name}</p>
-            <div className="text-sm mt-2">
-              <span className="text-green-600">Qty: {quantity}</span>
-              <span className="mx-2">|</span>
-              <span>₹{(selectedVariant.price * quantity).toLocaleString('en-IN')}</span>
-            </div>
-          </div>
-        </div>,
-        {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        }
-      );
-      
-      if (onAddToCart) {
-        onAddToCart();
-      }
-      setQuantity(1);
-    } catch (error) {
-      console.error("Failed to add item to cart:", error);
-      toast.error("Failed to add item to cart");
-    } finally {
-      setIsAddingToCart(false);
-    }
-  };
-
-  const handleBuyNow = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!selectedVariant) {
-      console.error("Cannot buy now: No variant selected");
-      return;
-    }
-
-    // Prepare buy now item (ensure all required fields)
-    const buyNowItem = {
-      id: `${product.id}_${selectedVariant.id}_${Date.now()}`,
-      productId: product.id,
-      variantId: selectedVariant.id,
-      quantity: quantity,
-      product: product,
-      variant: selectedVariant,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    // Add to cart as well
-    await dispatch(addToCart({
-      productId: product.id,
-      variantId: selectedVariant.id,
-      quantity: quantity,
-    }));
-    // Clear any previous buy now session
-    dispatch(clearBuyNowItem());
-    // Reset checkout state (step, address, payment, etc.)
-    dispatch(resetCheckout());
-    // Set the new buy now item
-    dispatch(setBuyNowItem(buyNowItem));
-    // Store info in sessionStorage for removal after order
-    sessionStorage.setItem('buyNowRemoveFromCart', JSON.stringify({ productId: product.id, variantId: selectedVariant.id }));
-    // Navigate to checkout
-    navigate("/checkout");
-  };
+  // Remove handleAddToCart and handleBuyNow since they are unused
 
   if (loading) {
     return (
@@ -194,8 +87,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
     );
   }
 
-  const basePrice = selectedVariant?.originalPrice || 0;
-  const discountedPrice = selectedVariant?.price || 0;
+  // Find the variant with the lowest price
+  const lowestPriceVariant = variants.reduce((min, v) => (v.price < min.price ? v : min), variants[0] || null);
 
   return (
     <Link
@@ -220,44 +113,36 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
             </span>
           )}
         </div>
-
-        {/* <div className="absolute bottom-1.5 right-1.5 bg-white shadow rounded-md p-0.5 flex items-center gap-0.5 z-10">
-          <button
-            onClick={handleQuantityDecrement}
-            className="w-5 h-5 flex items-center justify-center hover:bg-gray-100"
-          >
-            <Minus className="w-2.5 h-2.5 text-[#4A5D23]" />
-          </button>
-          <span className="w-4 text-center text-xs font-medium text-[#4A5D23]">
-            {quantity}
-          </span>
-          <button
-            onClick={handleQuantityIncrement}
-            className="w-5 h-5 flex items-center justify-center hover:bg-gray-100"
-          >
-            <Plus className="w-2.5 h-2.5 text-[#4A5D23]" />
-          </button>
-        </div> */}
       </div>
 
       <div className="px-3 py-4">
+        {/* Show product name */}
         <h3 className="text-sm font-semibold text-[#2C3639] mb-1 line-clamp-1">
           {product.name}
         </h3>
+        {/* Show lowest price variant info */}
+        {lowestPriceVariant && (
+          <div className="text-xs text-gray-600 mb-1">
+            {lowestPriceVariant.weight}
+          </div>
+        )}
         <p className="text-gray-600 text-[10px] mb-2 line-clamp-2">
           {product.description}
         </p>
-
         <div className="flex items-start justify-between mb-2">
           <div className="flex flex-col">
             <div className="flex items-baseline gap-1.5">
               <span className="text-base font-bold text-black">
-                ₹{discountedPrice.toLocaleString("en-IN")}
+                ₹{lowestPriceVariant ? lowestPriceVariant.price.toLocaleString("en-IN") : "-"}
               </span>
-              <span className="text-xs line-through text-gray-500">
-                ₹{basePrice.toLocaleString("en-IN")}
-              </span>
-              <span className="text-xs text-green-800">{selectedVariant?.discount}% off</span>
+              {lowestPriceVariant?.originalPrice && (
+                <span className="text-xs line-through text-gray-500">
+                  ₹{lowestPriceVariant.originalPrice.toLocaleString("en-IN")}
+                </span>
+              )}
+              {lowestPriceVariant?.discount && (
+                <span className="text-xs text-green-800">{lowestPriceVariant.discount}% off</span>
+              )}
             </div>
             {product.stockStatus === "out_of_stock" && (
               <span className="text-[10px] text-red-500 font-medium">
@@ -265,47 +150,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
               </span>
             )}
           </div>
-
           <div className="flex items-center gap-0.5">
             <Star className="w-3 h-3 fill-yellow-400 stroke-yellow-400" />
             <span className="text-[10px] font-medium">{product.ratings}</span>
           </div>
         </div>
-
-        <div className="flex gap-1">
-          {product.stockStatus === "out_of_stock" ? (
-            <button
-              disabled
-              className="w-full bg-gray-100 text-gray-500 py-1 rounded text-[10px] flex items-center justify-center"
-            >
-              Currently Unavailable
-            </button>
-          ) : (
-            <>
-              <button
-                onClick={handleAddToCart}
-                className="button flex-1 bg-white border border-[#0d6b1e] text-green-800 py-1.5 rounded hover:bg-green-800 hover:text-white transition-colors text-xs flex items-center justify-center gap-0.5"
-              >
-                {isAddingToCart ? (
-                  <span className="animate-pulse">Adding...</span>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-4 h-4" />
-                    Add
-                  </>
-                )}
-              </button>
-              <button
-                onClick={handleBuyNow}
-                disabled={isAddingToCart || !selectedVariant}
-                className="button flex-1 bg-[#0d6b1e] text-white py-1.5 rounded hover:bg-[#3A4D13] transition-colors text-xs flex items-center justify-center gap-0.5"
-              >
-                <CreditCard className="w-4 h-4" />
-                Buy
-              </button>
-            </>
-          )}
-        </div>
+        {/* No Add/Buy buttons here */}
       </div>
     </Link>
   );
