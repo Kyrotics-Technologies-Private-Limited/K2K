@@ -1,6 +1,12 @@
-
 import React, { useState, useEffect } from "react";
-import { FileEdit, Save, User as UserIcon, Phone, Mail, Calendar } from "lucide-react";
+import {
+  FileEdit,
+  Save,
+  User as UserIcon,
+  Phone,
+  Mail,
+  Calendar,
+} from "lucide-react";
 import { db, storage } from "../../services/firebase/firebase";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import {
@@ -9,7 +15,7 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 
 // User interface
@@ -24,9 +30,11 @@ export interface User {
 }
 
 const UserProfilePage: React.FC = () => {
-  const dispatch = useDispatch();
-  const { user: authUser, loading: authLoading } = useSelector((state: RootState) => state.auth);
-  
+  //const dispatch = useDispatch();
+  const { user: authUser, loading: authLoading } = useSelector(
+    (state: RootState) => state.auth
+  );
+
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -111,7 +119,7 @@ const UserProfilePage: React.FC = () => {
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
         profilePicture: downloadURL,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       // Update local state
@@ -139,7 +147,7 @@ const UserProfilePage: React.FC = () => {
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
         profilePicture: null,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       // Update local state
@@ -154,35 +162,67 @@ const UserProfilePage: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    // For name field, only allow alphabets and spaces
+    if (name === "name") {
+      const cleanedValue = value.replace(/[^a-zA-Z\s]/g, "");
+      setFormData((prev) => ({
+        ...prev,
+        [name]: cleanedValue,
+      }));
+    }
+    // For phone field, only allow numeric input and handle +91 prefix
+    else if (name === "phone") {
+      // Remove any non-numeric characters except '+'
+      const cleanedValue = value.replace(/[^\d+]/g, "");
+
+      // Handle the +91 prefix
+      let formattedValue = cleanedValue;
+      if (!cleanedValue.startsWith("+91")) {
+        // If input doesn't start with +91, remove any + if present
+        const numericOnly = cleanedValue.replace(/\+/g, "");
+        // Only add +91 if there are numbers
+        formattedValue = numericOnly ? `+91${numericOnly}` : "";
+      }
+
+      // Limit the total length to 13 characters (+91 plus 10 digits)
+      formattedValue = formattedValue.slice(0, 13);
+
+      setFormData((prev) => ({
+        ...prev,
+        [name]: formattedValue,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSaveProfile = async () => {
     if (!user) return;
-    
+
     try {
       setError(null);
-      
+
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
-      
+
       // Update local state
       setUser({
         ...user,
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
-      
+
       setEditMode(false);
     } catch (error) {
       console.error("Error saving profile:", error);
@@ -306,7 +346,7 @@ const UserProfilePage: React.FC = () => {
                       >
                         {profilePicture ? "Change Photo" : "Add Photo"}
                       </label>
-                      
+
                       {selectedFile && (
                         <button
                           onClick={handleUpload}
@@ -325,7 +365,7 @@ const UserProfilePage: React.FC = () => {
                 <h2 className="text-xl font-bold text-gray-900">
                   {formData.name || "Your Name"}
                 </h2>
-                
+
                 {user.createdAt && (
                   <div className="flex items-center justify-center mt-3 text-sm text-gray-600">
                     <Calendar className="w-4 h-4 mr-2 text-gray-400" />
@@ -341,7 +381,7 @@ const UserProfilePage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-800">
                   Account Information
                 </h3>
-                
+
                 {!editMode ? (
                   <button
                     onClick={() => setEditMode(true)}
@@ -364,7 +404,10 @@ const UserProfilePage: React.FC = () => {
               {editMode ? (
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
                       Full Name
                     </label>
                     <input
@@ -377,9 +420,12 @@ const UserProfilePage: React.FC = () => {
                       placeholder="Enter your full name"
                     />
                   </div>
-                  
+
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
                       Email
                     </label>
                     <input
@@ -392,9 +438,12 @@ const UserProfilePage: React.FC = () => {
                       placeholder="your.email@example.com"
                     />
                   </div>
-                  
+
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label
+                      htmlFor="phone"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
                       Phone Number
                     </label>
                     <input
@@ -404,7 +453,7 @@ const UserProfilePage: React.FC = () => {
                       value={formData.phone}
                       onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-                      placeholder="Enter your phone number"
+                      placeholder="+91 Enter your 10-digit number"
                     />
                   </div>
                 </div>
@@ -414,18 +463,22 @@ const UserProfilePage: React.FC = () => {
                     <Mail className="w-5 h-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-xs text-gray-500">Email</p>
-                      <p className="text-gray-800">{user.email || "Not provided"}</p>
+                      <p className="text-gray-800">
+                        {user.email || "Not provided"}
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center py-2 border-b border-gray-100">
                     <Phone className="w-5 h-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-xs text-gray-500">Phone</p>
-                      <p className="text-gray-800">{user.phone || "Not provided"}</p>
+                      <p className="text-gray-800">
+                        {user.phone || "Not provided"}
+                      </p>
                     </div>
                   </div>
-                  
+
                   {user.updatedAt && (
                     <div className="flex items-center py-2">
                       <div>
@@ -447,7 +500,3 @@ const UserProfilePage: React.FC = () => {
 };
 
 export default UserProfilePage;
-
-
-
-

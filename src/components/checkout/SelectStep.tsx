@@ -11,6 +11,46 @@ import { Address } from "../../types/address";
 import { addressApi } from "../../services/api/addressApi";
 import { PlusCircle, Trash2, Plus, Minus, Pencil } from "lucide-react";
 
+// Indian states list
+const INDIAN_STATES = [
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+  "Andaman and Nicobar Islands",
+  "Chandigarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi",
+  "Jammu and Kashmir",
+  "Ladakh",
+  "Lakshadweep",
+  "Puducherry",
+];
+
 export const SelectStep = () => {
   const dispatch = useAppDispatch();
   const { addresses, selectedAddress, isAddingNewAddress } = useAppSelector(
@@ -19,7 +59,7 @@ export const SelectStep = () => {
   const { buyNowItem, cartItems, activeCartId } = useAppSelector(
     (state) => state.cart
   );
-  const { user } = useAppSelector((state) => state.auth);
+  const {  } = useAppSelector((state) => state.auth);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [itemLoading, setItemLoading] = useState<{ [key: string]: boolean }>(
@@ -35,7 +75,7 @@ export const SelectStep = () => {
     name: "",
     phone: "",
     appartment: "",
-    adress: "",
+    address: "",
     state: "",
     country: "India",
     pincode: "",
@@ -130,7 +170,7 @@ export const SelectStep = () => {
       name: "",
       phone: "",
       appartment: "",
-      adress: "",
+      address: "",
       state: "",
       country: "India",
       pincode: "",
@@ -140,6 +180,35 @@ export const SelectStep = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    // Input validation based on field type
+    let validatedValue = value;
+
+    switch (name) {
+      case "name":
+        // Only allow alphabets and spaces for name
+        validatedValue = value.replace(/[^a-zA-Z\s]/g, "");
+        break;
+      case "phone":
+        // Only allow numbers for phone (max 10 digits)
+        validatedValue = value.replace(/[^0-9]/g, "").slice(0, 10);
+        break;
+      case "pincode":
+        // Only allow numbers for pincode (max 6 digits)
+        validatedValue = value.replace(/[^0-9]/g, "").slice(0, 6);
+        break;
+      default:
+        validatedValue = value;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: validatedValue,
+    }));
+  };
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -148,8 +217,32 @@ export const SelectStep = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Additional validation
+    if (formData.phone.length !== 10) {
+      setError("Phone number must be exactly 10 digits");
+      return;
+    }
+
+    if (formData.pincode.length !== 6) {
+      setError("Pincode must be exactly 6 digits");
+      return;
+    }
+
+    if (!formData.name.trim()) {
+      setError("Full name is required");
+      return;
+    }
+
+    if (!formData.state) {
+      setError("Please select a state");
+      return;
+    }
+
     try {
       setLoading(true);
+      setError(null); // Clear any previous errors
+
       if (editAddress) {
         // Edit mode: update address
         await addressApi.update(editAddress.id, formData);
@@ -198,12 +291,12 @@ export const SelectStep = () => {
 
   useEffect(() => {
     if (showDeleteModal) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [showDeleteModal]);
 
@@ -250,7 +343,9 @@ export const SelectStep = () => {
                       <div className="flex justify-between items-start gap-2">
                         <div>
                           <h3 className="font-medium">{address.name}</h3>
-                          <p className="text-sm text-gray-600">{address.phone}</p>
+                          <p className="text-sm text-gray-600">
+                            {address.phone}
+                          </p>
                         </div>
                         <div className="flex gap-2">
                           <button
@@ -263,7 +358,7 @@ export const SelectStep = () => {
                                 name: address.name,
                                 phone: address.phone,
                                 appartment: address.appartment,
-                                adress: address.adress,
+                                address: address.address,
                                 state: address.state,
                                 country: address.country,
                                 pincode: address.pincode,
@@ -296,7 +391,7 @@ export const SelectStep = () => {
                       </div>
                       <div className="mt-2 text-sm text-gray-600">
                         <p>{address.appartment}</p>
-                        <p>{address.adress}</p>
+                        <p>{address.address}</p>
                         <p>
                           {address.state}, {address.pincode}
                         </p>
@@ -323,6 +418,7 @@ export const SelectStep = () => {
                       required
                       value={formData.name}
                       onChange={handleInputChange}
+                      placeholder="Enter full name (alphabets only)"
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                     />
                   </div>
@@ -336,8 +432,18 @@ export const SelectStep = () => {
                       required
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                      placeholder="Enter 10-digit phone number"
+                      className={`mt-1 block w-full rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 ${
+                        formData.phone && formData.phone.length !== 10
+                          ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                          : "border-gray-300"
+                      }`}
                     />
+                    {formData.phone && formData.phone.length !== 10 && (
+                      <p className="mt-1 text-sm text-red-600">
+                        Phone number must be exactly 10 digits
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -360,9 +466,9 @@ export const SelectStep = () => {
                   </label>
                   <input
                     type="text"
-                    name="adress"
+                    name="address"
                     required
-                    value={formData.adress}
+                    value={formData.address}
                     onChange={handleInputChange}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                   />
@@ -373,14 +479,20 @@ export const SelectStep = () => {
                     <label className="block text-sm font-medium text-gray-700">
                       State
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="state"
                       required
                       value={formData.state}
-                      onChange={handleInputChange}
+                      onChange={handleSelectChange}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                    />
+                    >
+                      <option value="">Select State</option>
+                      {INDIAN_STATES.map((state) => (
+                        <option key={state} value={state}>
+                          {state}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
@@ -392,8 +504,18 @@ export const SelectStep = () => {
                       required
                       value={formData.pincode}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                      placeholder="Enter 6-digit pincode"
+                      className={`mt-1 block w-full rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 ${
+                        formData.pincode && formData.pincode.length !== 6
+                          ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                          : "border-gray-300"
+                      }`}
                     />
+                    {formData.pincode && formData.pincode.length !== 6 && (
+                      <p className="mt-1 text-sm text-red-600">
+                        Pincode must be exactly 6 digits
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
@@ -485,17 +607,25 @@ export const SelectStep = () => {
                             <>
                               <button
                                 onClick={() =>
-                                  handleUpdateQuantity(item.id, item.quantity - 1)
+                                  handleUpdateQuantity(
+                                    item.id,
+                                    item.quantity - 1
+                                  )
                                 }
                                 className="button p-1 rounded-md hover:bg-gray-100"
                                 disabled={itemLoading[item.id]}
                               >
                                 <Minus className="w-4 h-4" />
                               </button>
-                              <span className="w-8 text-center">{item.quantity}</span>
+                              <span className="w-8 text-center">
+                                {item.quantity}
+                              </span>
                               <button
                                 onClick={() =>
-                                  handleUpdateQuantity(item.id, item.quantity + 1)
+                                  handleUpdateQuantity(
+                                    item.id,
+                                    item.quantity + 1
+                                  )
                                 }
                                 className="button p-1 rounded-md hover:bg-gray-100"
                                 disabled={itemLoading[item.id]}
@@ -517,11 +647,12 @@ export const SelectStep = () => {
                         <p className="font-medium">
                           ₹{(item.variant?.price || 0) * item.quantity}
                         </p>
-                        {item.variant?.discount && item.variant.discount > 0 && (
-                          <p className="text-sm text-green-600">
-                            {item.variant.discount}% off
-                          </p>
-                        )}
+                        {item.variant?.discount &&
+                          item.variant.discount > 0 && (
+                            <p className="text-sm text-green-600">
+                              {item.variant.discount}% off
+                            </p>
+                          )}
                       </div>
                     </>
                   )}
@@ -536,8 +667,7 @@ export const SelectStep = () => {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>
-                  Subtotal{" "}
-                  <span className="text-xs ">(including GST)</span>
+                  Subtotal <span className="text-xs ">(including GST)</span>
                 </span>
                 <span>₹{localOrderSummary.subtotal.toFixed(2)}</span>
               </div>
@@ -582,7 +712,10 @@ export const SelectStep = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && addressToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 backdrop-blur-sm" style={{ zIndex: 49 }} />
+          <div
+            className="absolute inset-0 backdrop-blur-sm"
+            style={{ zIndex: 49 }}
+          />
           <div className="relative bg-green-100 rounded-lg shadow-lg p-6 w-full max-w-sm z-50">
             <h4 className="text-lg font-semibold mb-4">
               Would you like to delete this address?
