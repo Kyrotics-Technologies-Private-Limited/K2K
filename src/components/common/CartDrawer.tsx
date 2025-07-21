@@ -10,6 +10,7 @@ import {
   clearBuyNowItem,
 } from "../../store/slices/cartSlice";
 import { CartItemSkeleton } from "./CartItemSkeleton";
+import PhoneAuth from "../authComponents/PhoneAuth";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -25,17 +26,28 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     error: cartError,
   } = useAppSelector((state) => state.cart);
 
+  // Get authentication state
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
   // Local loading states for individual items
   const [updatingItems, setUpdatingItems] = useState<{
     [key: string]: boolean;
   }>({});
 
+  // Login modal state
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  // Initial cart restoration
+  // Initial cart restoration - only if user is authenticated
   useEffect(() => {
     const restoreCart = async () => {
+      // Only restore cart if user is authenticated
+      if (!isAuthenticated) {
+        return;
+      }
+
       const savedCartId = localStorage.getItem("cartId");
       if (savedCartId && !activeCartId) {
         try {
@@ -51,7 +63,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     };
 
     restoreCart();
-  }, [dispatch, activeCartId]);
+  }, [dispatch, activeCartId, isAuthenticated]);
+
+  // Close login modal when user becomes authenticated
+  useEffect(() => {
+    if (isAuthenticated && showLoginModal) {
+      setShowLoginModal(false);
+    }
+  }, [isAuthenticated, showLoginModal]);
 
   const handleUpdateQuantity = async (itemId: string, newQuantity: number) => {
     if (!activeCartId || newQuantity < 1) return;
@@ -92,7 +111,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     // Clear any previous buy now session before cart checkout
     dispatch(clearBuyNowItem());
     // Also reset checkout state to ensure step is 1 and no previous session remains
-    dispatch({ type: 'checkout/resetCheckout' });
+    dispatch({ type: "checkout/resetCheckout" });
     onClose();
     navigate("/checkout");
   };
@@ -154,9 +173,21 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             </div>
           )}
 
-          {!cartLoading &&
-          !cartError &&
-          (!cartItems || cartItems.length === 0) ? (
+          {!isAuthenticated ? (
+            <div className="flex-1 flex flex-col items-center justify-center gap-4">
+              <p className="text-gray-500">Please login to view your cart</p>
+              <button
+                onClick={() => {
+                  setShowLoginModal(true);
+                }}
+                className="bg-green-800 text-white px-6 py-2 rounded-lg hover:bg-[#3A4D13] transition-colors"
+              >
+                Login
+              </button>
+            </div>
+          ) : !cartLoading &&
+            !cartError &&
+            (!cartItems || cartItems.length === 0) ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4">
               <p className="text-gray-500">Your cart is empty</p>
               <button
@@ -286,6 +317,25 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           )}
         </div>
       </div>
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex justify-center items-center p-4 sm:p-8">
+          <div className="relative bg-green-50 rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-gray-100 animate-fade-in">
+            <button
+              onClick={() => setShowLoginModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-red-500"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h2 className="text-2xl font-semibold text-green-700 text-center mb-4">
+              Login with Kishan2Kitchen
+            </h2>
+            <PhoneAuth />
+          </div>
+        </div>
+      )}
     </>
   );
 };
