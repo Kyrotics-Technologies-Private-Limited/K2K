@@ -64,7 +64,6 @@ export const Payment = () => {
 
       // Create order payload
       const orderPayload = {
-        address_id: selectedAddress.userId!,
         address: {
           id: selectedAddress.id || "",
           user_id: selectedAddress.userId || "",
@@ -79,24 +78,22 @@ export const Payment = () => {
           email: "", // Fill if you have email
           appartment: selectedAddress.appartment,
           name: selectedAddress.name,
-          address: selectedAddress.adress,
+          address: selectedAddress.address,
           pincode: selectedAddress.pincode,
         },
         items: itemsToCheckout.map((item) => ({
-          product_id: item.productId,
-          variant_id: item.variantId,
+          productId: item.productId,
+          variantId: item.variantId,
           quantity: item.quantity,
           name: item.product?.name || '',
           image: item.product?.images?.main || '',
           variant_name: item.variant?.weight || '',
           unit_price: item.variant?.price || 0,
-        
         })),
         payment_id: "asdasdlfkjlkasdfioeklj",
         total_amount: localOrderSummary.total,
         payment_method: paymentMethod,
       };
-
 
       console.log("Order payload:", orderPayload);
 
@@ -133,8 +130,8 @@ export const Payment = () => {
       if (paymentMethod === "online" && response.payment_url) {
         window.location.href = response.payment_url;
       } else {
-        // For COD, redirect to success page
-        navigate(`/order-success`);
+        // For COD, redirect to success page and pass paymentMethod and total
+        navigate(`/order-success`, { state: { paymentMethod, orderTotal: localOrderSummary.total } });
       }
     } catch (err) {
       setLocalError("Failed to place order. Please try again.");

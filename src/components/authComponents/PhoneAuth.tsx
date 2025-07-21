@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { RecaptchaVerifier } from "firebase/auth";
 import * as authService from "../../services/api/authApi";
@@ -26,16 +25,10 @@ import {
 } from "../../store/slices/authSlice";
 
 const PhoneAuth: React.FC = () => {
-// Redux state and dispatch
+  // Redux state and dispatch
   const dispatch = useAppDispatch();
-  const { 
-    user,
-    isAuthenticated, 
-    loading, 
-    confirmationResult, 
-    error, 
-    phone 
-  } = useAppSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated, loading, confirmationResult, error, phone } =
+    useAppSelector((state: RootState) => state.auth);
 
   // Local state for form inputs
   const [otp, setOtp] = useState("");
@@ -68,7 +61,7 @@ const PhoneAuth: React.FC = () => {
     if (user) {
       setName(user.name || "");
       setEmail(user.email || "");
-      
+
       // If user is authenticated but needs profile completion
       if (user.needsProfileCompletion) {
         setShowUserInfoModal(true);
@@ -88,7 +81,7 @@ const PhoneAuth: React.FC = () => {
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Only allow numbers and limit to 10 digits
-    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
     dispatch(setPhone(value));
   };
 
@@ -97,7 +90,10 @@ const PhoneAuth: React.FC = () => {
 
     if (!phone || phone.trim().length !== 10) {
       // Set error in Redux state
-      dispatch({ type: "auth/setError", payload: "Please enter a valid 10-digit phone number" });
+      dispatch({
+        type: "auth/setError",
+        payload: "Please enter a valid 10-digit phone number",
+      });
       return;
     }
 
@@ -115,7 +111,7 @@ const PhoneAuth: React.FC = () => {
 
     // Add +91 prefix before sending to backend
     const fullPhoneNumber = `+91${phone}`;
-    
+
     // Dispatch sendOTP action
     dispatch(
       sendOTP({
@@ -191,6 +187,7 @@ const PhoneAuth: React.FC = () => {
     dispatch(clearConfirmationResult());
     setOtp("");
     dispatch(clearError());
+    // Keep the phone number so user can edit it, +91 prefix will be removed by input display logic
   };
 
   // console.log("User:", user);
@@ -231,7 +228,7 @@ const PhoneAuth: React.FC = () => {
             </div>
             <Input
               type="tel"
-              value={phone}
+              value={phone.replace(/^\+91/, "")}
               onChange={handlePhoneChange}
               placeholder="Enter 10-digit number"
               className="rounded-l-none focus-visible:ring-0"
@@ -332,7 +329,11 @@ const PhoneAuth: React.FC = () => {
               <label className="text-sm text-gray-700 mb-1 block">Name</label>
               <Input
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  // Only allow alphabets and spaces
+                  const value = e.target.value.replace(/[^a-zA-Z\s]/g, "");
+                  setName(value);
+                }}
                 disabled={loading}
                 placeholder="Enter your name"
               />

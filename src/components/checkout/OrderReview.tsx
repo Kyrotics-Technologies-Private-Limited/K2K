@@ -44,7 +44,7 @@ export const OrderReview = () => {
               {selectedAddress?.appartment && (
                 <p>{selectedAddress.appartment}</p>
               )}
-              <p>{selectedAddress?.adress}</p>
+              <p>{selectedAddress?.address}</p>
               <p>
                 {selectedAddress?.state}, {selectedAddress?.pincode}
               </p>

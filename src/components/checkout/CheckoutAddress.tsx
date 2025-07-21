@@ -31,7 +31,7 @@ export const CheckoutAddress = () => {
     name: "",
     phone: "",
     appartment: "",
-    adress: "",
+    address: "",
     state: "",
     country: "India",
     pincode: "",
@@ -123,7 +123,7 @@ export const CheckoutAddress = () => {
       name: user?.name || "",
       phone: user?.phone || "",
       appartment: "",
-      adress: "",
+      address: "",
       state: "",
       country: "India",
       pincode: "",
@@ -133,10 +133,20 @@ export const CheckoutAddress = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    // For name field, only allow alphabets and spaces
+    if (name === "name") {
+      const cleanedValue = value.replace(/[^a-zA-Z\s]/g, "");
+      setFormData((prev) => ({
+        ...prev,
+        [name]: cleanedValue,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -198,9 +208,9 @@ export const CheckoutAddress = () => {
                 <div className="space-y-4">
                   {addresses.map((address) => (
                     <div
-                      key={address.adress}
+                      key={address.address}
                       className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                        selectedAddress?.adress === address.adress
+                        selectedAddress?.address === address.address
                           ? "border-green-500 bg-green-50"
                           : "border-gray-200 hover:border-green-300"
                       }`}
@@ -221,7 +231,7 @@ export const CheckoutAddress = () => {
                       </div>
                       <div className="mt-2 text-sm text-gray-600">
                         <p>{address.appartment}</p>
-                        <p>{address.adress}</p>
+                        <p>{address.address}</p>
                         <p>
                           {address.state}, {address.pincode}
                         </p>
@@ -283,9 +293,9 @@ export const CheckoutAddress = () => {
                   </label>
                   <input
                     type="text"
-                    name="adress"
+                    name="address"
                     required
-                    value={formData.adress}
+                    value={formData.address}
                     onChange={handleInputChange}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                   />

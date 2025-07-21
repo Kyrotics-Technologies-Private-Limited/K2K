@@ -1,31 +1,35 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../store/store";
+import { orderApi } from "../services/api/orderApi";
 
 
 export const OrderSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { orderTotal, paymentMethod } = location.state || {};
-    const { activeCartId, cartItems, buyNowItem } = useAppSelector((state) => state.cart);
-  const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
+  const [order, setOrder] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
+  // Get orderId from URL query param
+  const params = new URLSearchParams(location.search);
+  const orderId = params.get("orderId");
 
-    // Local order summary calculation for itemsToCheckout
-    const localOrderSummary = useMemo(() => {
-      const subtotal = itemsToCheckout.reduce((total, item) => {
-        return total + (item.variant?.price || 0) * item.quantity;
-      }, 0);
-      const tax = 0; // GST removed
-      const shipping = subtotal > 500 ? 0 : 40;
-      return {
-        subtotal,
-        tax,
-        shipping,
-        total: subtotal + shipping,
-      };
-    }, [itemsToCheckout]);
+  useEffect(() => {
+    if (orderId) {
+      setLoading(true);
+      orderApi.getOrderById(orderId)
+        .then((data) => setOrder(data))
+        .catch((err) => setError("Failed to fetch order details."))
+        .finally(() => setLoading(false));
+    }
+  }, [orderId]);
+
+  // Local fallback for COD (old flow)
+  const total = order?.total_amount || orderTotal;
+  const payment = order?.payment_method || paymentMethod;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -43,22 +47,28 @@ export const OrderSuccess = () => {
           </div>
 
           <div className="mt-8 border-t border-gray-200 pt-6">
-            <dl className="space-y-4">
-              <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">Subtotal</dt>
-                <dd className="text-sm font-medium text-gray-900">
-                  ₹{localOrderSummary.subtotal.toFixed(2)}
-                </dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">Payment Method</dt>
-                <dd className="text-sm font-medium text-gray-900">
-                  {paymentMethod === "cod"
-                    ? "Cash on Delivery"
-                    : "Online Payment"}
-                </dd>
-              </div>
-            </dl>
+            {loading ? (
+              <div>Loading order details...</div>
+            ) : error ? (
+              <div className="text-red-600">{error}</div>
+            ) : (
+              <dl className="space-y-4">
+                <div className="flex justify-between">
+                  <dt className="text-sm text-gray-600">Total</dt>
+                  <dd className="text-sm font-medium text-gray-900">
+                    ₹{total?.toFixed(2)}
+                  </dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-sm text-gray-600">Payment Method</dt>
+                  <dd className="text-sm font-medium text-gray-900">
+                    {payment === "cod"
+                      ? "Cash on Delivery"
+                      : "Online Payment"}
+                  </dd>
+                </div>
+              </dl>
+            )}
           </div>
 
           <div className="mt-8">
