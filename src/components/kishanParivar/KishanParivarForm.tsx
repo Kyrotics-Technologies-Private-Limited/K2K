@@ -218,14 +218,14 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
       duration: '1 Month',
       price: '₹299',
       originalPrice: '₹349',
-      discount: '5%',
-      delivery: 'Standard',
+      discount: '15%',
+      delivery: 'Fast',
       popular: false,
       features: [
-        '5% discount on all products',
-        'Standard delivery (4-5 days)',
+        '15% discount on all products',
+        'Fast delivery (2-3 days)',
         'Priority customer support',
-        'Basic newsletter access'
+        'Free shipping on orders above ₹500'
       ]
     },
     {
@@ -234,11 +234,11 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
       duration: '3 Months',
       price: '₹799',
       originalPrice: '₹999',
-      discount: '10%',
+      discount: '15%',
       delivery: 'Fast',
       popular: true,
       features: [
-        '10% discount on all products',
+        '15% discount on all products',
         'Fast delivery (2-3 days)',
         'Priority customer support',
         'Free shipping on orders above ₹500'
@@ -251,13 +251,13 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
       price: '₹2,999',
       originalPrice: '₹3,999',
       discount: '15%',
-      delivery: 'Express',
+      delivery: 'Fast',
       popular: false,
       features: [
         '15% discount on all products',
-        'Express delivery (1-2 days)',
-        'Dedicated premium support',
-        'Free shipping on all orders'
+        'Fast delivery (2-3 days)',
+        'Priority customer support',
+        'Free shipping on orders above ₹500'
       ]
     }
   ];
@@ -444,7 +444,7 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
                     e.currentTarget.style.background = '#0c6908';
                   }}
                 >
-                  Choose {plan.name} Plan
+                  Pay Now
                 </button>
               </div>
             </div>
