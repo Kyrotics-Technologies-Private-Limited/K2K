@@ -23,8 +23,8 @@ const badgeIcons: { [key: string]: string } = {
   'Lab Tested': lab,
   'Made at Home- Not in Factories': home,
   'Zero Preservatives': Zeropre,
-  'No Bad Cholesterol': chol,
   'No added sugar': noadd,
+  'No Bad Cholesterol': chol,
   'Unprocessed': unpro,
   'Immunity Booster': immunity,
   'Sourced from Beekeepers': source,
@@ -33,7 +33,9 @@ const badgeIcons: { [key: string]: string } = {
   'Non Refined': refined,
 };
 
+
 export const ProductBadges: React.FC<ProductBadgeProps> = ({ product }) => {
+  console.log("product badges", product.badges)
   return (
     <div className="grid grid-cols-2 md:grid-cols-5 gap-4 py-6">
       {product.badges.map((badge, index) => (

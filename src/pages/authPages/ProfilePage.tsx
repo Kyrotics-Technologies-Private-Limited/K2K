@@ -313,7 +313,7 @@ const UserProfilePage: React.FC = () => {
                         alt="Profile"
                         className="w-full h-full object-cover"
                       />
-                      {editMode && (
+                      {/* {editMode && (
                         <button
                           onClick={removeProfilePicture}
                           className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
@@ -321,7 +321,7 @@ const UserProfilePage: React.FC = () => {
                         >
                           <span className="text-xs">×</span>
                         </button>
-                      )}
+                      )} */}
                     </div>
                   ) : (
                     <div className="w-32 h-32 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center border-4 border-white shadow-xl">
@@ -331,7 +331,7 @@ const UserProfilePage: React.FC = () => {
                 </div>
 
                 <div className="mt-16">
-                  {editMode && (
+                  {/* {editMode && (
                     <div className="mt-2">
                       <input
                         type="file"
@@ -357,7 +357,7 @@ const UserProfilePage: React.FC = () => {
                         </button>
                       )}
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
 

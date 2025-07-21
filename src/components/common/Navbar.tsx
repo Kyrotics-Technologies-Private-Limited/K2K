@@ -3,11 +3,11 @@ import {
   Menu,
   X,
   ShoppingCart,
-  Search,
+  // Search,
   ChevronDown,
   User as UserIcon,
 } from "lucide-react";
-import { RootState, useAppDispatch, useAppSelector } from "../../store/store";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import PhoneAuth from "../authComponents/PhoneAuth";
 import { signOut } from "../../store/slices/authSlice";
@@ -16,6 +16,8 @@ interface NavbarProps {
   onCartClick?: () => void;
 }
 
+// ...imports stay the same
+
 const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -23,11 +25,9 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const location = useLocation();
 
   // Get auth state from Redux
-  const { user, isAuthenticated, loading } = useAppSelector(
+  const { user, isAuthenticated} = useAppSelector(
     (state) => state.auth
   );
-
-  // Get cart state from Redux
   const cart = useAppSelector((state) => state.cart);
   if (!cart) {
     console.error("Cart is not available in the Redux store.");
@@ -40,20 +40,15 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
   const [isSigningOut, setIsSigningOut] = useState(false);
-
-  // Get user's name or display a default
   const displayName = user?.name || "User";
 
-  // Handle navigation to different routes
   const handleNavigation = (path: string) => {
     navigate(path);
-    setIsOpen(false); // Close mobile menu when navigating
-    setShowUserMenu(false); // Close user menu when navigating
+    setIsOpen(false);
+    setShowUserMenu(false);
   };
 
-  // Handle logout
   const logout = async () => {
     setIsSigningOut(true);
     try {
@@ -67,7 +62,6 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
     }
   };
 
-  // Toggle user menu for mobile
   const toggleUserMenu = () => {
     setShowUserMenu(!showUserMenu);
   };
@@ -90,6 +84,17 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-stretch space-x-4 xl:space-x-8 h-16">
+            <Link
+              to="/"
+              className={`text-sm xl:text-base transition px-4 flex items-center h-16 ${
+                location.pathname === "/"
+                  ? "bg-green-100 text-green-800 font-medium"
+                  : "text-gray-500 hover:text-black"
+              }`}
+            >
+              Home
+            </Link>
+
             <div className="relative group">
               <div className="flex items-center h-16">
                 <Link
@@ -123,7 +128,6 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             </div>
 
             {[
-              ["samples", "Try Our Sample"],
               ["kishanParivarPage", "Kishan Parivar"],
               ["traceability", "Traceability"],
               ["our-story", "Our Story"],
@@ -145,7 +149,6 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
           {/* Right-side Icons */}
           <div className="flex items-center">
-            {/* User Authentication Section */}
             {isAuthenticated ? (
               <div className="relative group hidden lg:block">
                 <div className="w-7 h-7 mr-2 rounded-full bg-green-600 text-white flex items-center justify-center cursor-pointer">
@@ -185,7 +188,6 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               </button>
             )}
 
-            {/* Mobile User Profile Button */}
             {isAuthenticated ? (
               <button
                 onClick={toggleUserMenu}
@@ -202,7 +204,6 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               </button>
             )}
 
-            {/* Cart Button */}
             <button onClick={onCartClick} className="button relative p-2">
               <ShoppingCart className="text-gray-700 w-6 h-8" />
               {itemCount > 0 && (
@@ -213,17 +214,12 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             </button>
           </div>
 
-          {/* Mobile Menu Icon */}
           <div className="lg:hidden flex items-center space-x-3">
             <button
               onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? "Close menu" : "Open menu"}
             >
-              {isOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
@@ -234,6 +230,18 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
         <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200">
           <div className="px-4 py-2">
             <div className="space-y-1">
+              <Link
+                to="/"
+                className={`block py-2 px-3 rounded-md ${
+                  location.pathname === "/"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-700 hover:bg-gray-50"
+                }`}
+                onClick={() => setIsOpen(false)}
+              >
+                Home
+              </Link>
+
               <Link
                 to="/all-products"
                 className={`block py-2 px-3 rounded-md ${
@@ -246,6 +254,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               >
                 All Products
               </Link>
+
               {["oils", "ghee", "honey", "natural"].map((type) => (
                 <Link
                   key={type}
@@ -265,8 +274,8 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                   {type.charAt(0).toUpperCase() + type.slice(1)}
                 </Link>
               ))}
+
               {[
-                ["samples", "Try Our Sample"],
                 ["kishanParivarPage", "Kishan Parivar"],
                 ["traceability", "Traceability"],
                 ["our-story", "Our Story"],
