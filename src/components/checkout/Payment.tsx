@@ -78,7 +78,7 @@ export const Payment = () => {
           email: "", // Fill if you have email
           appartment: selectedAddress.appartment,
           name: selectedAddress.name,
-          address: selectedAddress.adress,
+          address: selectedAddress.address,
           pincode: selectedAddress.pincode,
         },
         items: itemsToCheckout.map((item) => ({
