@@ -3,11 +3,11 @@ import {
   Menu,
   X,
   ShoppingCart,
-  Search,
+  // Search,
   ChevronDown,
   User as UserIcon,
 } from "lucide-react";
-import { RootState, useAppDispatch, useAppSelector } from "../../store/store";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import PhoneAuth from "../authComponents/PhoneAuth";
 import { signOut } from "../../store/slices/authSlice";
@@ -23,7 +23,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const location = useLocation();
 
   // Get auth state from Redux
-  const { user, isAuthenticated, loading } = useAppSelector(
+  const { user, isAuthenticated} = useAppSelector(
     (state) => state.auth
   );
 
