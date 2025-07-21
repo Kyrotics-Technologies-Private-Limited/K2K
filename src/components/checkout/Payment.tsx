@@ -64,6 +64,7 @@ export const Payment = () => {
 
       // Create order payload
       const orderPayload = {
+        address_id: selectedAddress.id || selectedAddress.userId || "",
         address: {
           id: selectedAddress.id || "",
           user_id: selectedAddress.userId || "",
@@ -82,8 +83,8 @@ export const Payment = () => {
           pincode: selectedAddress.pincode,
         },
         items: itemsToCheckout.map((item) => ({
-          productId: item.productId,
-          variantId: item.variantId,
+          product_id: item.productId,
+          variant_id: item.variantId,
           quantity: item.quantity,
           name: item.product?.name || '',
           image: item.product?.images?.main || '',

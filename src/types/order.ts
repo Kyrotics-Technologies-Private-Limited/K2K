@@ -1,7 +1,7 @@
 // src/types/order.ts
 
-import { CartItem } from "./cart";
-import { CartItemWithDetails } from "./cart";
+// import { CartItem } from "./cart";
+// import { CartItemWithDetails } from "./cart";
 
 export interface OrderItem {
   id: string;
