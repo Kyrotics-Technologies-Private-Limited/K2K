@@ -494,7 +494,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                 </div>
 <div>
   {variants[selectedVariant].units_in_stock <= 10 ?
-    <h2 className="text-green-900 font-extrabold animate-pulse text-base">
+    <h2 className="text-red-600 font-extrabold animate-bounce text-base">
       Hurry, only {variants[selectedVariant].units_in_stock} left!
     </h2>
     : null}
