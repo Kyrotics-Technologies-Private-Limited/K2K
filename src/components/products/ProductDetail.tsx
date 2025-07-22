@@ -8,7 +8,7 @@ import {
   Info,
   X,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Product } from "../../types";
 import { ProductCard } from "./ProductCard";
 import { ProductBadges } from "./Productbadge";
@@ -22,14 +22,17 @@ import { Variant } from "../../types/variant";
 import { toast } from "react-toastify";
 // import { CartItem } from "@/types/cart";
 import { resetCheckout } from "@/store/slices/checkoutSlice";
+import { useAuth } from "../../context/AuthContext";
+import PhoneAuth from "../authComponents/PhoneAuth";
+import { AuthProvider } from "../../context/AuthContext"; // Import AuthProvider
 
 interface ProductDetailProps {
   product: Product | undefined;
   relatedProducts: Product[];
-  onAddToCart?: () => void; // New prop for opening cart drawer
+  onAddToCart?: () => void;
 }
 
-export const ProductDetail: React.FC<ProductDetailProps> = ({
+const ProductDetailContent: React.FC<ProductDetailProps> = ({
   product,
   relatedProducts,
   onAddToCart,
@@ -45,9 +48,29 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const [addingToCart, setAddingToCart] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const { user } = useAuth(); // Now properly within AuthProvider
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const navigate = useNavigate();
 
+  const handleAddToCartClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user) {
+      setShowLoginModal(true);
+    } else {
+      setShowLoginModal(false);
+      handleAddToCart(e);
+    }
+  };
 
+  const handleBuyNowClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user) {
+      setShowLoginModal(true);
+    } else {
+      setShowLoginModal(false);
+      handleBuyNow(e);
+    }
+  };
 
   // Fetch variants when product changes
   useEffect(() => {
@@ -58,7 +81,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
         const fetchedVariants = await VariantApi.getVariantsByProductId(
           product.id
         );
-        // console.log("Fetched Variants: ", fetchedVariants);
         setVariants(fetchedVariants);
         setError(null);
       } catch (err) {
@@ -70,7 +92,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
     };
 
     fetchVariants();
-  }, [product]); // Add product as dependency
+  }, [product]);
 
   // Set initial variant when variants array is populated
   useEffect(() => {
@@ -90,6 +112,11 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
 
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+
     if (!product || !variants[selectedVariant]) {
       setError("Cannot add to cart: No product or variant selected");
       return;
@@ -97,15 +124,18 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 
     let cartId = activeCartId;
     if (!cartId) {
-      toast.success('Please Refresh the browser')
+      toast.success("Please Refresh the browser");
     }
 
     setAddingToCart(true);
     setError(null);
 
     try {
-   
-
+      const itemData: Partial<CartItem> = {
+        productId: product.id,
+        variantId: variants[selectedVariant].id,
+        quantity,
+      };
 
 
       toast.success(
@@ -148,7 +178,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
         onAddToCart();
       }
 
-      // setSuccess("Item added to cart successfully!");
       setTimeout(() => {
         setSuccess(null);
       }, 3000);
@@ -163,6 +192,11 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const handleBuyNow = async (e: React.MouseEvent) => {
     e.preventDefault();
 
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+
     if (!product || !variants[selectedVariant]) {
       setError("Cannot proceed: Missing required information");
       return;
@@ -172,7 +206,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
     setError(null);
 
     try {
-      // Prepare item data for buy now
       const buyNowItem = {
         id: `${product.id}_${variants[selectedVariant].id}_${Date.now()}`,
         productId: product.id,
@@ -181,21 +214,25 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
         product: product,
         variant: variants[selectedVariant],
       };
-      // Add to cart as well (option A)
-      await dispatch(addToCart({
-        productId: product.id,
-        variantId: variants[selectedVariant].id,
-        quantity: quantity,
-      }));
-      // Clear any previous buy now session
+      await dispatch(
+        addToCart({
+          productId: product.id,
+          variantId: variants[selectedVariant].id,
+          quantity: quantity,
+        })
+      );
       dispatch(clearBuyNowItem());
-      // Reset checkout state (step, address, payment, etc.)
       dispatch(resetCheckout());
-      // Set the new buy now item
       dispatch(setBuyNowItem(buyNowItem));
-      // Store info in sessionStorage for removal after order (option C)
-      sessionStorage.setItem('buyNowRemoveFromCart', JSON.stringify({ productId: product.id, variantId: variants[selectedVariant].id }));
-      // Navigate to checkout
+
+      sessionStorage.setItem(
+        "buyNowRemoveFromCart",
+        JSON.stringify({
+          productId: product.id,
+          variantId: variants[selectedVariant].id,
+        })
+      );
+
       navigate("/checkout");
     } catch (err) {
       setError("Failed to process buy now request");
@@ -333,64 +370,211 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   </p>
                 </div>
               ) : (
+                // <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
+                //   {variants.map((variant, index) => (
+                //     <button
+                //       key={variant.id}
+                //       onClick={() => setSelectedVariant(index)}
+                //       className={`button flex flex-col items-start p-3 rounded-lg w-full ${
+                //         selectedVariant === index
+                //           ? "bg-green-800 text-white"
+                //           : "bg-gray-50 hover:bg-gray-100"
+                //       } ${
+                //         !variant.inStock ? "opacity-50 cursor-not-allowed" : ""
+                //       }`}
+                //       disabled={!variant.inStock}
+                //     >
+                //       <div className="flex flex-col items-start w-full">
+                //         <div className="flex justify-between w-full items-start">
+                //           <span
+                //             className={`text-sm font-medium ${
+                //               selectedVariant === index
+                //                 ? "text-white"
+                //                 : "text-gray-900"
+                //             } mb-1`}
+                //           >
+                //             {variant.weight}
+                //           </span>
+                //         </div>
+                //         <div className="flex flex-wrap items-baseline gap-1 mb-1">
+                //           <span
+                //             className={`text-lg font-bold ${
+                //               selectedVariant === index
+                //                 ? "text-white"
+                //                 : "text-gray-900"
+                //             }`}
+                //           >
+                //             ₹{variant.price.toLocaleString("en-IN")}
+                //           </span>
+                //           {variant.originalPrice && (
+                //             <span className={`text-sm font-semibold line-through ${
+                //               selectedVariant === index
+                //                 ? "text-gray-300"
+                //                 : "text-gray-500"
+                //               }`}
+                //             >
+                //               ₹{variant.originalPrice.toLocaleString("en-IN")}
+                //             </span>
+                //           )}
+                //           {variant.discount && (
+                //             <span
+                //               className={`text-xs ${
+                //                 selectedVariant === index
+                //                   ? "text-white"
+                //                   : "text-red-600"
+                //               }`}
+                //             >
+                //               {variant.discount}% off
+                //             </span>
+                //           )}
+                //         </div>
+                //       </div>
+                //     </button>
+                //   ))}
+                // </div>
+
+                // <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
+                //   {variants.map((variant, index) => (
+                //     <button
+                //       key={variant.id}
+                //       onClick={() => setSelectedVariant(index)}
+                //       className={`button flex flex-col items-start p-3 rounded-lg w-full border-2 transition-all duration-200 ${
+                //         selectedVariant === index
+                //           ? "border-green-600 ring-2 ring-green-200 shadow-sm"
+                //           : "border-gray-200 hover:border-gray-300"
+                //       } ${
+                //         !variant.inStock ? "opacity-60 cursor-not-allowed" : ""
+                //       } bg-white`}
+                //       disabled={!variant.inStock}
+                //     >
+                //       <div className="flex flex-col items-start w-full">
+                //         <div className="flex justify-between w-full items-start">
+                //           <span
+                //             className={`text-sm font-medium ${
+                //               selectedVariant === index
+                //                 ? "text-green-800"
+                //                 : "text-gray-900"
+                //             } mb-1`}
+                //           >
+                //             {variant.weight}
+                //           </span>
+                //           {!variant.inStock && (
+                //             <span className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
+                //               Out of stock
+                //             </span>
+                //           )}
+                //         </div>
+                //         <div className="flex flex-wrap items-baseline gap-1 mb-1">
+                //           <span
+                //             className={`text-lg font-bold ${
+                //               selectedVariant === index
+                //                 ? "text-green-800"
+                //                 : "text-gray-900"
+                //             }`}
+                //           >
+                //             ₹{variant.price.toLocaleString("en-IN")}
+                //           </span>
+                //           {variant.originalPrice && (
+                //             <span
+                //               className={`text-sm font-medium line-through ${
+                //                 selectedVariant === index
+                //                   ? "text-green-600"
+                //                   : "text-gray-500"
+                //               }`}
+                //             >
+                //               ₹{variant.originalPrice.toLocaleString("en-IN")}
+                //             </span>
+                //           )}
+                //           {variant.discount && (
+                //             <span
+                //               className={`text-xs font-semibold ${
+                //                 selectedVariant === index
+                //                   ? "text-green-700"
+                //                   : "text-red-600"
+                //               }`}
+                //             >
+                //               {variant.discount}% off
+                //             </span>
+                //           )}
+                //         </div>
+                //       </div>
+                //     </button>
+                //   ))}
+                // </div>
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
-                  {variants.map((variant, index) => (
-                    <button
-                      key={variant.id}
-                      onClick={() => setSelectedVariant(index)}
-                      className={`border-2 border-black button flex flex-col items-start p-3 rounded-lg w-full ${
-                        selectedVariant === index
-                          ? "bg-green-800 text-white"
-                          : "bg-gray-50 hover:bg-gray-100"
-                      } ${
-                        (!variant.inStock || variant.units_in_stock <= 0)
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }`}
-                      disabled={!variant.inStock || variant.units_in_stock <= 0}
-                    >
-                      <div className="flex flex-col items-start w-full">
-                        <div className="flex justify-between w-full items-start">
-                          <span
-                            className={`text-sm font-medium ${
-                              selectedVariant === index
-                                ? "text-white"
-                                : "text-gray-900"
-                            } mb-1`}
-                          >
-                            {variant.weight}
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap items-baseline gap-1 mb-1">
-                          <span
-                            className={`text-lg font-bold ${
-                              selectedVariant === index
-                                ? "text-white"
-                                : "text-gray-900"
-                            }`}
-                          >
-                            ₹{variant.price.toLocaleString("en-IN")}
-                          </span>
-                          {variant.originalPrice && (
-                            <span className="text-sm font-semibold text-gray-500 line-through">
-                              ₹{variant.originalPrice.toLocaleString("en-IN")}
-                            </span>
-                          )}
-                          {variant.discount && (
+                  {variants.map((variant, index) => {
+                    const membershipPrice = variant.price * 0.85; // 15% discount for members
+                    return (
+                      <button
+                        key={variant.id}
+                        onClick={() => setSelectedVariant(index)}
+                        className={`button flex flex-col items-start p-3 rounded-lg w-full border-2 transition-all duration-200 ${
+                          selectedVariant === index
+                            ? "border-green-600 ring-2 ring-green-200 shadow-sm"
+                            : "border-gray-200 hover:border-gray-300"
+                        } ${
+                          (!variant.inStock || variant.units_in_stock <= 0)
+                            ? "opacity-60 cursor-not-allowed"
+                            : ""
+                        } bg-white`}
+                        disabled={!variant.inStock || variant.units_in_stock <= 0}
+                      >
+                        <div className="flex flex-col w-full space-y-1">
+                          {/* Variant weight and stock status */}
+                          <div className="flex justify-between w-full items-center">
                             <span
-                              className={`text-xs ${
+                              className={`text-sm font-medium ${
                                 selectedVariant === index
-                                  ? "text-white"
-                                  : "text-red-600"
+                                  ? "text-green-800"
+                                  : "text-gray-900"
                               }`}
                             >
-                              {variant.discount}% off
+                              {variant.weight}
                             </span>
-                          )}
+                            {!variant.inStock && (
+                              <span className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
+                                Out of stock
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Regular price */}
+                          <div className="flex flex-wrap items-baseline gap-1">
+                            <span className="text-lg font-bold text-gray-900">
+                              ₹{variant.price.toLocaleString("en-IN")}
+                            </span>
+                            {variant.originalPrice && (
+                              <span className="text-sm font-medium line-through text-gray-500">
+                                ₹{variant.originalPrice.toLocaleString("en-IN")}
+                              </span>
+                            )}
+                            {variant.discount && (
+                              <span className="text-xs font-semibold bg-red-50 text-red-600 px-1.5 py-0.5 rounded">
+                                {variant.discount}% off
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Compact Membership price */}
+                          <div className="flex items-baseline gap-1 mt-0.5">
+                            <Link
+                              to="/kishanParivarPage"
+                              className="flex items-baseline gap-1 hover:underline"
+                              onClick={(e) => e.stopPropagation()} // Prevent triggering the variant selection
+                            >
+                              <span className="text-sm font-bold text-green-700">
+                                ₹{membershipPrice.toLocaleString("en-IN")}
+                              </span>
+                              <span className="text-xs font-bold text-green-600">
+                                for KP Member
+                              </span>
+                            </Link>
+                          </div>
                         </div>
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -532,7 +716,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   ) : (
                     <>
                       <button
-                        onClick={handleAddToCart}
+                        onClick={handleAddToCartClick}
                         className="button flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
                         disabled={
                           !variants[selectedVariant]?.inStock || addingToCart
@@ -550,8 +734,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                           </>
                         )}
                       </button>
+
                       <button
-                        onClick={handleBuyNow}
+                        onClick={handleBuyNowClick}
                         className="button flex-1 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
                         disabled={!variants[selectedVariant].inStock || loading}
                       >
@@ -595,9 +780,35 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
           </div>
         </div>
       </div>
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex justify-center items-center p-4 sm:p-8">
+          <div className="relative bg-green-50 rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-gray-100 animate-fade-in">
+            <button
+              onClick={() => setShowLoginModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-red-500"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h2 className="text-2xl font-semibold text-green-700 text-center mb-4">
+              Login with Kishan2Kitchen
+            </h2>
+            <PhoneAuth />
+          </div>
+        </div>
+      )}
       <div className="pt-4">
         <RecognizedBy />
       </div>
     </div>
+  );
+};
+
+// Wrap the component with AuthProvider
+export const ProductDetail: React.FC<ProductDetailProps> = (props) => {
+  return (
+    <AuthProvider>
+      <ProductDetailContent {...props} />
+    </AuthProvider>
   );
 };
