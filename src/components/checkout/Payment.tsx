@@ -64,6 +64,7 @@ export const Payment = () => {
 
       // Create order payload
       const orderPayload = {
+        address_id: selectedAddress.id || "", // Add this line to fix the error
         address: {
           id: selectedAddress.id || "",
           user_id: selectedAddress.userId || "",
@@ -82,12 +83,12 @@ export const Payment = () => {
           pincode: selectedAddress.pincode,
         },
         items: itemsToCheckout.map((item) => ({
-          productId: item.productId,
-          variantId: item.variantId,
+          product_id: item.productId, // Changed from productId to product_id
+          variant_id: item.variantId, // Changed from variantId to variant_id
           quantity: item.quantity,
-          name: item.product?.name || '',
-          image: item.product?.images?.main || '',
-          variant_name: item.variant?.weight || '',
+          name: item.product?.name || "",
+          image: item.product?.images?.main || "",
+          variant_name: item.variant?.weight || "",
           unit_price: item.variant?.price || 0,
         })),
         payment_id: "asdasdlfkjlkasdfioeklj",
@@ -102,20 +103,23 @@ export const Payment = () => {
 
       // Remove buy now item from cart if needed (option C)
       if (buyNowItem) {
-        const removeInfo = sessionStorage.getItem('buyNowRemoveFromCart');
+        const removeInfo = sessionStorage.getItem("buyNowRemoveFromCart");
         if (removeInfo && activeCartId) {
           const { productId, variantId } = JSON.parse(removeInfo);
           // Find the cart item with matching productId and variantId
           const cartItem = cartItems.find(
-            (item) => item.productId === productId && item.variantId === variantId
+            (item) =>
+              item.productId === productId && item.variantId === variantId
           );
           if (cartItem) {
-            await dispatch(removeCartItem({
-              cartId: activeCartId,
-              itemId: cartItem.id,
-            })).unwrap();
+            await dispatch(
+              removeCartItem({
+                cartId: activeCartId,
+                itemId: cartItem.id,
+              })
+            ).unwrap();
           }
-          sessionStorage.removeItem('buyNowRemoveFromCart');
+          sessionStorage.removeItem("buyNowRemoveFromCart");
         }
       }
 
@@ -131,7 +135,9 @@ export const Payment = () => {
         window.location.href = response.payment_url;
       } else {
         // For COD, redirect to success page and pass paymentMethod and total
-        navigate(`/order-success`, { state: { paymentMethod, orderTotal: localOrderSummary.total } });
+        navigate(`/order-success`, {
+          state: { paymentMethod, orderTotal: localOrderSummary.total },
+        });
       }
     } catch (err) {
       setLocalError("Failed to place order. Please try again.");

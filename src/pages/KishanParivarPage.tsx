@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { AuthProvider } from '../context/AuthContext';
 import KishanParivarForm from '../components/kishanParivar/KishanParivarForm';
 import KishanParivarHero from '../components/kishanParivar/KishanParivarHero';
 import FeaturesKishanParivar from '../components/kishanParivar/FeaturesKishanParivar';
@@ -18,13 +19,14 @@ const KishanParivarPage = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <KishanParivarHero scrollToTarget={scrollToTarget}/>
-      <FeaturesKishanParivar scrollToTarget={scrollToTarget} />
-      <TrialPackSection/>
-      <KishanParivarForm targetRef={targetRef} />
-    </div>
-    
+    <AuthProvider>
+      <div className="min-h-screen">
+        <KishanParivarHero scrollToTarget={scrollToTarget}/>
+        <FeaturesKishanParivar scrollToTarget={scrollToTarget} />
+        <TrialPackSection/>
+        <KishanParivarForm targetRef={targetRef} />
+      </div>
+    </AuthProvider>
   );
 };
 

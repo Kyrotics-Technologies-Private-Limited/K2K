@@ -16,20 +16,28 @@ import { BenefitsBanner } from "./InformationBanner";
 import { HealthBenefits } from "./HealthBenefits";
 import RecognizedBy from "../homePageComponents/RecognizedBy";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { addToCart, createCart, setBuyNowItem, clearBuyNowItem } from "../../store/slices/cartSlice";
+import {
+  addToCart,
+  createCart,
+  setBuyNowItem,
+  clearBuyNowItem,
+} from "../../store/slices/cartSlice";
 import VariantApi from "../../services/api/variantApi";
 import { Variant } from "../../types/variant";
 import { toast } from "react-toastify";
 import { CartItem } from "@/types/cart";
 import { resetCheckout } from "@/store/slices/checkoutSlice";
+import { useAuth } from "../../context/AuthContext";
+import PhoneAuth from "../authComponents/PhoneAuth";
+import { AuthProvider } from "../../context/AuthContext"; // Import AuthProvider
 
 interface ProductDetailProps {
   product: Product | undefined;
   relatedProducts: Product[];
-  onAddToCart?: () => void; // New prop for opening cart drawer
+  onAddToCart?: () => void;
 }
 
-export const ProductDetail: React.FC<ProductDetailProps> = ({
+const ProductDetailContent: React.FC<ProductDetailProps> = ({
   product,
   relatedProducts,
   onAddToCart,
@@ -45,9 +53,29 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const [addingToCart, setAddingToCart] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const { user } = useAuth(); // Now properly within AuthProvider
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const navigate = useNavigate();
 
+  const handleAddToCartClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user) {
+      setShowLoginModal(true);
+    } else {
+      setShowLoginModal(false);
+      handleAddToCart(e);
+    }
+  };
 
+  const handleBuyNowClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user) {
+      setShowLoginModal(true);
+    } else {
+      setShowLoginModal(false);
+      handleBuyNow(e);
+    }
+  };
 
   // Fetch variants when product changes
   useEffect(() => {
@@ -58,7 +86,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
         const fetchedVariants = await VariantApi.getVariantsByProductId(
           product.id
         );
-        // console.log("Fetched Variants: ", fetchedVariants);
         setVariants(fetchedVariants);
         setError(null);
       } catch (err) {
@@ -70,7 +97,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
     };
 
     fetchVariants();
-  }, [product]); // Add product as dependency
+  }, [product]);
 
   // Set initial variant when variants array is populated
   useEffect(() => {
@@ -90,6 +117,11 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
 
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+
     if (!product || !variants[selectedVariant]) {
       setError("Cannot add to cart: No product or variant selected");
       return;
@@ -97,15 +129,13 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 
     let cartId = activeCartId;
     if (!cartId) {
-      toast.success('Please Refresh the browser')
+      toast.success("Please Refresh the browser");
     }
 
     setAddingToCart(true);
     setError(null);
 
     try {
-   
-
       const itemData: Partial<CartItem> = {
         productId: product.id,
         variantId: variants[selectedVariant].id,
@@ -154,7 +184,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
         onAddToCart();
       }
 
-      // setSuccess("Item added to cart successfully!");
       setTimeout(() => {
         setSuccess(null);
       }, 3000);
@@ -169,6 +198,11 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const handleBuyNow = async (e: React.MouseEvent) => {
     e.preventDefault();
 
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+
     if (!product || !variants[selectedVariant]) {
       setError("Cannot proceed: Missing required information");
       return;
@@ -178,7 +212,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
     setError(null);
 
     try {
-      // Prepare item data for buy now
       const buyNowItem = {
         id: `${product.id}_${variants[selectedVariant].id}_${Date.now()}`,
         productId: product.id,
@@ -187,21 +220,27 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
         product: product,
         variant: variants[selectedVariant],
       };
-      // Add to cart as well (option A)
-      await dispatch(addToCart({
-        productId: product.id,
-        variantId: variants[selectedVariant].id,
-        quantity: quantity,
-      }));
-      // Clear any previous buy now session
+
+      await dispatch(
+        addToCart({
+          productId: product.id,
+          variantId: variants[selectedVariant].id,
+          quantity: quantity,
+        })
+      );
+
       dispatch(clearBuyNowItem());
-      // Reset checkout state (step, address, payment, etc.)
       dispatch(resetCheckout());
-      // Set the new buy now item
       dispatch(setBuyNowItem(buyNowItem));
-      // Store info in sessionStorage for removal after order (option C)
-      sessionStorage.setItem('buyNowRemoveFromCart', JSON.stringify({ productId: product.id, variantId: variants[selectedVariant].id }));
-      // Navigate to checkout
+
+      sessionStorage.setItem(
+        "buyNowRemoveFromCart",
+        JSON.stringify({
+          productId: product.id,
+          variantId: variants[selectedVariant].id,
+        })
+      );
+
       navigate("/checkout");
     } catch (err) {
       setError("Failed to process buy now request");
@@ -517,7 +556,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   ) : (
                     <>
                       <button
-                        onClick={handleAddToCart}
+                        onClick={handleAddToCartClick}
                         className="button flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
                         disabled={
                           !variants[selectedVariant]?.inStock || addingToCart
@@ -535,8 +574,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                           </>
                         )}
                       </button>
+
                       <button
-                        onClick={handleBuyNow}
+                        onClick={handleBuyNowClick}
                         className="button flex-1 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
                         disabled={!variants[selectedVariant].inStock || loading}
                       >
@@ -580,9 +620,35 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
           </div>
         </div>
       </div>
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex justify-center items-center p-4 sm:p-8">
+          <div className="relative bg-green-50 rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-gray-100 animate-fade-in">
+            <button
+              onClick={() => setShowLoginModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-red-500"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h2 className="text-2xl font-semibold text-green-700 text-center mb-4">
+              Login with Kishan2Kitchen
+            </h2>
+            <PhoneAuth />
+          </div>
+        </div>
+      )}
       <div className="pt-4">
         <RecognizedBy />
       </div>
     </div>
+  );
+};
+
+// Wrap the component with AuthProvider
+export const ProductDetail: React.FC<ProductDetailProps> = (props) => {
+  return (
+    <AuthProvider>
+      <ProductDetailContent {...props} />
+    </AuthProvider>
   );
 };
