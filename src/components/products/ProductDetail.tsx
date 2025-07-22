@@ -16,16 +16,11 @@ import { BenefitsBanner } from "./InformationBanner";
 import { HealthBenefits } from "./HealthBenefits";
 import RecognizedBy from "../homePageComponents/RecognizedBy";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import {
-  addToCart,
-  // createCart,
-  setBuyNowItem,
-  clearBuyNowItem,
-} from "../../store/slices/cartSlice";
+import { addToCart,  setBuyNowItem, clearBuyNowItem } from "../../store/slices/cartSlice";
 import VariantApi from "../../services/api/variantApi";
 import { Variant } from "../../types/variant";
 import { toast } from "react-toastify";
-import { CartItem } from "@/types/cart";
+// import { CartItem } from "@/types/cart";
 import { resetCheckout } from "@/store/slices/checkoutSlice";
 import { useAuth } from "../../context/AuthContext";
 import PhoneAuth from "../authComponents/PhoneAuth";
@@ -142,7 +137,6 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
         quantity,
       };
 
-      const result = await dispatch(addToCart(itemData)).unwrap();
 
       toast.success(
         <div className="flex items-center gap-3">
@@ -245,6 +239,21 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
       console.error("Failed to process buy now:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateQuantity = (direction: 'increment' | 'decrement') => {
+    const stock = variants[selectedVariant]?.units_in_stock || 1;
+    if (direction === 'increment') {
+      if (quantity >= stock) {
+        toast.info(`Only ${stock} left in stock.`);
+        return;
+      }
+      setQuantity((prev) => prev + 1);
+    } else if (direction === 'decrement') {
+      if (quantity > 1) {
+        setQuantity((prev) => prev - 1);
+      }
     }
   };
 
@@ -505,11 +514,11 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                             ? "border-green-600 ring-2 ring-green-200 shadow-sm"
                             : "border-gray-200 hover:border-gray-300"
                         } ${
-                          !variant.inStock
+                          (!variant.inStock || variant.units_in_stock <= 0)
                             ? "opacity-60 cursor-not-allowed"
                             : ""
                         } bg-white`}
-                        disabled={!variant.inStock}
+                        disabled={!variant.inStock || variant.units_in_stock <= 0}
                       >
                         <div className="flex flex-col w-full space-y-1">
                           {/* Variant weight and stock status */}
@@ -667,15 +676,19 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                     </div>
                   </div>
                 </div>
-
+<div>
+  {variants[selectedVariant].units_in_stock <= 10 ?
+    <h2 className="text-green-900 font-extrabold animate-pulse text-base">
+      Hurry, only {variants[selectedVariant].units_in_stock} left!
+    </h2>
+    : null}
+</div>
                 <div className="flex items-center space-x-3">
                   <div className="flex border border-gray-300 rounded-xl">
                     <button
-                      onClick={() =>
-                        setQuantity((prev) => Math.max(1, prev - 1))
-                      }
+                      onClick={() => handleUpdateQuantity('decrement')}
                       className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
-                      disabled={loading}
+                      disabled={loading || quantity <= 1}
                     >
                       -
                     </button>
@@ -683,9 +696,9 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                       {quantity}
                     </span>
                     <button
-                      onClick={() => setQuantity((prev) => prev + 1)}
+                      onClick={() => handleUpdateQuantity('increment')}
                       className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
-                      disabled={loading}
+                      disabled={loading || quantity >= (variants[selectedVariant]?.units_in_stock || 1)}
                     >
                       +
                     </button>

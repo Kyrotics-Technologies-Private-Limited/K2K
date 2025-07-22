@@ -8,4 +8,5 @@ export interface Variant {
     inStock: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+    units_in_stock:number;
   }

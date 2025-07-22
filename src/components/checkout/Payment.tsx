@@ -64,7 +64,7 @@ export const Payment = () => {
 
       // Create order payload
       const orderPayload = {
-        address_id: selectedAddress.id || "", // Add this line to fix the error
+        address_id: selectedAddress.id || selectedAddress.userId || "",
         address: {
           id: selectedAddress.id || "",
           user_id: selectedAddress.userId || "",
@@ -83,8 +83,8 @@ export const Payment = () => {
           pincode: selectedAddress.pincode,
         },
         items: itemsToCheckout.map((item) => ({
-          product_id: item.productId, // Changed from productId to product_id
-          variant_id: item.variantId, // Changed from variantId to variant_id
+          product_id: item.productId,
+          variant_id: item.variantId,
           quantity: item.quantity,
           name: item.product?.name || "",
           image: item.product?.images?.main || "",
