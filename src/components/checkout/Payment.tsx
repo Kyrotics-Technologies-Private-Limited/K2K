@@ -64,6 +64,7 @@ export const Payment = () => {
 
       // Create order payload
       const orderPayload = {
+ feature/debarati
         address_id: selectedAddress.id || selectedAddress.userId || "",
         address: {
           id: selectedAddress.id || "",
@@ -86,9 +87,9 @@ export const Payment = () => {
           product_id: item.productId,
           variant_id: item.variantId,
           quantity: item.quantity,
-          name: item.product?.name || '',
-          image: item.product?.images?.main || '',
-          variant_name: item.variant?.weight || '',
+          name: item.product?.name || "",
+          image: item.product?.images?.main || "",
+          variant_name: item.variant?.weight || "",
           unit_price: item.variant?.price || 0,
         })),
         payment_id: "asdasdlfkjlkasdfioeklj",
@@ -103,20 +104,23 @@ export const Payment = () => {
 
       // Remove buy now item from cart if needed (option C)
       if (buyNowItem) {
-        const removeInfo = sessionStorage.getItem('buyNowRemoveFromCart');
+        const removeInfo = sessionStorage.getItem("buyNowRemoveFromCart");
         if (removeInfo && activeCartId) {
           const { productId, variantId } = JSON.parse(removeInfo);
           // Find the cart item with matching productId and variantId
           const cartItem = cartItems.find(
-            (item) => item.productId === productId && item.variantId === variantId
+            (item) =>
+              item.productId === productId && item.variantId === variantId
           );
           if (cartItem) {
-            await dispatch(removeCartItem({
-              cartId: activeCartId,
-              itemId: cartItem.id,
-            })).unwrap();
+            await dispatch(
+              removeCartItem({
+                cartId: activeCartId,
+                itemId: cartItem.id,
+              })
+            ).unwrap();
           }
-          sessionStorage.removeItem('buyNowRemoveFromCart');
+          sessionStorage.removeItem("buyNowRemoveFromCart");
         }
       }
 
@@ -132,7 +136,9 @@ export const Payment = () => {
         window.location.href = response.payment_url;
       } else {
         // For COD, redirect to success page and pass paymentMethod and total
-        navigate(`/order-success`, { state: { paymentMethod, orderTotal: localOrderSummary.total } });
+        navigate(`/order-success`, {
+          state: { paymentMethod, orderTotal: localOrderSummary.total },
+        });
       }
     } catch (err) {
       setLocalError("Failed to place order. Please try again.");
