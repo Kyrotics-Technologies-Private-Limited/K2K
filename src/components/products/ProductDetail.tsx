@@ -8,7 +8,7 @@ import {
   Info,
   X,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Product } from "../../types";
 import { ProductCard } from "./ProductCard";
 import { ProductBadges } from "./Productbadge";
@@ -16,7 +16,12 @@ import { BenefitsBanner } from "./InformationBanner";
 import { HealthBenefits } from "./HealthBenefits";
 import RecognizedBy from "../homePageComponents/RecognizedBy";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { addToCart, createCart, setBuyNowItem, clearBuyNowItem } from "../../store/slices/cartSlice";
+import {
+  addToCart,
+  // createCart,
+  setBuyNowItem,
+  clearBuyNowItem,
+} from "../../store/slices/cartSlice";
 import VariantApi from "../../services/api/variantApi";
 import { Variant } from "../../types/variant";
 import { toast } from "react-toastify";
@@ -46,8 +51,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
-
-
 
   // Fetch variants when product changes
   useEffect(() => {
@@ -97,15 +100,13 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 
     let cartId = activeCartId;
     if (!cartId) {
-      toast.success('Please Refresh the browser')
+      toast.success("Please Refresh the browser");
     }
 
     setAddingToCart(true);
     setError(null);
 
     try {
-   
-
       const itemData: Partial<CartItem> = {
         productId: product.id,
         variantId: variants[selectedVariant].id,
@@ -188,11 +189,13 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
         variant: variants[selectedVariant],
       };
       // Add to cart as well (option A)
-      await dispatch(addToCart({
-        productId: product.id,
-        variantId: variants[selectedVariant].id,
-        quantity: quantity,
-      }));
+      await dispatch(
+        addToCart({
+          productId: product.id,
+          variantId: variants[selectedVariant].id,
+          quantity: quantity,
+        })
+      );
       // Clear any previous buy now session
       dispatch(clearBuyNowItem());
       // Reset checkout state (step, address, payment, etc.)
@@ -200,7 +203,13 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
       // Set the new buy now item
       dispatch(setBuyNowItem(buyNowItem));
       // Store info in sessionStorage for removal after order (option C)
-      sessionStorage.setItem('buyNowRemoveFromCart', JSON.stringify({ productId: product.id, variantId: variants[selectedVariant].id }));
+      sessionStorage.setItem(
+        "buyNowRemoveFromCart",
+        JSON.stringify({
+          productId: product.id,
+          variantId: variants[selectedVariant].id,
+        })
+      );
       // Navigate to checkout
       navigate("/checkout");
     } catch (err) {
@@ -324,62 +333,211 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   </p>
                 </div>
               ) : (
+                // <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
+                //   {variants.map((variant, index) => (
+                //     <button
+                //       key={variant.id}
+                //       onClick={() => setSelectedVariant(index)}
+                //       className={`button flex flex-col items-start p-3 rounded-lg w-full ${
+                //         selectedVariant === index
+                //           ? "bg-green-800 text-white"
+                //           : "bg-gray-50 hover:bg-gray-100"
+                //       } ${
+                //         !variant.inStock ? "opacity-50 cursor-not-allowed" : ""
+                //       }`}
+                //       disabled={!variant.inStock}
+                //     >
+                //       <div className="flex flex-col items-start w-full">
+                //         <div className="flex justify-between w-full items-start">
+                //           <span
+                //             className={`text-sm font-medium ${
+                //               selectedVariant === index
+                //                 ? "text-white"
+                //                 : "text-gray-900"
+                //             } mb-1`}
+                //           >
+                //             {variant.weight}
+                //           </span>
+                //         </div>
+                //         <div className="flex flex-wrap items-baseline gap-1 mb-1">
+                //           <span
+                //             className={`text-lg font-bold ${
+                //               selectedVariant === index
+                //                 ? "text-white"
+                //                 : "text-gray-900"
+                //             }`}
+                //           >
+                //             ₹{variant.price.toLocaleString("en-IN")}
+                //           </span>
+                //           {variant.originalPrice && (
+                //             <span className={`text-sm font-semibold line-through ${
+                //               selectedVariant === index
+                //                 ? "text-gray-300"
+                //                 : "text-gray-500"
+                //               }`}
+                //             >
+                //               ₹{variant.originalPrice.toLocaleString("en-IN")}
+                //             </span>
+                //           )}
+                //           {variant.discount && (
+                //             <span
+                //               className={`text-xs ${
+                //                 selectedVariant === index
+                //                   ? "text-white"
+                //                   : "text-red-600"
+                //               }`}
+                //             >
+                //               {variant.discount}% off
+                //             </span>
+                //           )}
+                //         </div>
+                //       </div>
+                //     </button>
+                //   ))}
+                // </div>
+
+                // <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
+                //   {variants.map((variant, index) => (
+                //     <button
+                //       key={variant.id}
+                //       onClick={() => setSelectedVariant(index)}
+                //       className={`button flex flex-col items-start p-3 rounded-lg w-full border-2 transition-all duration-200 ${
+                //         selectedVariant === index
+                //           ? "border-green-600 ring-2 ring-green-200 shadow-sm"
+                //           : "border-gray-200 hover:border-gray-300"
+                //       } ${
+                //         !variant.inStock ? "opacity-60 cursor-not-allowed" : ""
+                //       } bg-white`}
+                //       disabled={!variant.inStock}
+                //     >
+                //       <div className="flex flex-col items-start w-full">
+                //         <div className="flex justify-between w-full items-start">
+                //           <span
+                //             className={`text-sm font-medium ${
+                //               selectedVariant === index
+                //                 ? "text-green-800"
+                //                 : "text-gray-900"
+                //             } mb-1`}
+                //           >
+                //             {variant.weight}
+                //           </span>
+                //           {!variant.inStock && (
+                //             <span className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
+                //               Out of stock
+                //             </span>
+                //           )}
+                //         </div>
+                //         <div className="flex flex-wrap items-baseline gap-1 mb-1">
+                //           <span
+                //             className={`text-lg font-bold ${
+                //               selectedVariant === index
+                //                 ? "text-green-800"
+                //                 : "text-gray-900"
+                //             }`}
+                //           >
+                //             ₹{variant.price.toLocaleString("en-IN")}
+                //           </span>
+                //           {variant.originalPrice && (
+                //             <span
+                //               className={`text-sm font-medium line-through ${
+                //                 selectedVariant === index
+                //                   ? "text-green-600"
+                //                   : "text-gray-500"
+                //               }`}
+                //             >
+                //               ₹{variant.originalPrice.toLocaleString("en-IN")}
+                //             </span>
+                //           )}
+                //           {variant.discount && (
+                //             <span
+                //               className={`text-xs font-semibold ${
+                //                 selectedVariant === index
+                //                   ? "text-green-700"
+                //                   : "text-red-600"
+                //               }`}
+                //             >
+                //               {variant.discount}% off
+                //             </span>
+                //           )}
+                //         </div>
+                //       </div>
+                //     </button>
+                //   ))}
+                // </div>
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
-                  {variants.map((variant, index) => (
-                    <button
-                      key={variant.id}
-                      onClick={() => setSelectedVariant(index)}
-                      className={`button flex flex-col items-start p-3 rounded-lg w-full ${
-                        selectedVariant === index
-                          ? "bg-green-800 text-white"
-                          : "bg-gray-50 hover:bg-gray-100"
-                      } ${
-                        !variant.inStock ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
-                      disabled={!variant.inStock}
-                    >
-                      <div className="flex flex-col items-start w-full">
-                        <div className="flex justify-between w-full items-start">
-                          <span
-                            className={`text-sm font-medium ${
-                              selectedVariant === index
-                                ? "text-white"
-                                : "text-gray-900"
-                            } mb-1`}
-                          >
-                            {variant.weight}
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap items-baseline gap-1 mb-1">
-                          <span
-                            className={`text-lg font-bold ${
-                              selectedVariant === index
-                                ? "text-white"
-                                : "text-gray-900"
-                            }`}
-                          >
-                            ₹{variant.price.toLocaleString("en-IN")}
-                          </span>
-                          {variant.originalPrice && (
-                            <span className="text-sm font-semibold text-gray-500 line-through">
-                              ₹{variant.originalPrice.toLocaleString("en-IN")}
-                            </span>
-                          )}
-                          {variant.discount && (
+                  {variants.map((variant, index) => {
+                    const membershipPrice = variant.price * 0.85; // 15% discount for members
+                    return (
+                      <button
+                        key={variant.id}
+                        onClick={() => setSelectedVariant(index)}
+                        className={`button flex flex-col items-start p-3 rounded-lg w-full border-2 transition-all duration-200 ${
+                          selectedVariant === index
+                            ? "border-green-600 ring-2 ring-green-200 shadow-sm"
+                            : "border-gray-200 hover:border-gray-300"
+                        } ${
+                          !variant.inStock
+                            ? "opacity-60 cursor-not-allowed"
+                            : ""
+                        } bg-white`}
+                        disabled={!variant.inStock}
+                      >
+                        <div className="flex flex-col w-full space-y-1">
+                          {/* Variant weight and stock status */}
+                          <div className="flex justify-between w-full items-center">
                             <span
-                              className={`text-xs ${
+                              className={`text-sm font-medium ${
                                 selectedVariant === index
-                                  ? "text-white"
-                                  : "text-red-600"
+                                  ? "text-green-800"
+                                  : "text-gray-900"
                               }`}
                             >
-                              {variant.discount}% off
+                              {variant.weight}
                             </span>
-                          )}
+                            {!variant.inStock && (
+                              <span className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
+                                Out of stock
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Regular price */}
+                          <div className="flex flex-wrap items-baseline gap-1">
+                            <span className="text-lg font-bold text-gray-900">
+                              ₹{variant.price.toLocaleString("en-IN")}
+                            </span>
+                            {variant.originalPrice && (
+                              <span className="text-sm font-medium line-through text-gray-500">
+                                ₹{variant.originalPrice.toLocaleString("en-IN")}
+                              </span>
+                            )}
+                            {variant.discount && (
+                              <span className="text-xs font-semibold bg-red-50 text-red-600 px-1.5 py-0.5 rounded">
+                                {variant.discount}% off
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Compact Membership price */}
+                          <div className="flex items-baseline gap-1 mt-0.5">
+                            <Link
+                              to="/kishanParivarPage"
+                              className="flex items-baseline gap-1 hover:underline"
+                              onClick={(e) => e.stopPropagation()} // Prevent triggering the variant selection
+                            >
+                              <span className="text-sm font-bold text-green-700">
+                                ₹{membershipPrice.toLocaleString("en-IN")}
+                              </span>
+                              <span className="text-xs font-bold text-green-600">
+                                for KP Member
+                              </span>
+                            </Link>
+                          </div>
                         </div>
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>

@@ -2,7 +2,8 @@ import { useRef } from 'react';
 import KishanParivarForm from '../components/kishanParivar/KishanParivarForm';
 import KishanParivarHero from '../components/kishanParivar/KishanParivarHero';
 import FeaturesKishanParivar from '../components/kishanParivar/FeaturesKishanParivar';
-import TrialPackSection from '../components/kishanParivar/TrialPackSection';
+import MembershipStatusSection from '@/components/kishanParivar/MembershipStatusSecction';
+
 
 
 
@@ -21,7 +22,7 @@ const KishanParivarPage = () => {
     <div className="min-h-screen">
       <KishanParivarHero scrollToTarget={scrollToTarget}/>
       <FeaturesKishanParivar scrollToTarget={scrollToTarget} />
-      <TrialPackSection/>
+      <MembershipStatusSection/>
       <KishanParivarForm targetRef={targetRef} />
     </div>
     
