@@ -64,7 +64,6 @@ export const Payment = () => {
 
       // Create order payload
       const orderPayload = {
- feature/debarati
         address_id: selectedAddress.id || selectedAddress.userId || "",
         address: {
           id: selectedAddress.id || "",
