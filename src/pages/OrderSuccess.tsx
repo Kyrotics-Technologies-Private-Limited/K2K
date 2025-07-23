@@ -1,7 +1,6 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState,  useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "../store/store";
 import { orderApi } from "../services/api/orderApi";
 
 

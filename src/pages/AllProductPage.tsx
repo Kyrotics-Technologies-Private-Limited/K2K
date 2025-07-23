@@ -175,15 +175,15 @@ import { ProductGrid } from "../components/products/ProductGrid";
 import {
   Brain,
   Heart,
-  Leaf,
-  Scale,
-  Zap,
+  // Leaf,
+  // Scale,
+  // Zap,
   Weight,
   Utensils,
   Battery,
-  Moon,
-  Shield,
-  LucideMoveLeft,
+  // Moon,
+  // Shield,
+ 
 } from "lucide-react";
 import RecognizedBy from "../components/homePageComponents/RecognizedBy";
 import { productApi } from '../services/api/productApi'
@@ -255,50 +255,50 @@ const AllProductPage = () => {
     },
   ];
 
-  const naturalSolutions = [
-    {
-      title: "Brain Boost",
-      image: "/assets/solutions/brain.jpg",
-      description: "Enhanced Mental Clarity",
-      icon: <Brain className="w-8 h-8 text-green-700" />,
-    },
-    {
-      title: "Heart Care",
-      image: "/assets/solutions/heart.jpg",
-      description: "Cardiovascular Support",
-      icon: <Heart className="w-8 h-8 text-green-700" />,
-    },
-    {
-      title: "Gut Health",
-      image: "/assets/solutions/gut.jpg",
-      description: "Digestive Wellness",
-      icon: <Leaf className="w-8 h-8 text-green-700" />,
-    },
-    {
-      title: "Weight Balance",
-      image: "/assets/solutions/weight.jpg",
-      description: "Natural Weight Management",
-      icon: <Scale className="w-8 h-8 text-green-700" />,
-    },
-    {
-      title: "Energy Boost",
-      image: "/assets/solutions/energy.jpg",
-      description: "Natural Vitality",
-      icon: <Zap className="w-8 h-8 text-green-700" />,
-    },
-    {
-      title: "Sleep Better",
-      image: "/assets/solutions/sleep.jpg",
-      description: "Restful Natural Sleep",
-      icon: <Moon className="w-8 h-8 text-green-700" />,
-    },
-    {
-      title: "Immunity Shield",
-      image: "/assets/solutions/immunity.jpg",
-      description: "Natural Defense System",
-      icon: <Shield className="w-8 h-8 text-green-700" />,
-    },
-  ];
+  // const naturalSolutions = [
+  //   {
+  //     title: "Brain Boost",
+  //     image: "/assets/solutions/brain.jpg",
+  //     description: "Enhanced Mental Clarity",
+  //     icon: <Brain className="w-8 h-8 text-green-700" />,
+  //   },
+  //   {
+  //     title: "Heart Care",
+  //     image: "/assets/solutions/heart.jpg",
+  //     description: "Cardiovascular Support",
+  //     icon: <Heart className="w-8 h-8 text-green-700" />,
+  //   },
+  //   {
+  //     title: "Gut Health",
+  //     image: "/assets/solutions/gut.jpg",
+  //     description: "Digestive Wellness",
+  //     icon: <Leaf className="w-8 h-8 text-green-700" />,
+  //   },
+  //   {
+  //     title: "Weight Balance",
+  //     image: "/assets/solutions/weight.jpg",
+  //     description: "Natural Weight Management",
+  //     icon: <Scale className="w-8 h-8 text-green-700" />,
+  //   },
+  //   {
+  //     title: "Energy Boost",
+  //     image: "/assets/solutions/energy.jpg",
+  //     description: "Natural Vitality",
+  //     icon: <Zap className="w-8 h-8 text-green-700" />,
+  //   },
+  //   {
+  //     title: "Sleep Better",
+  //     image: "/assets/solutions/sleep.jpg",
+  //     description: "Restful Natural Sleep",
+  //     icon: <Moon className="w-8 h-8 text-green-700" />,
+  //   },
+  //   {
+  //     title: "Immunity Shield",
+  //     image: "/assets/solutions/immunity.jpg",
+  //     description: "Natural Defense System",
+  //     icon: <Shield className="w-8 h-8 text-green-700" />,
+  //   },
+  // ];
 
   return (
     <div className="bg-white">

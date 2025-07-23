@@ -19,7 +19,7 @@ interface CartDrawerProps {
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const {
-    cart,
+    // cart,
     cartItems,
     activeCartId,
     loading: cartLoading,
