@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search } from 'lucide-react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Product, FilterState, SortOption } from '../../types';
 import { ProductCard } from './ProductCard';
@@ -13,7 +12,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
   const [searchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState('All');
 
-  const [filters, setFilters] = useState<FilterState>({
+  const [filters] = useState<FilterState>({
     category: [],
     priceRange: [0, 10000],
     availability: ['in_stock', 'low_stock'],

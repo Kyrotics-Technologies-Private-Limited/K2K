@@ -20,7 +20,6 @@ import { addToCart,  setBuyNowItem, clearBuyNowItem } from "../../store/slices/c
 import VariantApi from "../../services/api/variantApi";
 import { Variant } from "../../types/variant";
 import { toast } from "react-toastify";
-// import { CartItem } from "@/types/cart";
 import { resetCheckout } from "@/store/slices/checkoutSlice";
 import { useAuth } from "../../context/AuthContext";
 import PhoneAuth from "../authComponents/PhoneAuth";
@@ -81,7 +80,26 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
         const fetchedVariants = await VariantApi.getVariantsByProductId(
           product.id
         );
-        setVariants(fetchedVariants);
+        // Sort variants by weight ascending (parse weight if needed)
+        // Parse weight/volume and convert to a comparable value (grams or millilitres)
+        const parseWeightOrVolume = (w: string) => {
+          if (!w) return 0;
+          // Match numbers and units (e.g., '500g', '1kg', '250mg', '1L', '500ml')
+          const match = w.match(/([\d.]+)\s*(kg|g|mg|l|ml)/i);
+          if (!match) return 0;
+          let value = parseFloat(match[1]);
+          let unit = match[2].toLowerCase();
+          // Weight units
+          if (unit === "kg") value *= 1000;
+          if (unit === "mg") value /= 1000;
+          // Volume units
+          if (unit === "l") value *= 1000;
+          // All values are now in grams or millilitres
+          return value;
+        };
+        const sortedVariants = [...fetchedVariants].sort((a, b) => parseWeightOrVolume(a.weight) - parseWeightOrVolume(b.weight));
+        setVariants(sortedVariants);
+        setVariants(sortedVariants);
         setError(null);
       } catch (err) {
         console.error("Error fetching variants:", err);
@@ -131,12 +149,14 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
     setError(null);
 
     try {
-      const itemData: Partial<CartItem> = {
-        productId: product.id,
-        variantId: variants[selectedVariant].id,
-        quantity,
-      };
-
+      // Dispatch addToCart to update Redux state
+      await dispatch(
+        addToCart({
+          productId: product.id,
+          variantId: variants[selectedVariant].id,
+          quantity: quantity,
+        })
+      );
 
       toast.success(
         <div className="flex items-center gap-3">
@@ -370,137 +390,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                   </p>
                 </div>
               ) : (
-                // <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
-                //   {variants.map((variant, index) => (
-                //     <button
-                //       key={variant.id}
-                //       onClick={() => setSelectedVariant(index)}
-                //       className={`button flex flex-col items-start p-3 rounded-lg w-full ${
-                //         selectedVariant === index
-                //           ? "bg-green-800 text-white"
-                //           : "bg-gray-50 hover:bg-gray-100"
-                //       } ${
-                //         !variant.inStock ? "opacity-50 cursor-not-allowed" : ""
-                //       }`}
-                //       disabled={!variant.inStock}
-                //     >
-                //       <div className="flex flex-col items-start w-full">
-                //         <div className="flex justify-between w-full items-start">
-                //           <span
-                //             className={`text-sm font-medium ${
-                //               selectedVariant === index
-                //                 ? "text-white"
-                //                 : "text-gray-900"
-                //             } mb-1`}
-                //           >
-                //             {variant.weight}
-                //           </span>
-                //         </div>
-                //         <div className="flex flex-wrap items-baseline gap-1 mb-1">
-                //           <span
-                //             className={`text-lg font-bold ${
-                //               selectedVariant === index
-                //                 ? "text-white"
-                //                 : "text-gray-900"
-                //             }`}
-                //           >
-                //             ₹{variant.price.toLocaleString("en-IN")}
-                //           </span>
-                //           {variant.originalPrice && (
-                //             <span className={`text-sm font-semibold line-through ${
-                //               selectedVariant === index
-                //                 ? "text-gray-300"
-                //                 : "text-gray-500"
-                //               }`}
-                //             >
-                //               ₹{variant.originalPrice.toLocaleString("en-IN")}
-                //             </span>
-                //           )}
-                //           {variant.discount && (
-                //             <span
-                //               className={`text-xs ${
-                //                 selectedVariant === index
-                //                   ? "text-white"
-                //                   : "text-red-600"
-                //               }`}
-                //             >
-                //               {variant.discount}% off
-                //             </span>
-                //           )}
-                //         </div>
-                //       </div>
-                //     </button>
-                //   ))}
-                // </div>
-
-                // <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
-                //   {variants.map((variant, index) => (
-                //     <button
-                //       key={variant.id}
-                //       onClick={() => setSelectedVariant(index)}
-                //       className={`button flex flex-col items-start p-3 rounded-lg w-full border-2 transition-all duration-200 ${
-                //         selectedVariant === index
-                //           ? "border-green-600 ring-2 ring-green-200 shadow-sm"
-                //           : "border-gray-200 hover:border-gray-300"
-                //       } ${
-                //         !variant.inStock ? "opacity-60 cursor-not-allowed" : ""
-                //       } bg-white`}
-                //       disabled={!variant.inStock}
-                //     >
-                //       <div className="flex flex-col items-start w-full">
-                //         <div className="flex justify-between w-full items-start">
-                //           <span
-                //             className={`text-sm font-medium ${
-                //               selectedVariant === index
-                //                 ? "text-green-800"
-                //                 : "text-gray-900"
-                //             } mb-1`}
-                //           >
-                //             {variant.weight}
-                //           </span>
-                //           {!variant.inStock && (
-                //             <span className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
-                //               Out of stock
-                //             </span>
-                //           )}
-                //         </div>
-                //         <div className="flex flex-wrap items-baseline gap-1 mb-1">
-                //           <span
-                //             className={`text-lg font-bold ${
-                //               selectedVariant === index
-                //                 ? "text-green-800"
-                //                 : "text-gray-900"
-                //             }`}
-                //           >
-                //             ₹{variant.price.toLocaleString("en-IN")}
-                //           </span>
-                //           {variant.originalPrice && (
-                //             <span
-                //               className={`text-sm font-medium line-through ${
-                //                 selectedVariant === index
-                //                   ? "text-green-600"
-                //                   : "text-gray-500"
-                //               }`}
-                //             >
-                //               ₹{variant.originalPrice.toLocaleString("en-IN")}
-                //             </span>
-                //           )}
-                //           {variant.discount && (
-                //             <span
-                //               className={`text-xs font-semibold ${
-                //                 selectedVariant === index
-                //                   ? "text-green-700"
-                //                   : "text-red-600"
-                //               }`}
-                //             >
-                //               {variant.discount}% off
-                //             </span>
-                //           )}
-                //         </div>
-                //       </div>
-                //     </button>
-                //   ))}
-                // </div>
+                
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
                   {variants.map((variant, index) => {
@@ -678,7 +568,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                 </div>
 <div>
   {variants[selectedVariant].units_in_stock <= 10 ?
-    <h2 className="text-green-900 font-extrabold animate-pulse text-base">
+    <h2 className="text-red-600 font-extrabold animate-bounce text-base">
       Hurry, only {variants[selectedVariant].units_in_stock} left!
     </h2>
     : null}
