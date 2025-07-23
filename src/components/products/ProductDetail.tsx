@@ -131,13 +131,6 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
     setError(null);
 
     try {
-      const itemData: Partial<CartItem> = {
-        productId: product.id,
-        variantId: variants[selectedVariant].id,
-        quantity,
-      };
-
-
       toast.success(
         <div className="flex items-center gap-3">
           <img
