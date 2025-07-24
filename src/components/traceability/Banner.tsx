@@ -15,7 +15,7 @@ const NatureTraceBannerContent: React.FC = () => {
       return;
     }
     window.open(
-      "https://yourcompanywebsite.com",
+      "https://k2ktraceability.netlify.app/customer",
       "_blank",
       "noopener,noreferrer"
     );
