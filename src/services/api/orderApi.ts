@@ -27,35 +27,40 @@ const createAuthConfig = async () => {
     headers: { Authorization: `Bearer ${token}` }
   };
 };
-export const orderApi = {
+
 // ✅ Create an order
-createOrder: async (
+const createOrder: (
   payload: CreateOrderPayload
-): Promise<CreateOrderResponse> => {
+) => Promise<CreateOrderResponse> = async (
+  payload: CreateOrderPayload
+) => {
   const config = await createAuthConfig();
   const response = await api.post<CreateOrderResponse>('/orders', payload, config);
   return response.data;
-},
+};
 
 // ✅ Get all orders of the current user
-getUserOrders : async (): Promise<Order[]> => {
+const getUserOrders: () => Promise<Order[]> = async (): Promise<Order[]> => {
   const config = await createAuthConfig();
   const response = await api.get<Order[]>('/orders', config);
   return response.data;
-},
+};
 
 // ✅ Get a single order by ID
-getOrderById : async (orderId: string): Promise<Order> => {
+const getOrderById: (orderId: string) => Promise<Order> = async (orderId: string): Promise<Order> => {
   const config = await createAuthConfig();
   const response = await api.get<Order>(`/orders/${orderId}`, config);
   return response.data;
-},
+};
 
 // ✅ Cancel an order
-cancelOrder : async (
+const cancelOrder: (
   orderId: string,
   payload?: CancelOrderPayload
-): Promise<{ message: string }> => {
+) => Promise<{ message: string }> = async (
+  orderId: string,
+  payload?: CancelOrderPayload
+) => {
   const config = await createAuthConfig();
   const response = await api.put<{ message: string }>(
     `/orders/${orderId}/cancel`,
@@ -63,13 +68,16 @@ cancelOrder : async (
     config
   );
   return response.data;
-},
+};
 
 // ✅ Update order status (for user if allowed)
-updateOrderStatus : async (
+const updateOrderStatus: (
   orderId: string,
   payload: UpdateOrderStatusPayload
-): Promise<{ message: string }> => {
+) => Promise<{ message: string }> = async (
+  orderId: string,
+  payload: UpdateOrderStatusPayload
+) => {
   const config = await createAuthConfig();
   const response = await api.put<{ message: string }>(
     `/orders/${orderId}/status`,
@@ -77,12 +85,39 @@ updateOrderStatus : async (
     config
   );
   return response.data;
-},
+};
 
 // ✅ Track order
-trackOrder : async (orderId: string): Promise<TrackingInfo> => {
+const trackOrder: (orderId: string) => Promise<TrackingInfo> = async (orderId: string): Promise<TrackingInfo> => {
   const config = await createAuthConfig();
   const response = await api.get<TrackingInfo>(`/orders/${orderId}/track`, config);
   return response.data;
-}
+};
+
+// Validate stock before placing order
+const validateOrderStock: (items: any[]) => Promise<any> = async (items: any[]) => {
+  try {
+    const token = await getAuthToken();
+    const response = await api.post(
+      '/orders/validate-stock',
+      { items },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error validating order stock:', error);
+    throw error;
+  }
+};
+
+export const orderApi = {
+  createOrder,
+  getUserOrders,
+  getOrderById,
+  cancelOrder,
+  updateOrderStatus,
+  trackOrder,
+  validateOrderStock,
 };

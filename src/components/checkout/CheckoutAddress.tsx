@@ -11,6 +11,7 @@ import { updateCartItem, removeCartItem } from "../../store/slices/cartSlice";
 import { Address } from "../../types/address";
 import { addressApi } from "../../services/api/addressApi";
 import { PlusCircle, Trash2, Plus, Minus } from "lucide-react";
+import { toast } from "react-toastify";
 
 export const CheckoutAddress = () => {
   const dispatch = useAppDispatch();
@@ -85,6 +86,27 @@ export const CheckoutAddress = () => {
   const handleUpdateQuantity = async (itemId: string, newQuantity: number) => {
     if (!activeCartId || newQuantity < 1 || itemLoading[itemId]) return;
 
+    // Find the cart item to get variant information
+    const cartItem = cartItems.find((item) => item.id === itemId);
+    if (!cartItem || !cartItem.variant) {
+      console.error("Cart item or variant not found");
+      return;
+    }
+
+    // Check stock availability before updating quantity
+    const variant = cartItem.variant;
+    if (!variant.inStock || variant.units_in_stock <= 0) {
+      toast.error("This variant is out of stock");
+      return;
+    }
+
+    if (newQuantity > variant.units_in_stock) {
+      toast.error(
+        `Only ${variant.units_in_stock} units available in stock. Requested: ${newQuantity}`
+      );
+      return;
+    }
+
     try {
       setItemLoading((prev) => ({ ...prev, [itemId]: true }));
       await dispatch(
@@ -94,8 +116,14 @@ export const CheckoutAddress = () => {
           itemData: { quantity: newQuantity },
         })
       ).unwrap();
-    } catch (error) {
-      console.error("Failed to update quantity:", error);
+    } catch (error: any) {
+      // Handle stock validation errors from server
+      if (error.message && error.message.includes("stock")) {
+        toast.error(error.message);
+      } else {
+        console.error("Failed to update quantity:", error);
+        toast.error("Failed to update item quantity");
+      }
     } finally {
       setItemLoading((prev) => ({ ...prev, [itemId]: false }));
     }
@@ -427,7 +455,17 @@ export const CheckoutAddress = () => {
                               handleUpdateQuantity(item.id, item.quantity + 1)
                             }
                             className="p-1 rounded-md hover:bg-gray-100"
-                            disabled={itemLoading[item.id]}
+                            disabled={
+                              itemLoading[item.id] ||
+                              (item.variant &&
+                                item.quantity >= item.variant.units_in_stock)
+                            }
+                            title={
+                              item.variant &&
+                              item.quantity >= item.variant.units_in_stock
+                                ? `Only ${item.variant.units_in_stock} available`
+                                : "Increase quantity"
+                            }
                           >
                             <Plus className="w-4 h-4" />
                           </button>

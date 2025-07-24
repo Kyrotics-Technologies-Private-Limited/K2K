@@ -10,6 +10,7 @@ import { updateCartItem, removeCartItem } from "../../store/slices/cartSlice";
 import { Address } from "../../types/address";
 import { addressApi } from "../../services/api/addressApi";
 import { PlusCircle, Trash2, Plus, Minus, Pencil } from "lucide-react";
+import { toast } from "react-toastify";
 
 // Indian states list
 const INDIAN_STATES = [
@@ -59,7 +60,7 @@ export const SelectStep = () => {
   const { buyNowItem, cartItems, activeCartId } = useAppSelector(
     (state) => state.cart
   );
-  const {  } = useAppSelector((state) => state.auth);
+  const {} = useAppSelector((state) => state.auth);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [itemLoading, setItemLoading] = useState<{ [key: string]: boolean }>(
@@ -131,6 +132,27 @@ export const SelectStep = () => {
   const handleUpdateQuantity = async (itemId: string, newQuantity: number) => {
     if (!activeCartId || newQuantity < 1 || itemLoading[itemId]) return;
 
+    // Find the cart item to get variant information
+    const cartItem = cartItems.find((item) => item.id === itemId);
+    if (!cartItem || !cartItem.variant) {
+      console.error("Cart item or variant not found");
+      return;
+    }
+
+    // Check stock availability before updating quantity
+    const variant = cartItem.variant;
+    if (!variant.inStock || variant.units_in_stock <= 0) {
+      toast.error("This variant is out of stock");
+      return;
+    }
+
+    if (newQuantity > variant.units_in_stock) {
+      toast.error(
+        `Only ${variant.units_in_stock} units available in stock. Requested: ${newQuantity}`
+      );
+      return;
+    }
+
     try {
       setItemLoading((prev) => ({ ...prev, [itemId]: true }));
       await dispatch(
@@ -140,8 +162,14 @@ export const SelectStep = () => {
           itemData: { quantity: newQuantity },
         })
       ).unwrap();
-    } catch (error) {
-      console.error("Failed to update quantity:", error);
+    } catch (error: any) {
+      // Handle stock validation errors from server
+      if (error.message && error.message.includes("stock")) {
+        toast.error(error.message);
+      } else {
+        console.error("Failed to update quantity:", error);
+        toast.error("Failed to update item quantity");
+      }
     } finally {
       setItemLoading((prev) => ({ ...prev, [itemId]: false }));
     }
@@ -285,6 +313,35 @@ export const SelectStep = () => {
       setError("No items to checkout");
       return;
     }
+
+    // Validate stock availability for all items before proceeding
+    for (const item of itemsToCheckout) {
+      if (!item.variant) {
+        setError(
+          `Variant information missing for ${item.product?.name || "item"}`
+        );
+        return;
+      }
+
+      if (!item.variant.inStock || item.variant.units_in_stock <= 0) {
+        setError(
+          `${item.product?.name || "Item"} (${
+            item.variant.weight
+          }) is out of stock`
+        );
+        return;
+      }
+
+      if (item.quantity > item.variant.units_in_stock) {
+        setError(
+          `${item.product?.name || "Item"} (${item.variant.weight}) - Only ${
+            item.variant.units_in_stock
+          } units available. Requested: ${item.quantity}`
+        );
+        return;
+      }
+    }
+
     // Always go to the first review step (step 2)
     dispatch(setStep(2));
   };
@@ -628,7 +685,18 @@ export const SelectStep = () => {
                                   )
                                 }
                                 className="button p-1 rounded-md hover:bg-gray-100"
-                                disabled={itemLoading[item.id]}
+                                disabled={
+                                  itemLoading[item.id] ||
+                                  (item.variant &&
+                                    item.quantity >=
+                                      item.variant.units_in_stock)
+                                }
+                                title={
+                                  item.variant &&
+                                  item.quantity >= item.variant.units_in_stock
+                                    ? `Only ${item.variant.units_in_stock} available`
+                                    : "Increase quantity"
+                                }
                               >
                                 <Plus className="w-4 h-4" />
                               </button>

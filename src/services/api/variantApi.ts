@@ -91,6 +91,27 @@ export const getVariantsByProductId = async (productId: string): Promise<Variant
   }
 };
 
+// Get latest stock information for multiple variants
+export const getLatestStockInfo = async (variants: { productId: string; variantId: string }[]) => {
+  try {
+    const stockPromises = variants.map(async ({ productId, variantId }) => {
+      const variant = await getVariantById(productId, variantId);
+      return {
+        productId,
+        variantId,
+        inStock: variant.inStock,
+        units_in_stock: variant.units_in_stock,
+        weight: variant.weight
+      };
+    });
+    
+    return await Promise.all(stockPromises);
+  } catch (error) {
+    console.error("Error fetching latest stock info:", error);
+    throw error;
+  }
+};
+
 // Export all functions as a single object
 const variantApi = {
   getVariants,

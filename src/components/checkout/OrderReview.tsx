@@ -1,12 +1,15 @@
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { setStep } from "../../store/slices/checkoutSlice";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { toast } from "react-toastify";
+import { orderApi } from "../../services/api/orderApi";
 
 export const OrderReview = () => {
   const dispatch = useAppDispatch();
   const { selectedAddress } = useAppSelector((state) => state.checkout);
   const { buyNowItem, cartItems } = useAppSelector((state) => state.cart);
   const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
+  const [isCheckingStock, setIsCheckingStock] = useState(false);
 
   // Local order summary calculation for itemsToCheckout
   const localOrderSummary = useMemo(() => {
@@ -27,8 +30,57 @@ export const OrderReview = () => {
     dispatch(setStep(1));
   };
 
-  const handleContinue = () => {
-    dispatch(setStep(3));
+  const handleContinue = async () => {
+    setIsCheckingStock(true);
+
+    try {
+      // Prepare items for stock validation
+      const itemsForValidation = itemsToCheckout.map((item) => ({
+        productId: item.productId,
+        variantId: item.variantId,
+        quantity: item.quantity,
+      }));
+
+      // Validate stock using server endpoint
+      const stockValidation = await orderApi.validateOrderStock(
+        itemsForValidation
+      );
+
+      if (!stockValidation.valid) {
+        // Show stock issues
+        const stockIssues = stockValidation.results
+          .filter((result: any) => !result.valid)
+          .map((result: any) => {
+            const item = itemsToCheckout.find(
+              (i) =>
+                i.productId === result.productId &&
+                i.variantId === result.variantId
+            );
+            const itemName = item?.product?.name || "Item";
+            const weight = result.weight || item?.variant?.weight || "Variant";
+
+            if (result.error === "Variant is out of stock") {
+              return `${itemName} (${weight}) - Out of stock`;
+            } else if (result.error === "Insufficient stock") {
+              return `${itemName} (${weight}) - Only ${result.currentStock} available. Requested: ${result.requestedQuantity}`;
+            } else {
+              return `${itemName} (${weight}) - ${result.error}`;
+            }
+          });
+
+        // Show all stock issues
+        stockIssues.forEach((issue: string) => toast.error(issue));
+        return;
+      }
+
+      // All stock checks passed, proceed to payment
+      dispatch(setStep(3));
+    } catch (error) {
+      console.error("Error checking stock:", error);
+      toast.error("Failed to verify stock availability. Please try again.");
+    } finally {
+      setIsCheckingStock(false);
+    }
   };
 
   return (
@@ -103,7 +155,9 @@ export const OrderReview = () => {
         <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span>Subtotal <span className="text-xs ">(including GST)</span></span>
+            <span>
+              Subtotal <span className="text-xs ">(including GST)</span>
+            </span>
             <span>₹{localOrderSummary.subtotal.toFixed(2)}</span>
           </div>
           {/* <div className="flex justify-between">
@@ -135,9 +189,10 @@ export const OrderReview = () => {
         </button>
         <button
           onClick={handleContinue}
-          className="button px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+          disabled={isCheckingStock}
+          className="w-2xl bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Continue to Payment
+          {isCheckingStock ? "Checking Stock..." : "Continue to Payment"}
         </button>
       </div>
     </div>

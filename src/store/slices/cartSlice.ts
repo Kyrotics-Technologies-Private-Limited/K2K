@@ -342,7 +342,12 @@ const cartSlice = createSlice({
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Failed to add item to cart";
+        // Handle stock validation errors specifically
+        if (action.error.message && action.error.message.includes("stock")) {
+          state.error = action.error.message;
+        } else {
+          state.error = action.error.message || "Failed to add item to cart";
+        }
       })
 
       // Update Item
@@ -369,7 +374,12 @@ const cartSlice = createSlice({
       })
       .addCase(updateCartItem.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Failed to update cart item";
+        // Handle stock validation errors specifically
+        if (action.error.message && action.error.message.includes("stock")) {
+          state.error = action.error.message;
+        } else {
+          state.error = action.error.message || "Failed to update cart item";
+        }
       })
 
       // Remove Item
