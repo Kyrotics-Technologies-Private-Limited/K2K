@@ -339,3 +339,4 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     </>
   );
 };
+

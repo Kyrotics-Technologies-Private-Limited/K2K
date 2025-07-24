@@ -42,6 +42,7 @@ import authReducer from "./slices/authSlice";
 import cartReducer from "./slices/cartSlice";
 import checkoutReducer from "./slices/checkoutSlice";
 import orderReducer from "./slices/orderSlice";
+import membershipReducer from "./slices/membershipSlice"; // << ADD THIS LINE
 
 export const store = configureStore({
   reducer: {
@@ -49,7 +50,7 @@ export const store = configureStore({
     cart: cartReducer,
     checkout: checkoutReducer,
     order: orderReducer,
-    // No membershipApi RTK slice here!
+    membership: membershipReducer,  // << REGISTER THE SLICE
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -65,6 +66,7 @@ export type AppDispatch = typeof store.dispatch;
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+
 
 
 
