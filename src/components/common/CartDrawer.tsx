@@ -11,6 +11,7 @@ import {
 } from "../../store/slices/cartSlice";
 import { CartItemSkeleton } from "./CartItemSkeleton";
 import PhoneAuth from "../authComponents/PhoneAuth";
+import { toast } from "react-toastify";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -75,6 +76,27 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const handleUpdateQuantity = async (itemId: string, newQuantity: number) => {
     if (!activeCartId || newQuantity < 1) return;
 
+    // Find the cart item to get variant information
+    const cartItem = cartItems.find((item) => item.id === itemId);
+    if (!cartItem || !cartItem.variant) {
+      console.error("Cart item or variant not found");
+      return;
+    }
+
+    // Check stock availability before updating quantity
+    const variant = cartItem.variant;
+    if (!variant.inStock || variant.units_in_stock <= 0) {
+      toast.error("This variant is out of stock");
+      return;
+    }
+
+    if (newQuantity > variant.units_in_stock) {
+      toast.error(
+        `Only ${variant.units_in_stock} units available in stock. Requested: ${newQuantity}`
+      );
+      return;
+    }
+
     try {
       setUpdatingItems((prev) => ({ ...prev, [itemId]: true }));
       await dispatch(
@@ -84,8 +106,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           itemData: { quantity: newQuantity },
         })
       ).unwrap();
-    } catch (err) {
-      console.error("Failed to update item:", err);
+    } catch (err: any) {
+      // Handle stock validation errors from server
+      if (err.message && err.message.includes("stock")) {
+        toast.error(err.message);
+      } else {
+        console.error("Failed to update item:", err);
+        toast.error("Failed to update item quantity");
+      }
     } finally {
       setUpdatingItems((prev) => ({ ...prev, [itemId]: false }));
     }
@@ -108,6 +136,34 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   };
 
   const handleCheckout = () => {
+    // Validate stock availability for all items before checkout
+    for (const item of cartItems) {
+      if (!item.variant) {
+        toast.error(
+          `Variant information missing for ${item.product?.name || "item"}`
+        );
+        return;
+      }
+
+      if (!item.variant.inStock || item.variant.units_in_stock <= 0) {
+        toast.error(
+          `${item.product?.name || "Item"} (${
+            item.variant.weight
+          }) is out of stock`
+        );
+        return;
+      }
+
+      if (item.quantity > item.variant.units_in_stock) {
+        toast.error(
+          `${item.product?.name || "Item"} (${item.variant.weight}) - Only ${
+            item.variant.units_in_stock
+          } units available. Requested: ${item.quantity}`
+        );
+        return;
+      }
+    }
+
     // Clear any previous buy now session before cart checkout
     dispatch(clearBuyNowItem());
     // Also reset checkout state to ensure step is 1 and no previous session remains
@@ -127,6 +183,26 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   // Calculate total items
   const getTotalItems = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
+  };
+
+  // Check if any items are out of stock
+  const hasOutOfStockItems = () => {
+    return cartItems.some(
+      (item) =>
+        !item.variant?.inStock ||
+        (item.variant?.units_in_stock || 0) <= 0 ||
+        item.quantity > (item.variant?.units_in_stock || 0)
+    );
+  };
+
+  // Get out of stock items for display
+  const getOutOfStockItems = () => {
+    return cartItems.filter(
+      (item) =>
+        !item.variant?.inStock ||
+        (item.variant?.units_in_stock || 0) <= 0 ||
+        item.quantity > (item.variant?.units_in_stock || 0)
+    );
   };
 
   const renderSkeletons = () => {
@@ -227,6 +303,21 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                           <p className="text-sm text-gray-500">
                             {item.variant?.weight || "Variant"}
                           </p>
+                          {/* Stock status indicators */}
+                          {item.variant && (
+                            <div className="mt-1">
+                              {!item.variant.inStock ||
+                              item.variant.units_in_stock <= 0 ? (
+                                <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
+                                  Out of Stock
+                                </span>
+                              ) : item.variant.units_in_stock <= 5 ? (
+                                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                                  Only {item.variant.units_in_stock} left
+                                </span>
+                              ) : null}
+                            </div>
+                          )}
                           <div className="mt-2 flex items-center justify-between">
                             <div className="flex items-center space-x-2">
                               <button
@@ -252,7 +343,18 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                                   )
                                 }
                                 className="p-1 hover:bg-gray-100 rounded"
-                                disabled={updatingItems[item.id]}
+                                disabled={
+                                  updatingItems[item.id] ||
+                                  (item.variant &&
+                                    item.quantity >=
+                                      item.variant.units_in_stock)
+                                }
+                                title={
+                                  item.variant &&
+                                  item.quantity >= item.variant.units_in_stock
+                                    ? `Only ${item.variant.units_in_stock} available`
+                                    : "Increase quantity"
+                                }
                               >
                                 <Plus className="button w-4 h-4" />
                               </button>
@@ -301,6 +403,27 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
           {!cartLoading && cartItems && cartItems.length > 0 && (
             <div className="border-t border-gray-200 px-6 py-4 space-y-4">
+              {/* Stock warnings */}
+              {hasOutOfStockItems() && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <h4 className="text-sm font-medium text-red-800 mb-2">
+                    Stock Issues Detected
+                  </h4>
+                  <div className="space-y-1">
+                    {getOutOfStockItems().map((item) => (
+                      <p key={item.id} className="text-xs text-red-700">
+                        • {item.product?.name || "Item"} (
+                        {item.variant?.weight || "Variant"}) -
+                        {!item.variant?.inStock ||
+                        (item.variant?.units_in_stock || 0) <= 0
+                          ? " Out of stock"
+                          : ` Only ${item.variant?.units_in_stock} available (requested: ${item.quantity})`}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center justify-between text-lg font-semibold">
                 <span>Total ({getTotalItems()} items)</span>
                 <span className="text-[#4A5D23]">
@@ -309,9 +432,16 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               </div>
               <button
                 onClick={handleCheckout}
-                className="button w-full bg-green-800 text-white py-3 rounded-lg hover:bg-[#3A4D13] transition-colors"
+                className={`button w-full py-3 rounded-lg transition-colors ${
+                  hasOutOfStockItems()
+                    ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                    : "bg-green-800 text-white hover:bg-[#3A4D13]"
+                }`}
+                disabled={hasOutOfStockItems()}
               >
-                Proceed to Checkout
+                {hasOutOfStockItems()
+                  ? "Cannot Checkout - Stock Issues"
+                  : "Proceed to Checkout"}
               </button>
             </div>
           )}
@@ -339,4 +469,3 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     </>
   );
 };
-
