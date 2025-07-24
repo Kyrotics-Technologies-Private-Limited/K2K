@@ -43,6 +43,7 @@ import VariantEditPage from "./pages/admin/VariantEditPage";
 import BlogPage from "./pages/BlogPage";
 import BlogDetailPage from "./pages/BlogDetailPage";
 import ScrollToTop from './components/common/ScrollToTop';
+import MembershipSuccess from "./pages/MembershipSuccess";
 
 
 const PublicLayout = () => {
@@ -89,10 +90,8 @@ function App() {
               <Route path="/product/:id" element={<ProductPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/order-success" element={<OrderSuccess />} />
-              <Route
-                path="/kishanParivarPage"
-                element={<KishanParivarPage />}
-              />
+              <Route path="/kishanParivarPage" element={<KishanParivarPage />}/>
+              <Route path="/membership-success" element={<MembershipSuccess />}/>
               <Route path="/register" element={<SignUp />} />
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
