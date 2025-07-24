@@ -1,4 +1,4 @@
-// import React, { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
@@ -14,9 +14,9 @@ const OrdersPage = () => {
     (state: RootState) => state.order
   );
 
-  // useEffect(() => {
-  //   dispatch(fetchOrders());
-  // }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchOrders());
+  }, [dispatch]);
 
   const handleCancelOrder = async (orderId: string) => {
     if (window.confirm("Are you sure you want to cancel this order?")) {
