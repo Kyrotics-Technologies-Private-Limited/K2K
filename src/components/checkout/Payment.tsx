@@ -10,6 +10,16 @@ import {
 import { orderApi } from "../../services/api/orderApi";
 import { deleteCart, removeCartItem } from "../../store/slices/cartSlice";
 
+// Extend the Window interface to include 'toast'
+declare global {
+  interface Window {
+    toast?: {
+      error: (content: React.ReactNode | string) => void;
+      [key: string]: any;
+    };
+  }
+}
+
 export const Payment = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -77,7 +87,7 @@ export const Payment = () => {
       );
 
       if (!stockValidation.valid) {
-        // Show stock issues
+        // Show stock issues with product image in toast
         const stockIssues = stockValidation.results
           .filter((result: any) => !result.valid)
           .map((result: any) => {
@@ -88,17 +98,39 @@ export const Payment = () => {
             );
             const itemName = item?.product?.name || "Item";
             const weight = result.weight || item?.variant?.weight || "Variant";
-
+            const image = item?.product?.images?.main;
+            let message = "";
             if (result.error === "Variant is out of stock") {
-              return `${itemName} (${weight}) - Out of stock`;
+              message = `${itemName} (${weight}) - Out of stock`;
             } else if (result.error === "Insufficient stock") {
-              return `${itemName} (${weight}) - Only ${result.currentStock} available. Requested: ${result.requestedQuantity}`;
+              message = `${itemName} (${weight}) - Only ${result.currentStock} available. Requested: ${result.requestedQuantity}`;
             } else {
-              return `${itemName} (${weight}) - ${result.error}`;
+              message = `${itemName} (${weight}) - ${result.error}`;
             }
+            // If image exists, return a JSX element for toast
+            if (image) {
+              return (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <img src={image} alt={itemName} style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }} />
+                  <span>{message}</span>
+                </div>
+              );
+            }
+            return message;
           });
 
-        setLocalError(`Stock issues detected: ${stockIssues.join(", ")}`);
+        // If any JSX, show toast, else setLocalError
+        if (stockIssues.some((issue: any) => typeof issue !== 'string')) {
+          stockIssues.forEach((issue: any) => {
+            if (typeof issue !== 'string') {
+              
+              window.toast ? window.toast.error(issue) : alert('Out of stock');
+            }
+          });
+          setLocalError(null);
+        } else {
+          setLocalError(` ${stockIssues.join(", ")}`);
+        }
         dispatch(setProcessing(false));
         return;
       }
