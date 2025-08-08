@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
-import KishanParivarForm from '../components/kishanParivar/KishanParivarForm';
+import KishanParivarForm from '../components/kishanParivar/KishanParivarplans';
 import KishanParivarHero from '../components/kishanParivar/KishanParivarHero';
 import FeaturesKishanParivar from '../components/kishanParivar/FeaturesKishanParivar';
 import MembershipStatusSection from '@/components/kishanParivar/MembershipStatusSecction';

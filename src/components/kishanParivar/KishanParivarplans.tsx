@@ -23,7 +23,7 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
   const [plans, setPlans] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const [subscribing, setSubscribing] = useState(false);
+  const [subscribingPlanId, setSubscribingPlanId] = useState<PlanType | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Fetch membership settings on mount
@@ -97,15 +97,9 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
     if (!user) {
       setShowLoginModal(true);
     } else {
-      try {
-        setSubscribing(true);
-        await membershipApi.subscribe(planId);
-        setSubscribing(false);
-        navigate("/membership-success");
-      } catch {
-        setSubscribing(false);
-        alert("Failed to subscribe, please try again.");
-      }
+      // Find the selected plan object
+      const selectedPlan = plans.find((p) => p.id === planId);
+      navigate("/membership-payment", { state: { plan: selectedPlan } });
     }
   };
 
@@ -286,10 +280,10 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
                   </div>
                   <button
                     className="button w-full py-3 px-6 rounded-xl font-semibold text-white bg-green-brand transition-all duration-300"
-                    disabled={subscribing || isLoading}
+                    disabled={subscribingPlanId === plan.id || isLoading}
                     onClick={() => handlePayNowClick(plan.id as PlanType)}
                   >
-                    {subscribing ? "Processing..." : "Pay Now"}
+                    {subscribingPlanId === plan.id ? "Processing..." : "Pay Now"}
                   </button>
                 </div>
               </div>
