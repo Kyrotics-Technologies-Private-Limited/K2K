@@ -28,7 +28,7 @@ const KishanParivarPage = () => {
         if (targetRef.current) {
           targetRef.current.scrollIntoView({ behavior: "smooth" });
         }
-      }, 500);
+      }, 1000);
     }
   }, [location.hash]);
 
