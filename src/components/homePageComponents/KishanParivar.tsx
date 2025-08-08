@@ -253,10 +253,10 @@ const KishanParivar: React.FC = () => {
             {/* Enhanced CTA */}
             <div className="flex flex-col sm:flex-row gap-4">
               <a
-                href="/kishanParivarPage"
+                href="/kishanParivarPage#membership-plans"
                 className="button bg-green-brand text-white font-semibold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg flex-1 text-center"
               >
-                Apply Now - ₹499/year
+                Subscribe Now
               </a>
               <button className="button border-2 border-green-brand text-green-brand hover:bg-green-50 font-medium py-3 px-6 rounded-lg transition-colors flex-1 text-center">
                 Learn More

@@ -26,7 +26,6 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
   const [error, setError] = useState<string | null>(null);
   const [variants, setVariants] = useState<Variant[]>([]);
   // const [quantity, setQuantity] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
 
   useEffect(() => {
     const fetchProductVariants = async () => {
@@ -35,9 +34,7 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
         const data = await VariantApi.getVariantsByProductId(product.id);
         setVariants(data);
         
-        if (data && data.length > 0) {
-          setSelectedVariant(data[0]);
-        }
+        // Variants loaded successfully
         
         setError(null);
       } catch (err) {
@@ -56,117 +53,6 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
     navigate(`/product/${product.id}`);
   };
 
-  // const handleQuantityDecrement = (e: React.MouseEvent) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  //   setQuantity(prev => Math.max(1, prev - 1));
-  // };
-
-  // const handleQuantityIncrement = (e: React.MouseEvent) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  //   setQuantity(prev => prev + 1);
-  // };
-
-  // const handleAddToCart = async (e: React.MouseEvent) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-
-  //   if (!selectedVariant) {
-  //     console.error("Cannot add to cart: No variant selected");
-  //     return;
-  //   }
-
-  //   let cartId = activeCartId;
-  //   if (!cartId) {
-  //     try {
-  //       const newCart = await dispatch(createCart()).unwrap();
-  //       activeCartId = newCart.id;
-  //     } catch (error) {
-  //       console.error("Failed to create cart:", error);
-  //       return;
-  //     }
-  //   }
-
-  //   setIsAddingToCart(true);
-  //   try {
-  //     const itemData = {
-  //       productId: product.id,
-  //       variantId: selectedVariant.id,
-  //       quantity: quantity,
-  //     };
-
-  //     const result = await dispatch(
-  //       addToCart({
-  //         cartId: activeCartId!,
-  //         itemData
-  //       })
-  //     ).unwrap();
-
-  //     toast.success(
-  //       <div className="flex items-center gap-3">
-  //         <img 
-  //           src={product.images.main} 
-  //           alt={product.name}
-  //           className="w-12 h-12 object-cover rounded"
-  //         />
-  //         <div className="flex-1">
-  //           <h3 className="font-medium mb-2">Added to Cart!</h3>
-  //           <p className="text-sm text-gray-600">{product.name}</p>
-  //           <div className="text-sm mt-2">
-  //             <span className="text-green-600">Qty: {quantity}</span>
-  //             <span className="mx-2">|</span>
-  //             <span>₹{(selectedVariant.price * quantity).toLocaleString('en-IN')}</span>
-  //           </div>
-  //         </div>
-  //       </div>,
-  //       {
-  //         position: "top-right",
-  //         autoClose: 3000,
-  //         hideProgressBar: false,
-  //         closeOnClick: true,
-  //         pauseOnHover: true,
-  //         draggable: true,
-  //       }
-  //     );
-      
-  //     if (onAddToCart) {
-  //       onAddToCart();
-  //     }
-  //     setQuantity(1);
-  //   } catch (error) {
-  //     console.error("Failed to add item to cart:", error);
-  //     toast.error("Failed to add item to cart");
-  //   } finally {
-  //     setIsAddingToCart(false);
-  //   }
-  // };
-
-  // const handleBuyNow = (e: React.MouseEvent) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-    
-  //   if (!selectedVariant || !activeCartId) {
-  //     console.error("Cannot buy now: No variant selected or no active cart");
-  //     return;
-  //   }
-    
-  //   const itemData = {
-  //     productId: product.id,
-  //     variantId: selectedVariant.id,
-  //     quantity: quantity,
-  //     price: selectedVariant.price
-  //   };
-    
-  //   dispatch(
-  //     addToCart({
-  //       cartId: activeCartId,
-  //       itemData
-  //     })
-  //   );
-  //   navigate("/checkout");
-  // };
-
   if (loading) {
     return (
       <div className="bg-white border-0.5 border-grey-50 rounded-md shadow-md p-4 h-full flex items-center justify-center">
@@ -183,8 +69,7 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
     );
   }
 
-  const basePrice = selectedVariant?.originalPrice || 0;
-  const discountedPrice = selectedVariant?.price || 0;
+  const lowestPriceVariant = variants.reduce((min, v) => (v.price < min.price ? v : min), variants[0] || null);
 
   return (
     <div className="group bg-white border-0.5 border-grey-50 rounded-md shadow-md overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md relative w-full">
@@ -200,6 +85,12 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           loading="lazy"
         />
+        {/* Show lowest price variant info */}
+        {lowestPriceVariant && (
+          <div className="text-xs text-gray-600 mb-1">
+            {lowestPriceVariant.weight}
+          </div>
+        )}
         <div className="absolute top-1.5 left-1.5 flex gap-0.5">
           <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-white/90 text-[#4A5D23]">
             {product.category}
@@ -239,15 +130,19 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
         </p>
 
         <div className="flex items-start justify-between mb-2">
-          <div className="flex flex-col">
+        <div className="flex flex-col">
             <div className="flex items-baseline gap-1.5">
               <span className="text-base font-bold text-black">
-                ₹{discountedPrice.toLocaleString("en-IN")}
+                ₹{lowestPriceVariant ? lowestPriceVariant.price.toLocaleString("en-IN") : "-"}
               </span>
-              <span className="text-xs line-through text-gray-500">
-                ₹{basePrice.toLocaleString("en-IN")}
-              </span>
-              <span className="text-xs text-green-800">{selectedVariant?.discount} off</span>
+              {lowestPriceVariant?.originalPrice && (
+                <span className="text-xs line-through text-gray-500">
+                  ₹{lowestPriceVariant.originalPrice.toLocaleString("en-IN")}
+                </span>
+              )}
+              {lowestPriceVariant?.discount && (
+                <span className="text-xs text-green-800">{lowestPriceVariant.discount}% off</span>
+              )}
             </div>
             {product.stockStatus === "out_of_stock" && (
               <span className="text-[10px] text-red-500 font-medium">

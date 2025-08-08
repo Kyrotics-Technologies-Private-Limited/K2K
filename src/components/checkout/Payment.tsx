@@ -61,10 +61,11 @@ export const Payment = () => {
 
   const handlePlaceOrder = async () => {
     if (!paymentMethod) {
-      setLocalError("Please select a payment method");
+      setLocalError("Please select a payment method to continue");
+      console.log("Payment method not selected, error set");
       return;
     }
-
+    setLocalError(null);
     if (!selectedAddress) {
       setLocalError("Missing required information");
       return;
@@ -219,6 +220,8 @@ export const Payment = () => {
     }
   };
 
+  console.log("Error state:", error);
+  
   return (
     <div className="max-w-4xl mx-auto p-4">
       {/* Final Order Summary */}
@@ -246,19 +249,12 @@ export const Payment = () => {
             <span>₹{localOrderSummary.total.toFixed(2)}</span>
           </div>
         </div>
-
-        {error && (
-          <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-md">
-            {error}
-          </div>
-        )}
       </div>
 
       {/* Payment Methods */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-4">Select Payment Method</h2>
-
-        <div className="space-y-4">
+         <h2 className="text-lg font-semibold mb-4">Select Payment Method</h2>
+         <div className="space-y-4">
           {/* Online Payment */}
           <div
             className={`border rounded-lg p-4 cursor-pointer transition-colors ${
@@ -315,7 +311,13 @@ export const Payment = () => {
             </div>
           </div>
         </div>
-      </div>
+      
+        {error && (
+          <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-md">
+            {error}
+          </div>
+        )}
+        </div>
 
       {/* Navigation Buttons */}
       <div className="flex justify-between mt-8">
@@ -328,7 +330,7 @@ export const Payment = () => {
         </button>
         <button
           onClick={handlePlaceOrder}
-          disabled={isProcessing || !paymentMethod}
+          disabled={isProcessing}
           className={`px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center ${
             isProcessing ? "opacity-50 cursor-not-allowed" : ""
           }`}

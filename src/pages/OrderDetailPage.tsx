@@ -66,11 +66,18 @@ const OrderDetailPage = () => {
 
   const handleCancelOrder = async () => {
     if (!order) return;
-    if (window.confirm("Are you sure you want to cancel this order?")) {
+    // Check if order can be cancelled
+    if (order.status === "cancelled" || order.status === "delivered") {
+      alert(`Order cannot be cancelled. Current status: ${order.status}`);
+      return;
+    }
+    if (window.confirm("Are you sure you want to cancel this order? This will restock the products in inventory.")) {
       try {
         await dispatch(cancelOrder(order.id)).unwrap();
+        alert("Order cancelled successfully and products have been restocked in inventory.");
       } catch (error) {
         console.error("Failed to cancel order:", error);
+        alert("Failed to cancel order. Please try again.");
       }
     }
   };

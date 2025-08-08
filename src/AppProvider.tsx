@@ -96,8 +96,7 @@
 
 
 import React, { useEffect, useState } from "react";
-import { Provider } from "react-redux";
-import { store, useAppDispatch } from "./store/store";
+import { useAppDispatch } from "./store/store";
 import { setUser, resetAuth } from "./store/slices/authSlice";
 import { initializeCart, fetchCartItems } from "./store/slices/cartSlice";
 import { auth } from "./services/firebase/firebase";
@@ -131,9 +130,14 @@ export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({
             })
           );
 
-          const result = await dispatch(initializeCart()).unwrap();
-          if (result.cart?.id) {
-            await dispatch(fetchCartItems(result.cart.id)).unwrap();
+          // Initialize cart after user signs in
+          try {
+            const result = await dispatch(initializeCart()).unwrap();
+            if (result.cart?.id) {
+              await dispatch(fetchCartItems(result.cart.id)).unwrap();
+            }
+          } catch (error) {
+            console.error("Error initializing cart for authenticated user:", error);
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -148,18 +152,24 @@ export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({
             })
           );
 
-          const result = await dispatch(initializeCart()).unwrap();
-          if (result.cart?.id) {
-            await dispatch(fetchCartItems(result.cart.id)).unwrap();
+          // Initialize cart after user signs in
+          try {
+            const result = await dispatch(initializeCart()).unwrap();
+            if (result.cart?.id) {
+              await dispatch(fetchCartItems(result.cart.id)).unwrap();
+            }
+          } catch (error) {
+            console.error("Error initializing cart for authenticated user:", error);
           }
         }
       } else {
         dispatch(resetAuth());
-
-        const result = await dispatch(initializeCart()).unwrap();
-        if (result.cart?.id) {
-          await dispatch(fetchCartItems(result.cart.id)).unwrap();
-        }
+        
+        // For unauthenticated users, we'll initialize cart when they try to add items
+        // Clear any existing cart data
+        localStorage.removeItem("cartId");
+        localStorage.removeItem("cart");
+        localStorage.removeItem("cartItems");
       }
 
       // ✅ Auth state has been resolved
@@ -182,11 +192,7 @@ export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({
 
 // Main App Provider to wrap the application with necessary context providers
 const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-  return (
-    <Provider store={store}>
-      <AuthInitializer>{children}</AuthInitializer>
-    </Provider>
-  );
+  return <AuthInitializer>{children}</AuthInitializer>;
 };
 
 export default AppProvider;
