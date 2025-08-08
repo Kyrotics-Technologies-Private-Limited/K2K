@@ -416,6 +416,7 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
   return (
     <div
       ref={targetRef}
+      id="membership-plans"
       className="relative min-h-screen flex items-center justify-center py-8 px-4 overflow-hidden"
       style={{
         backgroundImage:

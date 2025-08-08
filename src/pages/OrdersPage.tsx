@@ -1,11 +1,13 @@
-import React, { useEffect } from "react";
+import{ useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
-import { fetchOrders, cancelOrder } from "../store/slices/orderSlice";
+import { fetchOrders } from "../store/slices/orderSlice";
+import { orderApi } from "../services/api/orderApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PackageOpen, ShoppingCart, AlertTriangle } from "lucide-react";
+import { toast } from "react-toastify";
 
 const OrdersPage = () => {
   const navigate = useNavigate();
@@ -13,19 +15,53 @@ const OrdersPage = () => {
   const { orders, loading, error } = useSelector(
     (state: RootState) => state.order
   );
+  const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
 
   const handleCancelOrder = async (orderId: string) => {
-    if (window.confirm("Are you sure you want to cancel this order?")) {
-      try {
-        await dispatch(cancelOrder(orderId)).unwrap();
-      } catch (error) {
-        console.error("Failed to cancel order:", error);
-      }
+    // Find the order to check its status
+    const order = orders?.find(o => o.id === orderId);
+    if (!order) return;
+    
+    // Check if order can be cancelled
+    const orderStatus = order.status.toLowerCase();
+    const nonCancellableStatuses = ['cancelled', 'delivered', 'shipped'];
+    
+    if (nonCancellableStatuses.includes(orderStatus)) {
+      toast.error(`Order cannot be cancelled. Current status: ${order.status}`);
+      return;
     }
+    
+    // Show confirmation popup
+    setCancellingOrderId(orderId);
+    setShowCancelConfirm(true);
+  };
+
+  const confirmCancelOrder = async () => {
+    if (!cancellingOrderId) return;
+    
+    try {
+      await orderApi.cancelOrder(cancellingOrderId);
+      toast.success("Order cancelled successfully!");
+      // Refresh orders list
+      dispatch(fetchOrders());
+    } catch (error: any) {
+      console.error("Failed to cancel order:", error);
+      const errorMessage = error?.response?.data?.message || "Failed to cancel order. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setCancellingOrderId(null);
+      setShowCancelConfirm(false);
+    }
+  };
+
+  const cancelCancelOrder = () => {
+    setCancellingOrderId(null);
+    setShowCancelConfirm(false);
   };
 
   const handleViewOrder = (orderId: string) => {
@@ -178,7 +214,9 @@ const OrdersPage = () => {
                     <PackageOpen className="w-4 h-4 mr-1" />
                     View Details
                   </Button>
-                  {order.status.toLowerCase() === "processing" && (
+                  {order.status.toLowerCase() !== "cancelled" && 
+                   order.status.toLowerCase() !== "delivered" && 
+                   order.status.toLowerCase() !== "shipped" && (
                     <Button
                       variant="destructive"
                       size="sm"
@@ -194,6 +232,39 @@ const OrdersPage = () => {
           </Card>
         ))}
       </div>
+
+      {/* Cancel Order Confirmation Popup */}
+      {showCancelConfirm && (
+        <div className="fixed inset-0 backdrop-blur-sm  bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+            <div className="flex items-center mb-4">
+              <AlertTriangle className="h-6 w-6 text-red-500 mr-3" />
+              <h3 className="text-lg font-semibold text-gray-900">
+                Cancel Order
+              </h3>
+            </div>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to cancel this order? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={cancelCancelOrder}
+                className="button"
+              >
+                No, Keep Order
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmCancelOrder}
+                className="button"
+              >
+                Yes, Cancel Order
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

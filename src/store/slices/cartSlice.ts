@@ -183,8 +183,16 @@ export const addToCart = createAsyncThunk<
   async (itemData, { getState, dispatch }) => {
     let cartId = getState().cart.activeCartId;
     if (!cartId) {
-      const cart = await dispatch(fetchUserCart()).unwrap();
-      cartId = cart.id;
+      try {
+        // Try to get user cart first
+        const cart = await dispatch(fetchUserCart()).unwrap();
+        cartId = cart.id;
+      } catch (error) {
+        // If user cart fails, create a new cart
+        console.log("Creating new cart for user");
+        const cart = await dispatch(createCart()).unwrap();
+        cartId = cart.id;
+      }
     }
     const newItem = await cartApi.addCartItem(cartId, itemData);
     return fetchItemDetails(newItem);
