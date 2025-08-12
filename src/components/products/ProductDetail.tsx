@@ -527,8 +527,8 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                                   >
                                     <span className="text-sm font-bold text-green-700">
                                       ₹
-                                      {getFinalPrice(
-                                        variant.price
+                                      {Math.round(
+                                        variant.price - (variant.price * kpDiscount) / 100
                                       ).toLocaleString("en-IN")}
                                     </span>
                                     <span className="text-xs font-bold text-green-600">
