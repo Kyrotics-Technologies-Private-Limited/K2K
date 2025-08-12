@@ -127,6 +127,7 @@ export const SelectStep = () => {
 
   const handleSelectAddress = (address: Address) => {
     dispatch(setSelectedAddress(address));
+    setError(null); // Clear warning when address is selected
   };
 
   const handleUpdateQuantity = async (itemId: string, newQuantity: number) => {
@@ -739,10 +740,7 @@ export const SelectStep = () => {
                 </span>
                 <span>₹{localOrderSummary.subtotal.toFixed(2)}</span>
               </div>
-              {/* <div className="flex justify-between">
-                <span>GST (18%)</span>
-                <span>₹{localOrderSummary.tax.toFixed(2)}</span>
-              </div> */}
+              
               <div className="flex justify-between">
                 <span>Shipping</span>
                 <span>

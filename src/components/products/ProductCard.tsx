@@ -57,19 +57,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
     navigate(`/product/${product.id}`);
   };
 
-  // const handleQuantityDecrement = (e: React.MouseEvent) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  //   setQuantity(prev => Math.max(1, prev - 1));
-  // };
-
-  // const handleQuantityIncrement = (e: React.MouseEvent) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  //   setQuantity(prev => prev + 1);
-  // };
-
-  // Remove handleAddToCart and handleBuyNow since they are unused
+ 
 
   if (loading) {
     return (

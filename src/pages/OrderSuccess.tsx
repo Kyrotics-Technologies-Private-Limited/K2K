@@ -2,6 +2,7 @@ import { useState,  useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
 import { orderApi } from "../services/api/orderApi";
+// import { toast } from "react-toastify";
 
 
 
@@ -22,7 +23,7 @@ export const OrderSuccess = () => {
       setLoading(true);
       orderApi.getOrderById(orderId)
         .then((data) => setOrder(data))
-        .catch((err) => setError("Failed to fetch order details."))
+        .catch((_err) => setError("Failed to fetch order details."))
         .finally(() => setLoading(false));
     }
   }, [orderId]);
@@ -67,6 +68,14 @@ export const OrderSuccess = () => {
                       : "Online Payment"}
                   </dd>
                 </div>
+                {order?.status && (
+                  <div className="flex justify-between">
+                    <dt className="text-sm text-gray-600">Order Status</dt>
+                    <dd className="text-sm font-medium text-gray-900">
+                      {order.status}
+                    </dd>
+                  </div>
+                )}
               </dl>
             )}
           </div>
