@@ -44,6 +44,7 @@ import BlogPage from "./pages/BlogPage";
 import BlogDetailPage from "./pages/BlogDetailPage";
 import ScrollToTop from './components/common/ScrollToTop';
 import MembershipSuccess from "./pages/MembershipSuccess";
+import MembershipPayment from "./pages/MembershipPayment";
 
 
 const PublicLayout = () => {
@@ -91,6 +92,7 @@ function App() {
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/order-success" element={<OrderSuccess />} />
               <Route path="/kishanParivarPage" element={<KishanParivarPage />}/>
+              <Route path="/membership-payment" element={<MembershipPayment />}/>
               <Route path="/membership-success" element={<MembershipSuccess />}/>
               <Route path="/register" element={<SignUp />} />
               <Route path="/login" element={<Login />} />

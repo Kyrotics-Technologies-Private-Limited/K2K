@@ -7,9 +7,9 @@ const MembershipSuccess: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-tr from-green-100 to-green-200"
+      className="min-h-screen flex flex-col items-center justify-center bg-white border border-green-200"
     >
-      <div className="bg-white rounded-2xl shadow-2xl px-8 py-12 max-w-lg w-full flex flex-col items-center">
+      <div className="bg-white rounded-2xl shadow-2xl px-8 py-12 max-w-lg w-full flex flex-col items-center border border-green-200">
         <CheckCircle className="w-16 h-16 text-green-600 mb-4"/>
         <h1 className="text-3xl font-bold mb-2 text-green-700 text-center">
           Membership Activated!
@@ -24,7 +24,7 @@ const MembershipSuccess: React.FC = () => {
         >
           Start Shopping
         </button>
-        <span className="text-sm text-gray-400 mt-6">
+        <span className="text-sm text-green-700 mt-6">
           Thank you for supporting natural products and local farmers!
         </span>
       </div>

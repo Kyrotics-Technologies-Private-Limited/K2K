@@ -43,7 +43,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
   onAddToCart,
 }) => {
   const dispatch = useAppDispatch();
-  const { activeCartId } = useAppSelector((state) => state.cart);
+  // const { activeCartId } = useAppSelector((state) => state.cart);
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [variants, setVariants] = useState<Variant[]>([]);
@@ -173,9 +173,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
       return;
     }
 
-    if (!activeCartId) {
-      toast.success("Please Refresh the browser");
-    }
+    // Cart will be created automatically if it doesn't exist
     setAddingToCart(true);
     setError(null);
     try {
