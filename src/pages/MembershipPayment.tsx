@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { membershipApi } from "../services/api/membershipApi";
+import { MembershipPlan } from "../types/membership";
 
 const MembershipPayment: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   // Get selected plan from navigation state
-  const plan = location.state?.plan;
+  const plan = location.state?.plan as MembershipPlan;
   const [paymentMethod, setPaymentMethod] = useState<"card" | "upi" | "credit" | "debit" | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,19 +71,19 @@ const MembershipPayment: React.FC = () => {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-600">Plan Name:</span>
-                <span className="font-semibold text-green-700">{plan.name}</span>
+                <span className="font-semibold text-green-700">{plan.type}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Duration:</span>
-                <span className="font-semibold">{plan.duration}</span>
+                <span className="font-semibold">{plan.duration} {plan.duration === 1 ? 'Month' : 'Months'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Final Price:</span>
-                <span className="font-bold text-xl text-green-700">{plan.price}</span>
+                <span className="font-bold text-xl text-green-700">₹{plan.price}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Discount:</span>
-                <span className="font-semibold text-green-600">{plan.discount}</span>
+                <span className="font-semibold text-green-600">{plan.discountPercentage}%</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Benefits:</span>
@@ -261,7 +262,7 @@ const MembershipPayment: React.FC = () => {
                 Processing Payment...
               </>
             ) : (
-              `Proceed to Pay (${plan.price})`
+              `Proceed to Pay (₹${plan.price})`
             )}
           </button>
         </div>

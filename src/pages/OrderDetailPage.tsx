@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
@@ -21,6 +21,7 @@ const OrderDetailPage = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  const [invoiceGenerated, setInvoiceGenerated] = useState(false);
 
   const {
     currentOrder: order,
@@ -33,6 +34,14 @@ const OrderDetailPage = () => {
       dispatch(fetchOrderById(orderId));
     }
   }, [dispatch, orderId]);
+
+  // Initialize invoice generated flag from localStorage when order loads
+  useEffect(() => {
+    if (order?.id) {
+      const key = `invoice_generated_${order.id}`;
+      setInvoiceGenerated(localStorage.getItem(key) === "1");
+    }
+  }, [order?.id]);
 
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
@@ -67,7 +76,7 @@ const OrderDetailPage = () => {
   const handleCancelOrder = async () => {
     if (!order) return;
     // Check if order can be cancelled
-    if (order.status === "cancelled" || order.status === "delivered") {
+    if (order.status.toLowerCase() === "cancelled" || order.status.toLowerCase() === "delivered") {
       alert(`Order cannot be cancelled. Current status: ${order.status}`);
       return;
     }
@@ -94,13 +103,32 @@ const OrderDetailPage = () => {
 
   const calculatedSubtotal =
     order?.items?.reduce(
-      (sum, item) => sum + (item.unit_price || 0) * (item.quantity || 0),
+      (sum, item) => {
+        const itemPrice = (item.quantity || 0) * (item.unit_price || 0);
+        
+        // Apply KP member discount if it exists
+        if (order.kp_discount_percentage && order.kp_discount_percentage > 0) {
+          const discountedItemPrice = Math.floor(itemPrice - (itemPrice * order.kp_discount_percentage) / 100);
+          return sum + discountedItemPrice;
+        }
+        
+        return sum + itemPrice;
+      },
       0
     ) || 0;
   const calculatedShipping = calculatedSubtotal > 500 ? 0 : 40;
 
   const handleDownloadInvoice = () => {
     if (!order) return;
+    // Only allow once per order and only if delivered
+    if (order.status.toLowerCase() !== "delivered") {
+      return;
+    }
+    const key = `invoice_generated_${order.id}`;
+    if (invoiceGenerated) {
+      alert("Invoice already generated for this order.");
+      return;
+    }
 
     const doc = new jsPDF();
 
@@ -184,9 +212,20 @@ const OrderDetailPage = () => {
 
       //  Summary
       doc.setFontSize(11);
-      doc.text(`Subtotal: ₹${calculatedSubtotal}`, 14, finalY + 10);
-      doc.text(`Shipping: ₹${calculatedShipping}`, 14, finalY + 16);
-      doc.text(`Total Amount: ₹${order.total_amount}`, 14, finalY + 22);
+      doc.text(`Subtotal (after KP discount): ₹${calculatedSubtotal}`, 14, finalY + 10);
+      
+      // Add KP Member Discount information to invoice
+      if (order.kp_discount_amount && order.kp_discount_amount > 0) {
+        doc.text(`Original Subtotal: ₹${(calculatedSubtotal + order.kp_discount_amount).toFixed(2)}`, 14, finalY + 16);
+        doc.text(`KP Member Discount (${order.kp_discount_percentage}%): -₹${order.kp_discount_amount.toFixed(2)}`, 14, finalY + 22);
+        doc.text(`Subtotal after discount: ₹${calculatedSubtotal}`, 14, finalY + 28);
+        doc.text(`Shipping: ₹${calculatedShipping}`, 14, finalY + 34);
+        doc.text(`Total Amount: ₹${order.total_amount}`, 14, finalY + 40);
+        doc.text(`Total Saved: ₹${order.kp_discount_amount.toFixed(2)}`, 14, finalY + 46);
+      } else {
+        doc.text(`Shipping: ₹${calculatedShipping}`, 14, finalY + 16);
+        doc.text(`Total Amount: ₹${order.total_amount}`, 14, finalY + 22);
+      }
 
       // Payment Info
       // if (order.payment) {
@@ -205,7 +244,9 @@ const OrderDetailPage = () => {
       // Static fallback transaction ID
       const transactionId = order.payment?.transaction_id || "TXN_K2K_123456";
 
-      doc.text(`Transaction ID: ${transactionId}`, 14, finalY + 50);
+      // Adjust transaction ID position based on whether KP discount exists
+      const transactionY = order.kp_discount_amount && order.kp_discount_amount > 0 ? finalY + 56 : finalY + 32;
+      doc.text(`Transaction ID: ${transactionId}`, 14, transactionY);
 
       // Thank-you Footer
       doc.setFontSize(10);
@@ -222,6 +263,9 @@ const OrderDetailPage = () => {
       );
 
       doc.save(`Invoice_${order.id.slice(-6)}.pdf`);
+      // Mark as generated once
+      localStorage.setItem(key, "1");
+      setInvoiceGenerated(true);
     };
 
     // ✅ Load logo image
@@ -316,9 +360,27 @@ const OrderDetailPage = () => {
                       <p className="text-sm text-gray-600">
                         Quantity: {item.quantity}
                       </p>
-                      <p className="text-sm font-medium">
-                        ₹{item.quantity * (item.unit_price || 0)}
-                      </p>
+                       {/* Show pricing with KP member discount */}
+                       {order.kp_discount_amount && order.kp_discount_amount > 0 && order.kp_discount_percentage ? (
+                         <div className="space-y-1">
+                           {/* Original price (crossed out) */}
+                           <p className="text-sm text-gray-500 line-through">
+                             ₹{item.quantity * (item.unit_price || 0)}
+                           </p>
+                           {/* KP Member price */}
+                           <p className="text-lg font-semibold text-green-600">
+                             KP Member ({order.kp_discount_percentage}% off): ₹{Math.floor((item.quantity * (item.unit_price || 0)) - ((item.quantity * (item.unit_price || 0)) * order.kp_discount_percentage / 100))}
+                           </p>
+                           {/* Savings amount */}
+                           <p className="text-xs text-green-600">
+                             Save ₹{Math.floor((item.quantity * (item.unit_price || 0)) * order.kp_discount_percentage / 100)}
+                           </p>
+                         </div>
+                       ) : (
+                         <p className="text-sm font-medium">
+                           ₹{item.quantity * (item.unit_price || 0)}
+                         </p>
+                       )}
                     </div>
                   </div>
                 ))}
@@ -400,14 +462,37 @@ const OrderDetailPage = () => {
                   <span className="text-gray-600">Subtotal</span>
                   <span>₹{calculatedSubtotal}</span>
                 </div>
+                
+                {/* Show KP Member Discount Information */}
+                {order.kp_discount_amount && order.kp_discount_amount > 0 && (
+                  <>
+                    <div className="flex justify-between py-2 border-b text-gray-500">
+                      <span>Original Subtotal</span>
+                      <span className="line-through">₹{(calculatedSubtotal + order.kp_discount_amount).toFixed(2)}</span>
+                    </div>
+                    {/* <div className="flex justify-between py-2 border-b text-green-600">
+                      <span>KP Member Discount ({order.kp_discount_percentage}%)</span>
+                      <span>-₹{order.kp_discount_amount.toFixed(2)}</span>
+                    </div> */}
+                  </>
+                )}
                 <div className="flex justify-between py-2 border-b">
                   <span className="text-gray-600">Shipping</span>
                   <span>₹{calculatedShipping}</span>
                 </div>
-                <div className="flex justify-between py-2 font-medium">
+                <div className="flex justify-between border-b py-2 font-medium">
                   <span>Total</span>
                   <span>₹{order.total_amount}</span>
                 </div>
+                
+                {/* Show total savings for KP members */}
+                {order.kp_discount_amount && order.kp_discount_amount > 0 && (
+                  <div className="flex justify-between py-2  text-green-600 font-medium">
+                    <span>Total Saved with KP Membership</span>
+                    <span>₹{order.kp_discount_amount.toFixed(2)}</span>
+                  </div>
+                )}
+                
 
                 {/* Payment Information */}
                 {order.payment && (
@@ -439,6 +524,8 @@ const OrderDetailPage = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Invoice Information removed as per requirement */}
               </div>
               {order.status.toLowerCase() === "processing" && (
                 <Button
@@ -449,15 +536,21 @@ const OrderDetailPage = () => {
                   Cancel Order
                 </Button>
               )}
-
+              {/* Invoice Download Button - keep button only */}
               <Button
                 variant="outline"
-                className="w-full mt-2 bg-green-600 text-white hover:bg-green-700"
+                className={`w-full mt-2 ${
+                  order.status.toLowerCase() === "delivered" && !invoiceGenerated
+                    ? "bg-green-600 text-white hover:bg-green-700"
+                    : "bg-gray-600  border-gray-900 text-black cursor-not-allowed"
+                }`}
                 onClick={handleDownloadInvoice}
+                disabled={order.status.toLowerCase() !== "delivered" || invoiceGenerated}
               >
                 <FileDown className="h-4 w-4 mr-2" />
-                Download Invoice
+                {invoiceGenerated ? "Invoice Generated Successfully" : "Download Invoice"}
               </Button>
+              
             </CardContent>
           </Card>
         </div>

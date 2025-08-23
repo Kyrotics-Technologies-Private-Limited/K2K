@@ -60,6 +60,10 @@ export interface Order {
   created_at: string;
   updated_at: string;
   tracking_number?: string;
+  // KP Membership discount fields
+  kp_discount_percentage?: number;
+  kp_discount_amount?: number;
+  original_total?: number;
 }
 
 export interface TrackingEvent {

@@ -139,10 +139,20 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
   const isMember = !!(
     membershipStatus?.isMember && membershipStatus.membershipEnd
   );
-  const kpDiscount = kpSettings?.discountPercentage ?? 0;
+  
+  // Get discount percentage - prioritize user's membership discount, then fallback to plans
+  const kpDiscount = membershipStatus?.discountPercentage ?? 
+    (kpSettings && kpSettings.length > 0 ? kpSettings[0].discountPercentage : 0);
+  
   const getFinalPrice = (regularPrice: number) =>
     isMember && kpDiscount > 0
-      ? Math.round(regularPrice - (regularPrice * kpDiscount) / 100)
+      ? Math.floor(regularPrice - (regularPrice * kpDiscount) / 100)
+      : regularPrice;
+
+  // Helper function to get KP member price for non-members
+  const getKPMemberPrice = (regularPrice: number) =>
+    kpDiscount > 0
+      ? Math.floor(regularPrice - (regularPrice * kpDiscount) / 100)
       : regularPrice;
 
   const handleAddToCart = async (e: React.MouseEvent) => {
@@ -518,14 +528,14 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                               {kpDiscount > 0 && (
                                 <div className="flex items-baseline gap-1 mt-0.5">
                                   <Link
-                                    to="/kishanParivarPage"
+                                    to="/kishan-parivar"
                                     className="flex items-baseline gap-1 hover:underline"
                                     style={{ color: "#15803d" }}
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     <span className="text-sm font-bold text-green-700">
                                       ₹
-                                      {getFinalPrice(
+                                      {getKPMemberPrice(
                                         variant.price
                                       ).toLocaleString("en-IN")}
                                     </span>
@@ -616,8 +626,20 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                                 </div>
                               )}
                               {!isMember && kpDiscount > 0 && (
-                                <div className="text-xs text-green-800">
-                                  Become a KP member for instant savings!
+                                <div className="space-y-2">
+                                  <div className="flex justify-between items-center border-b pb-2">
+                                    <span className="text-sm text-gray-600">
+                                      KP Member Price
+                                    </span>
+                                    <span className="text-base font-bold text-green-800">
+                                      ₹{getKPMemberPrice(variants[selectedVariant].price).toLocaleString("en-IN")}
+                                    </span>
+                                  </div>
+                                  <div className="text-xs text-green-800 bg-green-50 p-2 rounded">
+                                    <strong>Become a KP member for instant savings!</strong>
+                                    <br />
+                                    Save ₹{(variants[selectedVariant].price - getKPMemberPrice(variants[selectedVariant].price)).toLocaleString("en-IN")} on this product
+                                  </div>
                                 </div>
                               )}
                             </div>
@@ -626,6 +648,27 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                       </div>
                     </div>
                   </div>
+                  
+                  {/* KP Member Price for Regular Users */}
+                  {!isMember && kpDiscount > 0 && (
+                    <div className="mt-3 flex items-center gap-2">
+                      <span className="text-lg font-medium text-gray-600">
+                        KP Member Price:
+                      </span>
+                      <span className="text-xl font-bold text-green-700">
+                        ₹{getKPMemberPrice(variants[selectedVariant].price).toLocaleString("en-IN")}
+                      </span>
+                      <span className="text-sm font-medium text-green-600">
+                        (Save {kpDiscount}%)
+                      </span>
+                      <Link
+                        to="/kishanParivarPage"
+                        className="ml-2 text-sm font-medium text-green-700 hover:text-green-800 underline"
+                      >
+                        Become a Member
+                      </Link>
+                    </div>
+                  )}
                 </div>
                 {variants[selectedVariant].units_in_stock <= 10 && (
                   <h2 className="text-red-600 font-extrabold animate-bounce text-base">

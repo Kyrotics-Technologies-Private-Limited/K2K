@@ -12,6 +12,8 @@ import {
 import { CartItemSkeleton } from "./CartItemSkeleton";
 import PhoneAuth from "../authComponents/PhoneAuth";
 import { toast } from "react-toastify";
+import { membershipApi } from "../../services/api/membershipApi";
+import { MembershipStatus } from "../../types/membership";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -38,8 +40,54 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   // Login modal state
   const [showLoginModal, setShowLoginModal] = useState(false);
 
+  // Membership state
+  const [membershipStatus, setMembershipStatus] = useState<MembershipStatus | null>(null);
+  const [kpDiscount, setKpDiscount] = useState<number>(0);
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  // Fetch membership status when user is authenticated
+  useEffect(() => {
+    const fetchMembership = async () => {
+      if (isAuthenticated) {
+        try {
+          const status = await membershipApi.getStatus();
+          // console.log("Membership status:", status);
+          setMembershipStatus(status);
+          
+          // Get discount from user's membership status
+          let discount = status.discountPercentage || 0;
+          
+          // If no discount in user status, try to get it from membership plans
+          if (discount === 0) {
+            try {
+              const plans = await membershipApi.getPlans();
+              if (plans && plans.length > 0) {
+                // Use the first plan's discount as fallback
+                discount = plans[0].discountPercentage || 0;
+                console.log("Using fallback discount from plans:", discount);
+              }
+            } catch (planError) {
+              console.error("Failed to fetch membership plans for fallback:", planError);
+            }
+          }
+          
+          // console.log("Setting KP discount:", discount);
+          setKpDiscount(discount);
+        } catch (error) {
+          console.error("Failed to fetch membership status:", error);
+          setMembershipStatus(null);
+          setKpDiscount(0);
+        }
+      } else {
+        setMembershipStatus(null);
+        setKpDiscount(0);
+      }
+    };
+
+    fetchMembership();
+  }, [isAuthenticated]);
 
   // Initial cart restoration - only if user is authenticated
   useEffect(() => {
@@ -72,6 +120,46 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       setShowLoginModal(false);
     }
   }, [isAuthenticated, showLoginModal]);
+
+  // Helper function to calculate KP member price (similar to ProductDetail)
+  const getKPMemberPrice = (regularPrice: number) => {
+    if (kpDiscount > 0) {
+      const discountedPrice = Math.floor(regularPrice - (regularPrice * kpDiscount) / 100);
+      return discountedPrice;
+    }
+    return regularPrice;
+  };
+
+  // Function to get the effective discount percentage
+  const getEffectiveDiscount = () => {
+    // First try to get from user's membership status
+    if (membershipStatus?.discountPercentage && membershipStatus.discountPercentage > 0) {
+      return membershipStatus.discountPercentage;
+    }
+    
+    // Fallback to the kpDiscount state (which includes plans fallback)
+    return kpDiscount;
+  };
+
+  // Check if user is a KP member (similar to ProductDetail logic)
+  const isKPMember = !!(membershipStatus?.isMember && membershipStatus.membershipEnd);
+
+  // Get the effective discount for calculations
+  const effectiveDiscount = getEffectiveDiscount();
+
+  // console.log("CartDrawer Debug:", {
+  //   isKPMember,
+  //   kpDiscount,
+  //   effectiveDiscount,
+  //   membershipStatus,
+  //   cartItemsLength: cartItems.length,
+  //   membershipDetails: {
+  //     isMember: membershipStatus?.isMember,
+  //     membershipEnd: membershipStatus?.membershipEnd,
+  //     membershipType: membershipStatus?.membershipType,
+  //     discountPercentage: membershipStatus?.discountPercentage
+  //   }
+  // });
 
   const handleUpdateQuantity = async (itemId: string, newQuantity: number) => {
     if (!activeCartId || newQuantity < 1) return;
@@ -172,8 +260,17 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     navigate("/checkout");
   };
 
-  // Calculate cart total
+  // Calculate cart total with KP member discount
   const calculateTotal = () => {
+    return cartItems.reduce((total, item) => {
+      const price = item.variant?.price || 0;
+      const discountedPrice = isKPMember ? getKPMemberPrice(price) : price;
+      return total + discountedPrice * item.quantity;
+    }, 0);
+  };
+
+  // Calculate original total without discount
+  const calculateOriginalTotal = () => {
     return cartItems.reduce((total, item) => {
       const price = item.variant?.price || 0;
       return total + price * item.quantity;
@@ -371,12 +468,65 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                         <div className="text-right">
                           {item.variant && (
                             <>
-                              <p className="font-medium text-[#4A5D23]">
-                                ₹
-                                {(
-                                  item.variant.price * item.quantity
-                                ).toLocaleString("en-IN")}
-                              </p>
+                              {/* {console.log("Cart item price rendering:", {
+                                itemId: item.id,
+                                isKPMember,
+                                effectiveDiscount,
+                                variantPrice: item.variant.price,
+                                quantity: item.quantity,
+                                shouldShowKPPrice: isKPMember && effectiveDiscount > 0
+                              })} */}
+                              {isKPMember && effectiveDiscount > 0 ? (
+                                <>
+                                  {/* KP Member Price */}
+                                  <p className="font-medium text-[#4A5D23]">
+                                    ₹
+                                    {(
+                                      getKPMemberPrice(item.variant.price) * item.quantity
+                                    ).toLocaleString("en-IN")}
+                                  </p>
+                                  {/* Original Price (crossed out) */}
+                                  <p className="text-xs text-gray-500 line-through">
+                                    ₹
+                                    {(
+                                      item.variant.price * item.quantity
+                                    ).toLocaleString("en-IN")}
+                                  </p>
+                                  {/* KP Member Badge */}
+                                  <p className="text-xs text-green-600 font-medium">
+                                    KP Member ({effectiveDiscount}% off)
+                                  </p>
+                                  {/* Savings amount */}
+                                  <p className="text-xs text-green-700">
+                                    Save ₹{((item.variant.price - getKPMemberPrice(item.variant.price)) * item.quantity).toLocaleString("en-IN")}
+                                  </p>
+                                </>
+                              ) : (
+                                <>
+                                  {/* Regular Price */}
+                                  <p className="font-medium text-[#4A5D23]">
+                                    ₹
+                                    {(
+                                      item.variant.price * item.quantity
+                                    ).toLocaleString("en-IN")}
+                                  </p>
+                                  {/* Show KP Member Price for non-members if discount is available */}
+                                  {effectiveDiscount > 0 && (
+                                    <>
+                                      <p className="text-xs text-green-600">
+                                        KP Member: ₹
+                                        {(
+                                          getKPMemberPrice(item.variant.price) * item.quantity
+                                        ).toLocaleString("en-IN")}
+                                      </p>
+                                      <p className="text-xs text-gray-500">
+                                        Save {effectiveDiscount}%
+                                      </p>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                              {/* Existing variant discount display */}
                               {item.variant.discount! > 0 && (
                                 <p className="text-xs text-gray-500 line-through">
                                   ₹
@@ -426,10 +576,58 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
               <div className="flex items-center justify-between text-lg font-semibold">
                 <span>Total ({getTotalItems()} items)</span>
-                <span className="text-[#4A5D23]">
-                  ₹{calculateTotal().toLocaleString("en-IN")}
-                </span>
+                <div className="text-right">
+                  {isKPMember && effectiveDiscount > 0 ? (
+                    <>
+                      <span className="text-[#4A5D23]">
+                        ₹{calculateTotal().toLocaleString("en-IN")}
+                      </span>
+                      <div className="text-sm text-gray-500 line-through">
+                        ₹{calculateOriginalTotal().toLocaleString("en-IN")}
+                      </div>
+                    </>
+                  ) : (
+                    <span className="text-[#4A5D23]">
+                      ₹{calculateTotal().toLocaleString("en-IN")}
+                    </span>
+                  )}
+                </div>
               </div>
+              
+              {/* KP Member Discount Summary */}
+              {isKPMember && effectiveDiscount > 0 && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-green-800 font-medium">
+                      KP Member Discount ({effectiveDiscount}%)
+                    </span>
+                    <span className="text-green-700 font-bold">
+                      -₹{(calculateOriginalTotal() - calculateTotal()).toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                </div>
+              )}
+              
+              {/* KP Member Promotion for Non-Members */}
+              {!isKPMember && effectiveDiscount > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="text-sm text-blue-800">
+                    <div className="font-medium mb-1">Become a KP Member!</div>
+                    <div className="text-xs">
+                      Save {effectiveDiscount}% on all products. 
+                      <button
+                        onClick={() => {
+                          onClose();
+                          navigate("/kishanParivarPage");
+                        }}
+                        className="ml-1 text-blue-600 hover:text-blue-800 underline font-medium"
+                      >
+                        Join Now
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
               <button
                 onClick={handleCheckout}
                 className={`button w-full py-3 rounded-lg transition-colors ${
