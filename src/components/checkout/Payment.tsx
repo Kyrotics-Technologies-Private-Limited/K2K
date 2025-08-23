@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import {
@@ -126,7 +126,7 @@ export const Payment = () => {
 
       // Create order payload
       const orderPayload = {
-        address: selectedAddress,
+        address_id: selectedAddress.id,
         items: itemsToCheckout.map((item) => ({
           product_id: item.productId,
           variant_id: item.variantId,
