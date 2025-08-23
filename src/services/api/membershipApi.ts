@@ -1,5 +1,5 @@
 import api from './api';
-import { MembershipSettings, MembershipStatus } from '../../types/membership';
+import { MembershipSettings, MembershipPlan, MembershipStatus } from '../../types/membership';
 import { getAuth } from "firebase/auth";
 
 // Helper to get current user's auth token
@@ -21,9 +21,21 @@ const createAuthConfig = async () => {
 };
 
 export const membershipApi = {
-  // Get current membership plan/settings (no auth required)
+  // Get current membership plans (no auth required) - Updated to return array
   getSettings: async (): Promise<MembershipSettings> => {
     const response = await api.get<MembershipSettings>('/membership/settings');
+    return response.data;
+  },
+
+  // Get all membership plans (no auth required) - New method
+  getPlans: async (): Promise<MembershipPlan[]> => {
+    const response = await api.get<MembershipPlan[]>('/membership/plans');
+    return response.data;
+  },
+
+  // Get specific membership plan by ID (no auth required) - New method
+  getPlanById: async (id: string): Promise<MembershipPlan> => {
+    const response = await api.get<MembershipPlan>(`/membership/plan/${id}`);
     return response.data;
   },
 
@@ -34,10 +46,10 @@ export const membershipApi = {
     return response.data;
   },
 
-  // Subscribe to a membership plan (auth required)
-  subscribe: async (planType: "monthly" | "quarterly" | "yearly"): Promise<{ message: string }> => {
+  // Subscribe to a membership plan (auth required) - Updated to handle new structure
+  subscribe: async (planType: string): Promise<{ message: string; discountPercentage: number; duration: number }> => {
     const config = await createAuthConfig();
-    const response = await api.post<{ message: string }>(
+    const response = await api.post<{ message: string; discountPercentage: number; duration: number }>(
       '/membership/subscribe',
       { planType },
       config

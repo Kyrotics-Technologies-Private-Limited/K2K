@@ -23,7 +23,7 @@ declare global {
 export const Payment = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { selectedAddress, paymentMethod, isProcessing } = useAppSelector(
+  const { selectedAddress, paymentMethod, isProcessing, orderSummary } = useAppSelector(
     (state) => state.checkout
   );
   const { activeCartId, cartItems, buyNowItem } = useAppSelector(
@@ -31,20 +31,8 @@ export const Payment = () => {
   );
   const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
 
-  // Local order summary calculation for itemsToCheckout
-  const localOrderSummary = useMemo(() => {
-    const subtotal = itemsToCheckout.reduce((total, item) => {
-      return total + (item.variant?.price || 0) * item.quantity;
-    }, 0);
-    const tax = 0; // GST removed
-    const shipping = subtotal > 500 ? 0 : 40;
-    return {
-      subtotal,
-      tax,
-      shipping,
-      total: subtotal + shipping,
-    };
-  }, [itemsToCheckout]);
+  // Check if user is a KP member
+  const isKPMember = orderSummary.kpDiscountPercentage > 0 && orderSummary.kpDiscountAmount > 0;
 
   const [error, setLocalError] = useState<string | null>(null);
 
@@ -138,24 +126,7 @@ export const Payment = () => {
 
       // Create order payload
       const orderPayload = {
-        address_id: selectedAddress.id || selectedAddress.userId || "",
-        address: {
-          id: selectedAddress.id || "",
-          user_id: selectedAddress.userId || "",
-          first_name: selectedAddress.name || "",
-          last_name: "", // You can split name if needed
-          street: selectedAddress.appartment || "",
-          city: "", // Fill if you have city
-          state: selectedAddress.state,
-          postal_code: selectedAddress.pincode,
-          country: selectedAddress.country,
-          phone: selectedAddress.phone,
-          email: "", // Fill if you have email
-          appartment: selectedAddress.appartment,
-          name: selectedAddress.name,
-          address: selectedAddress.address,
-          pincode: selectedAddress.pincode,
-        },
+        address: selectedAddress,
         items: itemsToCheckout.map((item) => ({
           product_id: item.productId,
           variant_id: item.variantId,
@@ -166,8 +137,12 @@ export const Payment = () => {
           unit_price: item.variant?.price || 0,
         })),
         payment_id: "asdasdlfkjlkasdfioeklj",
-        total_amount: localOrderSummary.total,
+        total_amount: orderSummary.total,
         payment_method: paymentMethod,
+        // KP Member discount information
+        kp_discount_percentage: orderSummary.kpDiscountPercentage,
+        kp_discount_amount: orderSummary.kpDiscountAmount,
+        original_total: orderSummary.originalTotal,
       };
 
       console.log("Order payload:", orderPayload);
@@ -210,7 +185,7 @@ export const Payment = () => {
       } else {
         // For COD, redirect to success page and pass paymentMethod and total
         navigate(`/order-success`, {
-          state: { paymentMethod, orderTotal: localOrderSummary.total },
+          state: { paymentMethod, orderTotal: orderSummary.total }, // Use orderSummary.total
         });
       }
     } catch (err) {
@@ -234,20 +209,48 @@ export const Payment = () => {
           </div>
           <div className="flex justify-between">
             <span>Subtotal</span>
-            <span>₹{localOrderSummary.subtotal.toFixed(2)}</span>
+            <span>₹{orderSummary.subtotal.toFixed(2)}</span>
           </div>
+          
+          {/* Show original subtotal for KP members */}
+          {isKPMember && (
+            <div className="flex justify-between text-gray-500">
+              <span>Original Subtotal</span>
+              <span className="line-through">₹{(orderSummary.subtotal + orderSummary.kpDiscountAmount).toFixed(2)}</span>
+            </div>
+          )}
+          
           <div className="flex justify-between">
             <span>Shipping</span>
             <span>
-              {localOrderSummary.shipping === 0
+              {orderSummary.shipping === 0
                 ? "Free"
-                : `₹${localOrderSummary.shipping.toFixed(2)}`}
+                : `₹${orderSummary.shipping.toFixed(2)}`}
             </span>
           </div>
           <div className="flex justify-between font-semibold text-lg pt-2 border-t">
             <span>Total</span>
-            <span>₹{localOrderSummary.total.toFixed(2)}</span>
+            <div className="text-right">
+              {isKPMember ? (
+                <>
+                  <span className="text-green-600">₹{orderSummary.total.toFixed(2)}</span>
+                  <div className="text-sm text-gray-500 line-through">
+                    ₹{orderSummary.originalTotal.toFixed(2)}
+                  </div>
+                </>
+              ) : (
+                <span>₹{orderSummary.total.toFixed(2)}</span>
+              )}
+            </div>
           </div>
+          
+          {/* Show total savings from KP membership */}
+          {isKPMember && (
+            <div className="flex justify-between text-green-600 font-medium pt-2 border-t">
+              <span>Total Saved with KP Membership</span>
+              <span>₹{orderSummary.kpDiscountAmount.toFixed(2)}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -360,7 +363,7 @@ export const Payment = () => {
               Processing...
             </>
           ) : (
-            `Place Order (₹${localOrderSummary.total.toFixed(2)})`
+            `Place Order (₹${orderSummary.total.toFixed(2)})`
           )}
         </button>
       </div>

@@ -6,25 +6,13 @@ import { orderApi } from "../../services/api/orderApi";
 
 export const OrderReview = () => {
   const dispatch = useAppDispatch();
-  const { selectedAddress } = useAppSelector((state) => state.checkout);
+  const { selectedAddress, orderSummary } = useAppSelector((state) => state.checkout);
   const { buyNowItem, cartItems } = useAppSelector((state) => state.cart);
   const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
   const [isCheckingStock, setIsCheckingStock] = useState(false);
 
-  // Local order summary calculation for itemsToCheckout
-  const localOrderSummary = useMemo(() => {
-    const subtotal = itemsToCheckout.reduce((total, item) => {
-      return total + (item.variant?.price || 0) * item.quantity;
-    }, 0);
-    const tax = 0; // GST removed
-    const shipping = subtotal > 500 ? 0 : 40;
-    return {
-      subtotal,
-      tax,
-      shipping,
-      total: subtotal + shipping,
-    };
-  }, [itemsToCheckout]);
+  // Check if user is a KP member
+  const isKPMember = orderSummary.kpDiscountPercentage > 0 && orderSummary.kpDiscountAmount > 0;
 
   const handleBack = () => {
     dispatch(setStep(1));
@@ -134,12 +122,22 @@ export const OrderReview = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">
+                    {/* Show original price (small) */}
+                    <p className="text-sm text-gray-500 line-through">
                       ₹{(item.variant?.price || 0) * item.quantity}
                     </p>
-                    {item.variant?.discount && item.variant.discount > 0 && (
+                    
+                    {/* Show KP Member Price for each item */}
+                    {isKPMember && (
                       <p className="text-sm text-green-600">
-                        {item.variant.discount}% off
+                        KP Member: ₹{Math.floor(((item.variant?.price || 0) * item.quantity) - (((item.variant?.price || 0) * item.quantity) * orderSummary.kpDiscountPercentage) / 100)}
+                      </p>
+                    )}
+                    
+                    {/* Show regular price if not KP member */}
+                    {!isKPMember && (
+                      <p className="text-lg font-semibold">
+                        ₹{(item.variant?.price || 0) * item.quantity}
                       </p>
                     )}
                   </div>
@@ -158,8 +156,17 @@ export const OrderReview = () => {
             <span>
               Subtotal <span className="text-xs ">(including GST)</span>
             </span>
-            <span>₹{localOrderSummary.subtotal.toFixed(2)}</span>
+            <span>₹{orderSummary.subtotal.toFixed(2)}</span>
           </div>
+          
+          {/* Show original subtotal for KP members */}
+          {isKPMember && (
+            <div className="flex justify-between text-gray-500">
+              <span>Original Subtotal</span>
+              <span className="line-through">₹{(orderSummary.subtotal + orderSummary.kpDiscountAmount).toFixed(2)}</span>
+            </div>
+          )}
+          
           {/* <div className="flex justify-between">
             <span>GST (18%)</span>
             <span>₹{localOrderSummary.tax.toFixed(2)}</span>
@@ -167,15 +174,34 @@ export const OrderReview = () => {
           <div className="flex justify-between">
             <span>Shipping</span>
             <span>
-              {localOrderSummary.shipping === 0
+              {orderSummary.shipping === 0
                 ? "Free"
-                : `₹${localOrderSummary.shipping.toFixed(2)}`}
+                : `₹${orderSummary.shipping.toFixed(2)}`}
             </span>
           </div>
           <div className="flex justify-between font-semibold text-lg pt-2 border-t">
             <span>Total</span>
-            <span>₹{localOrderSummary.total.toFixed(2)}</span>
+            <div className="text-right">
+              {isKPMember ? (
+                <>
+                  <span className="text-green-600">₹{orderSummary.total.toFixed(2)}</span>
+                  <div className="text-sm text-gray-500 line-through">
+                    ₹{orderSummary.originalTotal.toFixed(2)}
+                  </div>
+                </>
+              ) : (
+                <span>₹{orderSummary.total.toFixed(2)}</span>
+              )}
+            </div>
           </div>
+          
+          {/* Show total savings from KP membership */}
+          {isKPMember && (
+            <div className="flex justify-between text-green-600 font-medium pt-2 border-t">
+              <span>Total Saved with KP Membership</span>
+              <span>₹{orderSummary.kpDiscountAmount.toFixed(2)}</span>
+            </div>
+          )}
         </div>
       </div>
 

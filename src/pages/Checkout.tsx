@@ -6,13 +6,15 @@ import { OrderReview } from "../components/checkout/OrderReview";
 import { Payment } from "../components/checkout/Payment";
 import { updateOrderSummary } from "../store/slices/checkoutSlice";
 import { ShoppingBag } from "lucide-react";
+import { membershipApi } from "../services/api/membershipApi";
+import { MembershipStatus } from "../types/membership";
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { currentStep } = useAppSelector((state) => state.checkout);
   const { buyNowItem, cartItems } = useAppSelector((state) => state.cart);
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
   // Scroll to top when step changes
   useEffect(() => {
@@ -31,22 +33,92 @@ export const CheckoutPage = () => {
       return;
     }
 
-    // If buyNowItem exists, calculate summary for it, else for cart
-    const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
-    const subtotal = itemsToCheckout.reduce((total, item) => {
-      return total + (item.variant?.price || 0) * item.quantity;
-    }, 0);
-    const tax = subtotal * 0.18; // 18% GST
-    const shipping = subtotal > 500 ? 0 : 40; // Free shipping above ₹500
-    dispatch(
-      updateOrderSummary({
-        subtotal,
-        tax,
-        shipping,
-        total: subtotal + shipping,
-      })
-    );
-  }, [cartItems, buyNowItem, dispatch, navigate, user]);
+    // Calculate order summary with KP member discount
+    const calculateOrderSummary = async () => {
+      try {
+        // Get membership status
+        let kpDiscountPercentage = 0;
+        let isKPMember = false;
+        
+        if (isAuthenticated) {
+          try {
+            const membershipStatus: MembershipStatus = await membershipApi.getStatus();
+            isKPMember = !!(membershipStatus?.isMember && membershipStatus.membershipEnd);
+            
+            // Get discount percentage
+            if (membershipStatus?.discountPercentage && membershipStatus.discountPercentage > 0) {
+              kpDiscountPercentage = membershipStatus.discountPercentage;
+            } else {
+              // Fallback to plans if no discount in user status
+              try {
+                const plans = await membershipApi.getPlans();
+                if (plans && plans.length > 0) {
+                  kpDiscountPercentage = plans[0].discountPercentage || 0;
+                }
+              } catch (planError) {
+                console.error("Failed to fetch membership plans for fallback:", planError);
+              }
+            }
+          } catch (error) {
+            console.error("Failed to fetch membership status:", error);
+          }
+        }
+
+        // If buyNowItem exists, calculate summary for it, else for cart
+        const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
+        
+        // Calculate subtotal with KP member discount applied to each item individually
+        const subtotal = itemsToCheckout.reduce((total, item) => {
+          const itemPrice = (item.variant?.price || 0) * item.quantity;
+          
+          // Apply KP member discount to each item individually
+          if (isKPMember && kpDiscountPercentage > 0) {
+            const discountedItemPrice = Math.floor(itemPrice - (itemPrice * kpDiscountPercentage) / 100);
+            return total + discountedItemPrice;
+          }
+          
+          return total + itemPrice;
+        }, 0);
+        
+        const tax = subtotal * 0.18; // 18% GST
+        const shipping = subtotal > 500 ? 0 : 40; // Free shipping above ₹500
+        
+        // Calculate original total without discount for comparison
+        const originalSubtotal = itemsToCheckout.reduce((total, item) => {
+          return total + (item.variant?.price || 0) * item.quantity;
+        }, 0);
+        
+        // Calculate KP member discount amount using floor values for consistency
+        const kpDiscountAmount = isKPMember && kpDiscountPercentage > 0 
+          ? itemsToCheckout.reduce((total, item) => {
+              const itemPrice = (item.variant?.price || 0) * item.quantity;
+              const itemDiscount = Math.floor((itemPrice * kpDiscountPercentage) / 100);
+              return total + itemDiscount;
+            }, 0)
+          : 0;
+        
+        // Final total is discounted subtotal + shipping
+        const finalTotal = subtotal + shipping;
+        const originalTotal = originalSubtotal + shipping;
+
+        dispatch(
+          updateOrderSummary({
+            subtotal,
+            tax,
+            shipping,
+            total: finalTotal,
+            kpDiscountPercentage,
+            kpDiscountAmount,
+            originalTotal,
+          })
+        );
+      } catch (error) {
+        console.error("Error calculating order summary:", error);
+      }
+    };
+
+    calculateOrderSummary();
+  }, [cartItems, buyNowItem, dispatch, navigate, user, isAuthenticated]);
 
   if (cartItems.length === 0 && !buyNowItem) {
     return (

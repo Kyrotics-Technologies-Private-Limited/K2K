@@ -1,14 +1,20 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { membershipApi } from '../../services/api/membershipApi';
-import { MembershipSettings, MembershipStatus } from '../../types/membership';
+import { MembershipSettings, MembershipPlan, MembershipStatus } from '../../types/membership';
 import { RootState } from '../store';
 
 // Thunks
 
-// Fetch site-wide membership plan details (not user-specific)
+// Fetch site-wide membership plans (not user-specific) - Updated to return array
 export const fetchMembershipSettings = createAsyncThunk(
   'membership/fetchSettings',
   async () => await membershipApi.getSettings()
+);
+
+// Fetch all membership plans (not user-specific) - New thunk
+export const fetchMembershipPlans = createAsyncThunk(
+  'membership/fetchPlans',
+  async () => await membershipApi.getPlans()
 );
 
 // Fetch current user's membership status (requires auth)
@@ -17,10 +23,10 @@ export const fetchMembershipStatus = createAsyncThunk(
   async () => await membershipApi.getStatus()
 );
 
-// Subscribe user to a plan (and update status upon success)
+// Subscribe user to a plan (and update status upon success) - Updated to handle new structure
 export const subscribeMembership = createAsyncThunk<
-  { message: string },
-  { planType: 'monthly' | 'quarterly' | 'yearly' },
+  { message: string; discountPercentage: number; duration: number },
+  { planType: string },
   { dispatch: any }
 >(
   'membership/subscribe',
@@ -36,19 +42,25 @@ export const subscribeMembership = createAsyncThunk<
 export interface MembershipState {
   status: MembershipStatus | null;
   settings: MembershipSettings | null;
+  plans: MembershipPlan[] | null;
   loadingStatus: boolean;
   loadingSettings: boolean;
+  loadingPlans: boolean;
   errorStatus: string | null;
   errorSettings: string | null;
+  errorPlans: string | null;
 }
 
 const initialState: MembershipState = {
   status: null,
   settings: null,
+  plans: null,
   loadingStatus: false,
   loadingSettings: false,
+  loadingPlans: false,
   errorStatus: null,
   errorSettings: null,
+  errorPlans: null,
 };
 
 // Slice
@@ -59,8 +71,10 @@ export const membershipSlice = createSlice({
     clearMembershipState: (state) => {
       state.status = null;
       state.settings = null;
+      state.plans = null;
       state.errorStatus = null;
       state.errorSettings = null;
+      state.errorPlans = null;
     },
   },
   extraReducers: (builder) => {
@@ -77,6 +91,21 @@ export const membershipSlice = createSlice({
       .addCase(fetchMembershipSettings.rejected, (state, action) => {
         state.loadingSettings = false;
         state.errorSettings = action.error.message || 'Failed to fetch membership settings';
+      });
+
+    // Plans
+    builder
+      .addCase(fetchMembershipPlans.pending, (state) => {
+        state.loadingPlans = true;
+        state.errorPlans = null;
+      })
+      .addCase(fetchMembershipPlans.fulfilled, (state, action) => {
+        state.loadingPlans = false;
+        state.plans = action.payload;
+      })
+      .addCase(fetchMembershipPlans.rejected, (state, action) => {
+        state.loadingPlans = false;
+        state.errorPlans = action.error.message || 'Failed to fetch membership plans';
       });
 
     // Status
@@ -119,11 +148,27 @@ export default membershipSlice.reducer;
 // Selectors
 export const selectMembershipStatus = (state: RootState) => state.membership.status;
 export const selectMembershipSettings = (state: RootState) => state.membership.settings;
+export const selectMembershipPlans = (state: RootState) => state.membership.plans;
 export const selectIsMember = (state: RootState) => !!(state.membership.status?.isMember);
-export const selectKPDiscount = (state: RootState) => state.membership.settings?.discountPercentage || 0;
-export const selectKPPlanPrices = (state: RootState) => ({
-  monthly: state.membership.settings?.monthlyPrice,
-  quarterly: state.membership.settings?.quarterlyPrice,
-  yearly: state.membership.settings?.yearlyPrice,
-});
+export const selectKPDiscount = (state: RootState) => {
+  // Try to get discount from user's membership status first, then from plans
+  const userDiscount = state.membership.status?.discountPercentage;
+  if (userDiscount !== undefined) return userDiscount;
+  
+  // Fallback to first plan's discount if available
+  const firstPlan = state.membership.plans?.[0];
+  return firstPlan?.discountPercentage || 0;
+};
+export const selectKPPlanPrices = (state: RootState) => {
+  const plans = state.membership.plans || [];
+  return {
+    plans: plans.map(plan => ({
+      id: plan.id,
+      type: plan.type,
+      price: plan.price,
+      duration: plan.duration,
+      discountPercentage: plan.discountPercentage
+    }))
+  };
+};
 
