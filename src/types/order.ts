@@ -18,16 +18,14 @@ export interface OrderItem {
 
 export interface OrderAddress {
   id: string;
-  user_id: string;
-  first_name: string;
-  last_name: string;
-  street: string;
-  city: string;
+  userId?: string;
+  // street: string;
+  // city: string;
   state: string;
-  postal_code: string;
+  // postal_code: string;
   country: string;
   phone: string;
-  email: string;
+  // email: string;
   appartment?: string;        // Optional field for apartment/suite
   name?: string;            // Optional field for full name
   address: string;         // Optional field for full address
