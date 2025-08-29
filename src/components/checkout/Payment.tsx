@@ -127,6 +127,7 @@ export const Payment = () => {
       // Create order payload
       const orderPayload = {
         address_id: selectedAddress.id,
+        address: selectedAddress,
         items: itemsToCheckout.map((item) => ({
           product_id: item.productId,
           variant_id: item.variantId,

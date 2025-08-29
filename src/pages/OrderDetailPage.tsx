@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
@@ -13,6 +13,8 @@ import {
   AlertTriangle,
   Ban,
   FileDown,
+  ShoppingCart,
+  CheckCircle,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -21,13 +23,15 @@ const OrderDetailPage = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const [invoiceGenerated, setInvoiceGenerated] = useState(false);
-
   const {
     currentOrder: order,
     loading,
     error,
   } = useSelector((state: RootState) => state.order);
+
+  const [lastStatus, setLastStatus] = useState<string>("");
+  // const [ setStatusUpdateTime] = useState<string>("");
+  const [statusTimestamps, setStatusTimestamps] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (orderId) {
@@ -35,13 +39,42 @@ const OrderDetailPage = () => {
     }
   }, [dispatch, orderId]);
 
-  // Initialize invoice generated flag from localStorage when order loads
+  // Initialize order placed timestamp when order loads
   useEffect(() => {
-    if (order?.id) {
-      const key = `invoice_generated_${order.id}`;
-      setInvoiceGenerated(localStorage.getItem(key) === "1");
+    if (order?.created_at && !statusTimestamps['pending'] && !statusTimestamps['confirmed']) {
+      setStatusTimestamps(prev => ({
+        ...prev,
+        'pending': formatDate(order.created_at)
+      }));
     }
-  }, [order?.id]);
+  }, [order?.created_at, statusTimestamps]);
+
+  // Track status changes for real-time updates
+  useEffect(() => {
+    if (order?.status && order.status !== lastStatus) {
+      const currentTime = new Date().toLocaleString("en-IN");
+      setLastStatus(order.status);
+      // setStatusUpdateTime(currentTime);
+
+      // Store timestamp for the new status
+      setStatusTimestamps(prev => ({
+        ...prev,
+        [order.status.toLowerCase()]: currentTime
+      }));
+    }
+  }, [order?.status, lastStatus]);
+
+  // Auto-refresh order status every 30 seconds for real-time updates
+  const refreshOrderStatus = useCallback(() => {
+    if (orderId && order?.status !== "delivered" && order?.status !== "cancelled") {
+      dispatch(fetchOrderById(orderId));
+    }
+  }, [orderId, order?.status, dispatch]);
+
+  useEffect(() => {
+    const interval = setInterval(refreshOrderStatus, 30000); // 30 seconds
+    return () => clearInterval(interval);
+  }, [refreshOrderStatus]);
 
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
@@ -101,17 +134,43 @@ const OrderDetailPage = () => {
     });
   };
 
+  const formatTimestamp = (timestamp: string) => {
+    if (!timestamp) return "";
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) return timestamp; // Return as-is if invalid date
+
+      const now = new Date();
+      const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+
+      if (diffInHours < 1) {
+        return "Just now";
+      } else if (diffInHours < 24) {
+        return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+      } else {
+        return date.toLocaleDateString("en-IN", {
+          day: "numeric",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+    } catch (error) {
+      return timestamp;
+    }
+  };
+
   const calculatedSubtotal =
     order?.items?.reduce(
       (sum, item) => {
         const itemPrice = (item.quantity || 0) * (item.unit_price || 0);
-        
+
         // Apply KP member discount if it exists
         if (order.kp_discount_percentage && order.kp_discount_percentage > 0) {
           const discountedItemPrice = Math.floor(itemPrice - (itemPrice * order.kp_discount_percentage) / 100);
           return sum + discountedItemPrice;
         }
-        
+
         return sum + itemPrice;
       },
       0
@@ -120,13 +179,8 @@ const OrderDetailPage = () => {
 
   const handleDownloadInvoice = () => {
     if (!order) return;
-    // Only allow once per order and only if delivered
+    // Only allow download if order is delivered
     if (order.status.toLowerCase() !== "delivered") {
-      return;
-    }
-    const key = `invoice_generated_${order.id}`;
-    if (invoiceGenerated) {
-      alert("Invoice already generated for this order.");
       return;
     }
 
@@ -165,22 +219,14 @@ const OrderDetailPage = () => {
       doc.text(`Order Status: ${order.status}`, 14, 62);
 
       // Shipping Address
-      const addressLines = order.address?.name
+      const addressLines = order.address
         ? [
-            order.address.name,
-            order.address.phone,
-            order.address.appartment,
-            order.address.address,
-            `${order.address.state}, ${order.address.country} - ${order.address.pincode}`,
-          ]
-        : order.address
-        ? [
-            `${order.address.first_name} ${order.address.last_name}`,
-            order.address.phone,
-            order.address.street,
-            `${order.address.city}, ${order.address.state} ${order.address.postal_code}`,
-            order.address.email,
-          ]
+          order.address.name,
+          order.address.phone,
+          order.address.appartment,
+          order.address.address,
+          `${order.address.state}, ${order.address.country} - ${order.address.pincode}`,
+        ]
         : ["Address not available"];
 
       doc.setFontSize(12);
@@ -213,7 +259,7 @@ const OrderDetailPage = () => {
       //  Summary
       doc.setFontSize(11);
       doc.text(`Subtotal (after KP discount): ₹${calculatedSubtotal}`, 14, finalY + 10);
-      
+
       // Add KP Member Discount information to invoice
       if (order.kp_discount_amount && order.kp_discount_amount > 0) {
         doc.text(`Original Subtotal: ₹${(calculatedSubtotal + order.kp_discount_amount).toFixed(2)}`, 14, finalY + 16);
@@ -263,9 +309,6 @@ const OrderDetailPage = () => {
       );
 
       doc.save(`Invoice_${order.id.slice(-6)}.pdf`);
-      // Mark as generated once
-      localStorage.setItem(key, "1");
-      setInvoiceGenerated(true);
     };
 
     // ✅ Load logo image
@@ -315,6 +358,8 @@ const OrderDetailPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
+
+
       <div className="flex items-center gap-4 mb-8">
         <Button
           variant="ghost"
@@ -330,6 +375,122 @@ const OrderDetailPage = () => {
           </p>
         </div>
       </div>
+
+      {/* Order Tracking - Single Row */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Truck className="h-5 w-5 text-blue-600" />
+            Track My Order
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Tracking Steps - Horizontal Layout */}
+            <div className="flex items-center justify-between">
+              {/* Order Placed */}
+              <div className="flex flex-col items-center text-center flex-1">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${order.status === "pending" || order.status === "confirmed" || order.status === "processing" || order.status === "shipped" || order.status === "delivered"
+                    ? "bg-green-100 text-green-600"
+                    : "bg-gray-100 text-gray-400"
+                  }`}>
+                  <ShoppingCart className="h-6 w-6" />
+                </div>
+                <span className="text-sm font-medium">Order Placed</span>
+                <span className="text-xs text-gray-500 mt-1">
+                  {statusTimestamps['pending'] || statusTimestamps['confirmed'] ? formatTimestamp(statusTimestamps['pending'] || statusTimestamps['confirmed']) :
+                    (order.status === "pending" || order.status === "confirmed" ? 'Just now' : 'Completed')}
+                </span>
+              </div>
+
+              {/* Progress Line */}
+              <div className="flex-1 h-0.5 bg-gray-200 mx-4 relative">
+                {(order.status === "processing" || order.status === "shipped" || order.status === "delivered") && (
+                  <div className="absolute inset-0 bg-green-500 h-full transition-all duration-500"></div>
+                )}
+              </div>
+
+              {/* Order Processing */}
+              <div className="flex flex-col items-center text-center flex-1">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${order.status === "processing" || order.status === "shipped" || order.status === "delivered"
+                    ? "bg-blue-100 text-blue-600"
+                    : "bg-gray-100 text-gray-400"
+                  }`}>
+                  <PackageOpen className="h-6 w-6" />
+                </div>
+                <span className="text-sm font-medium">Processing</span>
+                <span className="text-xs text-gray-500 mt-1">
+                  {statusTimestamps['processing'] ? formatTimestamp(statusTimestamps['processing']) :
+                    (order.status === "processing" ? 'Just now' :
+                      (order.status === "shipped" || order.status === "delivered" ? 'Completed' : 'Pending'))}
+                </span>
+              </div>
+
+              {/* Progress Line */}
+              <div className="flex-1 h-0.5 bg-gray-200 mx-4 relative">
+                {(order.status === "shipped" || order.status === "delivered") && (
+                  <div className="absolute inset-0 bg-green-500 h-full transition-all duration-500"></div>
+                )}
+              </div>
+
+              {/* Order Shipped */}
+              <div className="flex flex-col items-center text-center flex-1">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${order.status === "shipped" || order.status === "delivered"
+                    ? "bg-green-100 text-green-600"
+                    : "bg-gray-100 text-gray-400"
+                  }`}>
+                  <Truck className="h-6 w-6" />
+                </div>
+                <span className="text-sm font-medium">Shipped</span>
+                <span className="text-xs text-gray-500 mt-1">
+                  {statusTimestamps['shipped'] ? formatTimestamp(statusTimestamps['shipped']) :
+                    (order.status === "shipped" ? 'Just now' :
+                      (order.status === "delivered" ? 'Completed' : 'Pending'))}
+                </span>
+              </div>
+
+              {/* Progress Line */}
+              <div className="flex-1 h-0.5 bg-gray-200 mx-4 relative">
+                {order.status === "delivered" && (
+                  <div className="absolute inset-0 bg-green-500 h-full transition-all duration-500"></div>
+                )}
+              </div>
+
+              {/* Order Delivered */}
+              <div className="flex flex-col items-center text-center flex-1">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${order.status === "delivered"
+                    ? "bg-green-100 text-green-600"
+                    : "bg-gray-100 text-gray-400"
+                  }`}>
+                  <CheckCircle className="h-6 w-6" />
+                </div>
+                <span className="text-sm font-medium">Delivered</span>
+                <span className="text-xs text-gray-500 mt-1">
+                  {statusTimestamps['delivered'] ? formatTimestamp(statusTimestamps['delivered']) :
+                    (order.status === "delivered" ? 'Just now' : 'Pending')}
+                </span>
+              </div>
+            </div>
+
+
+
+
+
+            {/* Refresh Button */}
+            {/* <div className="pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refreshOrderStatus}
+                className="w-full"
+              >
+                <Clock className="h-4 w-4 mr-2" />
+                Refresh Status
+              </Button>
+            </div> */}
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-3">
         <div className="md:col-span-2 space-y-6">
@@ -360,27 +521,27 @@ const OrderDetailPage = () => {
                       <p className="text-sm text-gray-600">
                         Quantity: {item.quantity}
                       </p>
-                       {/* Show pricing with KP member discount */}
-                       {order.kp_discount_amount && order.kp_discount_amount > 0 && order.kp_discount_percentage ? (
-                         <div className="space-y-1">
-                           {/* Original price (crossed out) */}
-                           <p className="text-sm text-gray-500 line-through">
-                             ₹{item.quantity * (item.unit_price || 0)}
-                           </p>
-                           {/* KP Member price */}
-                           <p className="text-lg font-semibold text-green-600">
-                             KP Member ({order.kp_discount_percentage}% off): ₹{Math.floor((item.quantity * (item.unit_price || 0)) - ((item.quantity * (item.unit_price || 0)) * order.kp_discount_percentage / 100))}
-                           </p>
-                           {/* Savings amount */}
-                           <p className="text-xs text-green-600">
-                             Save ₹{Math.floor((item.quantity * (item.unit_price || 0)) * order.kp_discount_percentage / 100)}
-                           </p>
-                         </div>
-                       ) : (
-                         <p className="text-sm font-medium">
-                           ₹{item.quantity * (item.unit_price || 0)}
-                         </p>
-                       )}
+                      {/* Show pricing with KP member discount */}
+                      {order.kp_discount_amount && order.kp_discount_amount > 0 && order.kp_discount_percentage ? (
+                        <div className="space-y-1">
+                          {/* Original price (crossed out) */}
+                          <p className="text-sm text-gray-500 line-through">
+                            ₹{item.quantity * (item.unit_price || 0)}
+                          </p>
+                          {/* KP Member price */}
+                          <p className="text-lg font-semibold text-green-600">
+                            KP Member ({order.kp_discount_percentage}% off): ₹{Math.floor((item.quantity * (item.unit_price || 0)) - ((item.quantity * (item.unit_price || 0)) * order.kp_discount_percentage / 100))}
+                          </p>
+                          {/* Savings amount */}
+                          <p className="text-xs text-green-600">
+                            Save ₹{Math.floor((item.quantity * (item.unit_price || 0)) * order.kp_discount_percentage / 100)}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-sm font-medium">
+                          ₹{item.quantity * (item.unit_price || 0)}
+                        </p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -397,7 +558,7 @@ const OrderDetailPage = () => {
               <CardContent>
                 <div className="space-y-2">
                   {/* Support both legacy and new address formats */}
-                  {order.address.name ? (
+                  {order.address ? (
                     <>
                       <p className="font-medium">{order.address.name}</p>
                       <p className="text-gray-600">{order.address.phone}</p>
@@ -411,25 +572,18 @@ const OrderDetailPage = () => {
                       </p>
                     </>
                   ) : (
-                    <>
-                      <p className="font-medium">
-                        {order.address.first_name} {order.address.last_name}
-                      </p>
-                      <p className="text-gray-600">{order.address.phone}</p>
-                      <p className="text-gray-600">{order.address.street}</p>
-                      <p className="text-gray-600">
-                        {order.address.city}, {order.address.state}{" "}
-                        {order.address.postal_code}
-                      </p>
-                      {order.address.email && (
-                        <p className="text-gray-600">{order.address.email}</p>
-                      )}
-                    </>
+                    <p>
+                      Address not available
+                    </p>
                   )}
                 </div>
               </CardContent>
             </Card>
           )}
+
+
+
+
         </div>
 
         <div className="space-y-6">
@@ -462,7 +616,7 @@ const OrderDetailPage = () => {
                   <span className="text-gray-600">Subtotal</span>
                   <span>₹{calculatedSubtotal}</span>
                 </div>
-                
+
                 {/* Show KP Member Discount Information */}
                 {order.kp_discount_amount && order.kp_discount_amount > 0 && (
                   <>
@@ -484,7 +638,7 @@ const OrderDetailPage = () => {
                   <span>Total</span>
                   <span>₹{order.total_amount}</span>
                 </div>
-                
+
                 {/* Show total savings for KP members */}
                 {order.kp_discount_amount && order.kp_discount_amount > 0 && (
                   <div className="flex justify-between py-2  text-green-600 font-medium">
@@ -492,7 +646,7 @@ const OrderDetailPage = () => {
                     <span>₹{order.kp_discount_amount.toFixed(2)}</span>
                   </div>
                 )}
-                
+
 
                 {/* Payment Information */}
                 {order.payment && (
@@ -536,21 +690,20 @@ const OrderDetailPage = () => {
                   Cancel Order
                 </Button>
               )}
-              {/* Invoice Download Button - keep button only */}
+              {/* Invoice Download Button - unlimited downloads */}
               <Button
                 variant="outline"
-                className={`w-full mt-2 ${
-                  order.status.toLowerCase() === "delivered" && !invoiceGenerated
+                className={`w-full mt-2 ${order.status.toLowerCase() === "delivered"
                     ? "bg-green-600 text-white hover:bg-green-700"
-                    : "bg-gray-600  border-gray-900 text-black cursor-not-allowed"
-                }`}
+                    : "bg-gray-600 border-gray-900 text-black cursor-not-allowed"
+                  }`}
                 onClick={handleDownloadInvoice}
-                disabled={order.status.toLowerCase() !== "delivered" || invoiceGenerated}
+                disabled={order.status.toLowerCase() !== "delivered"}
               >
                 <FileDown className="h-4 w-4 mr-2" />
-                {invoiceGenerated ? "Invoice Generated Successfully" : "Download Invoice"}
+                Download Invoice
               </Button>
-              
+
             </CardContent>
           </Card>
         </div>
