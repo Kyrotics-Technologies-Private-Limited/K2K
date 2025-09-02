@@ -1,5 +1,3 @@
-
-
 import React, { RefObject, useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +18,7 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const [subscribingPlanId, ] = useState<string | null>(null);
+  const [subscribingPlanId] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Fetch membership plans on mount
