@@ -397,9 +397,15 @@ const OrderDetailPage = () => {
                   <ShoppingCart className="h-6 w-6" />
                 </div>
                 <span className="text-sm font-medium">Order Placed</span>
-                <span className="text-xs text-gray-500 mt-1">
-                  {statusTimestamps['pending'] || statusTimestamps['confirmed'] ? formatTimestamp(statusTimestamps['pending'] || statusTimestamps['confirmed']) :
-                    (order.status === "pending" || order.status === "confirmed" ? 'Just now' : 'Completed')}
+                  <span className="text-xs text-gray-500 mt-1">
+                    {statusTimestamps['pending']
+                      ? formatTimestamp(statusTimestamps['pending'])
+                      : statusTimestamps['confirmed']
+                        ? formatTimestamp(statusTimestamps['confirmed'])
+                        : 'Not available'}
+                  </span>
+                <span className="text-xs text-gray-400">
+                  {(order.status === "processing" || order.status === "shipped" || order.status === "delivered") ? 'Completed' : (order.status === "pending" || order.status === "confirmed" ? 'Pending' : '')}
                 </span>
               </div>
 
@@ -419,10 +425,13 @@ const OrderDetailPage = () => {
                   <PackageOpen className="h-6 w-6" />
                 </div>
                 <span className="text-sm font-medium">Processing</span>
-                <span className="text-xs text-gray-500 mt-1">
-                  {statusTimestamps['processing'] ? formatTimestamp(statusTimestamps['processing']) :
-                    (order.status === "processing" ? 'Just now' :
-                      (order.status === "shipped" || order.status === "delivered" ? 'Completed' : 'Pending'))}
+                  <span className="text-xs text-gray-500 mt-1">
+                    {statusTimestamps['processing']
+                      ? formatTimestamp(statusTimestamps['processing'])
+                      : 'Not available'}
+                  </span>
+                <span className="text-xs text-gray-400">
+                  {(order.status === "shipped" || order.status === "delivered") ? 'Completed' : (order.status === "processing" ? 'Processing' : 'Pending')}
                 </span>
               </div>
 
@@ -442,10 +451,13 @@ const OrderDetailPage = () => {
                   <Truck className="h-6 w-6" />
                 </div>
                 <span className="text-sm font-medium">Shipped</span>
-                <span className="text-xs text-gray-500 mt-1">
-                  {statusTimestamps['shipped'] ? formatTimestamp(statusTimestamps['shipped']) :
-                    (order.status === "shipped" ? 'Just now' :
-                      (order.status === "delivered" ? 'Completed' : 'Pending'))}
+                  <span className="text-xs text-gray-500 mt-1">
+                    {statusTimestamps['shipped']
+                      ? formatTimestamp(statusTimestamps['shipped'])
+                      : 'Not available'}
+                  </span>
+                <span className="text-xs text-gray-400">
+                  {(order.status === "delivered") ? 'Completed' : (order.status === "shipped" ? 'Shipped' : 'Pending')}
                 </span>
               </div>
 
@@ -465,9 +477,13 @@ const OrderDetailPage = () => {
                   <CheckCircle className="h-6 w-6" />
                 </div>
                 <span className="text-sm font-medium">Delivered</span>
-                <span className="text-xs text-gray-500 mt-1">
-                  {statusTimestamps['delivered'] ? formatTimestamp(statusTimestamps['delivered']) :
-                    (order.status === "delivered" ? 'Just now' : 'Pending')}
+                  <span className="text-xs text-gray-500 mt-1">
+                    {statusTimestamps['delivered']
+                      ? formatTimestamp(statusTimestamps['delivered'])
+                      : 'Not available'}
+                  </span>
+                <span className="text-xs text-gray-400">
+                  {(order.status === "delivered") ? 'Delivered' : 'Pending'}
                 </span>
               </div>
             </div>

@@ -98,8 +98,9 @@ const NatureTraceBannerContent: React.FC = () => {
             <h2 className="text-2xl font-semibold text-green-700 text-center mb-4">
               Login with Kishan2Kitchen
             </h2>
-            <PhoneAuth
-              onSuccess={() => {
+            <PhoneAuth />
+            <button
+              onClick={() => {
                 setShowLoginModal(false);
                 window.open(
                   "https://yourcompanywebsite.com",

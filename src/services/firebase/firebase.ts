@@ -5,8 +5,6 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-// Optional: reCAPTCHA Enterprise (commented unless you're using it)
-// import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 
 // Firebase configuration using environment variables
 const firebaseConfig = {
@@ -26,21 +24,5 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// Optional: reCAPTCHA Enterprise (Uncomment if using App Check)
-/*
-try {
-  if (typeof window !== "undefined" && (window as any).grecaptcha) {
-    const appCheck = initializeAppCheck(app, {
-      provider: new ReCaptchaEnterpriseProvider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
-      isTokenAutoRefreshEnabled: true,
-    });
-    console.log("App Check initialized with reCAPTCHA Enterprise.");
-  } else {
-    console.warn("grecaptcha not defined. Make sure reCAPTCHA script is loaded.");
-  }
-} catch (error) {
-  console.error("Error initializing App Check:", error);
-}
-*/
 
 export { app, analytics, auth, db, storage };

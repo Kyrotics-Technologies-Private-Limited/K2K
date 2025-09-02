@@ -7,6 +7,7 @@ import {
   Star,
   Info,
   X,
+  ArrowLeft,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Product } from "../../types";
@@ -15,7 +16,7 @@ import { ProductBadges } from "./Productbadge";
 import { BenefitsBanner } from "./InformationBanner";
 import { HealthBenefits } from "./HealthBenefits";
 import RecognizedBy from "../homePageComponents/RecognizedBy";
-import { useAppDispatch, useAppSelector } from "../../store/store";
+import { useAppDispatch } from "../../store/store";
 import {
   addToCart,
   setBuyNowItem,
@@ -355,6 +356,17 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4">
+        {/* Back Navigation */}
+        <div className="pt-6 pb-4">
+          <Link
+            to="/all-products"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-green-800 transition-colors duration-200"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back to All Products</span>
+          </Link>
+        </div>
+
         {/* Status messages */}
         {error && (
           <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4">
@@ -670,7 +682,11 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                     </div>
                   )}
                 </div>
-                {variants[selectedVariant].units_in_stock <= 10 && (
+                {variants[selectedVariant].units_in_stock <= 0 ? (
+                  <h2 className="text-red-600 font-extrabold text-base">
+                    Product is out of stock
+                  </h2>
+                ) : variants[selectedVariant].units_in_stock <= 10 && (
                   <h2 className="text-red-600 font-extrabold animate-bounce text-base">
                     Hurry, only {variants[selectedVariant].units_in_stock} left!
                   </h2>
