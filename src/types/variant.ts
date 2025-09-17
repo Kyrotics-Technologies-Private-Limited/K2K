@@ -9,4 +9,5 @@ export interface Variant {
     createdAt?: Date;
     updatedAt?: Date;
     units_in_stock:number;
+    gstPercentage?: number;
   }

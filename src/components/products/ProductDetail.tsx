@@ -145,16 +145,32 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
   const kpDiscount = membershipStatus?.discountPercentage ?? 
     (kpSettings && kpSettings.length > 0 ? kpSettings[0].discountPercentage : 0);
   
-  const getFinalPrice = (regularPrice: number) =>
+  // Pricing helpers: apply KP membership discount first, then GST
+  const applyGst = (amount: number, gstPercentage?: number) => {
+    const gst = gstPercentage ?? 0;
+    return Math.floor(amount + (amount * gst) / 100);
+  };
+
+  const getPriceAfterKpDiscount = (regularPrice: number) =>
     isMember && kpDiscount > 0
       ? Math.floor(regularPrice - (regularPrice * kpDiscount) / 100)
       : regularPrice;
 
+  const getFinalPriceWithGST = (regularPrice: number, gstPercentage?: number) => {
+    const discounted = getPriceAfterKpDiscount(regularPrice);
+    return applyGst(discounted, gstPercentage);
+  };
+
   // Helper function to get KP member price for non-members
-  const getKPMemberPrice = (regularPrice: number) =>
-    kpDiscount > 0
+  const getKPMemberPriceWithGST = (regularPrice: number, gstPercentage?: number) => {
+    const discounted = kpDiscount > 0
       ? Math.floor(regularPrice - (regularPrice * kpDiscount) / 100)
       : regularPrice;
+    return applyGst(discounted, gstPercentage);
+  };
+
+  const getRegularPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
+    applyGst(regularPrice, gstPercentage);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -216,7 +232,10 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
               <span>
                 ₹
                 {(
-                  getFinalPrice(variants[selectedVariant].price) * quantity
+                  getFinalPriceWithGST(
+                    variants[selectedVariant].price,
+                    variants[selectedVariant].gstPercentage
+                  ) * quantity
                 ).toLocaleString("en-IN")}
               </span>
             </div>
@@ -469,7 +488,10 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
                   {variants.map((variant, index) => {
-                    const discounted = getFinalPrice(variant.price);
+                    const discountedWithGst = getFinalPriceWithGST(
+                      variant.price,
+                      variant.gstPercentage
+                    );
                     return (
                       <button
                         key={variant.id}
@@ -507,10 +529,13 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                           {isMember && kpDiscount > 0 ? (
                             <div className="flex flex-wrap items-baseline gap-1">
                               <span className="text-lg font-bold text-green-800">
-                                ₹{discounted.toLocaleString("en-IN")}
+                                ₹{discountedWithGst.toLocaleString("en-IN")}
                               </span>
                               <span className="text-base font-medium text-gray-500 line-through">
-                                ₹{variant.price.toLocaleString("en-IN")}
+                                ₹{getRegularPriceWithGST(
+                                  variant.price,
+                                  variant.gstPercentage
+                                ).toLocaleString("en-IN")}
                               </span>
                               <span className="text-xs font-semibold bg-green-50 text-green-700 px-1.5 py-0.5 rounded">
                                 {kpDiscount}% KP Member
@@ -520,14 +545,18 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                             <>
                               <div className="flex flex-wrap items-baseline gap-1">
                                 <span className="text-lg font-bold text-gray-900">
-                                  ₹{variant.price.toLocaleString("en-IN")}
+                                  ₹{getRegularPriceWithGST(
+                                    variant.price,
+                                    variant.gstPercentage
+                                  ).toLocaleString("en-IN")}
                                 </span>
                                 {variant.originalPrice && (
                                   <span className="text-sm line-through text-gray-500">
                                     ₹
-                                    {variant.originalPrice.toLocaleString(
-                                      "en-IN"
-                                    )}
+                                    {getRegularPriceWithGST(
+                                      variant.originalPrice,
+                                      variant.gstPercentage
+                                    ).toLocaleString("en-IN")}
                                   </span>
                                 )}
                                 {variant.discount && (
@@ -547,8 +576,9 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                                   >
                                     <span className="text-sm font-bold text-green-700">
                                       ₹
-                                      {getKPMemberPrice(
-                                        variant.price
+                                      {getKPMemberPriceWithGST(
+                                        variant.price,
+                                        variant.gstPercentage
                                       ).toLocaleString("en-IN")}
                                     </span>
                                     <span className="text-xs font-bold text-green-600">
@@ -574,16 +604,18 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                     <div className="flex flex-row gap-4 relative">
                       <span className="text-4xl font-bold text-black">
                         ₹
-                        {getFinalPrice(
-                          variants[selectedVariant].price
+                        {getFinalPriceWithGST(
+                          variants[selectedVariant].price,
+                          variants[selectedVariant].gstPercentage
                         ).toLocaleString("en-IN")}
                       </span>
                       {isMember && kpDiscount > 0 && (
                         <span className="text-lg font-bold text-gray-500 line-through pt-2">
                           ₹
-                          {variants[selectedVariant].price.toLocaleString(
-                            "en-IN"
-                          )}
+                          {getRegularPriceWithGST(
+                            variants[selectedVariant].price,
+                            variants[selectedVariant].gstPercentage
+                          ).toLocaleString("en-IN")}
                         </span>
                       )}
                       <span className="text-lg font-bold text-gray-500 pt-2">
@@ -619,9 +651,10 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                                 </span>
                                 <span className="text-sm font-semibold text-gray-500 line-through">
                                   ₹
-                                  {variants[
-                                    selectedVariant
-                                  ].price.toLocaleString("en-IN")}
+                                  {getRegularPriceWithGST(
+                                    variants[selectedVariant].price,
+                                    variants[selectedVariant].gstPercentage
+                                  ).toLocaleString("en-IN")}
                                 </span>
                               </div>
                               {isMember && kpDiscount > 0 && (
@@ -631,8 +664,9 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                                   </span>
                                   <span className="text-base font-bold text-green-800">
                                     ₹
-                                    {getFinalPrice(
-                                      variants[selectedVariant].price
+                                    {getFinalPriceWithGST(
+                                      variants[selectedVariant].price,
+                                      variants[selectedVariant].gstPercentage
                                     ).toLocaleString("en-IN")}
                                   </span>
                                 </div>
@@ -644,13 +678,25 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                                       KP Member Price
                                     </span>
                                     <span className="text-base font-bold text-green-800">
-                                      ₹{getKPMemberPrice(variants[selectedVariant].price).toLocaleString("en-IN")}
+                                      ₹{getKPMemberPriceWithGST(
+                                        variants[selectedVariant].price,
+                                        variants[selectedVariant].gstPercentage
+                                      ).toLocaleString("en-IN")}
                                     </span>
                                   </div>
                                   <div className="text-xs text-green-800 bg-green-50 p-2 rounded">
                                     <strong>Become a KP member for instant savings!</strong>
                                     <br />
-                                    Save ₹{(variants[selectedVariant].price - getKPMemberPrice(variants[selectedVariant].price)).toLocaleString("en-IN")} on this product
+                                    Save ₹{(
+                                      getRegularPriceWithGST(
+                                        variants[selectedVariant].price,
+                                        variants[selectedVariant].gstPercentage
+                                      ) -
+                                      getKPMemberPriceWithGST(
+                                        variants[selectedVariant].price,
+                                        variants[selectedVariant].gstPercentage
+                                      )
+                                    ).toLocaleString("en-IN")} on this product
                                   </div>
                                 </div>
                               )}
@@ -668,7 +714,10 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                         KP Member Price:
                       </span>
                       <span className="text-xl font-bold text-green-700">
-                        ₹{getKPMemberPrice(variants[selectedVariant].price).toLocaleString("en-IN")}
+                        ₹{getKPMemberPriceWithGST(
+                          variants[selectedVariant].price,
+                          variants[selectedVariant].gstPercentage
+                        ).toLocaleString("en-IN")}
                       </span>
                       <span className="text-sm font-medium text-green-600">
                         (Save {kpDiscount}%)

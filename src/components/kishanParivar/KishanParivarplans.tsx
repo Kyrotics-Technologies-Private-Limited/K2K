@@ -1,33 +1,90 @@
+
+
 import React, { RefObject, useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import PhoneAuth from '../authComponents/PhoneAuth';
 import { X } from 'lucide-react';
 import { membershipApi } from '../../services/api/membershipApi';
-import { MembershipPlan } from '../../types/membership';
+import { MembershipSettings } from '../../types/membership';
 
 interface KishanParivarFormProps {
   targetRef: RefObject<HTMLDivElement | null>;
 }
 
+type PlanType = "monthly" | "quarterly" | "yearly";
+
 const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Local component state for membership plans, loading and error
-  const [plans, setPlans] = useState<MembershipPlan[]>([]);
+  // Local component state for membership settings, loading and error
+  const [settings, setSettings] = useState<MembershipSettings | null>(null);
+  const [plans, setPlans] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const [subscribingPlanId] = useState<string | null>(null);
+  const [subscribingPlanId, setSubscribingPlanId] = useState<PlanType | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // Fetch membership plans on mount
+  // Fetch membership settings on mount
   useEffect(() => {
     setIsLoading(true);
-    membershipApi.getPlans()
+    membershipApi.getSettings()
       .then((data) => {
-        setPlans(data);
+        setSettings(data);
         setIsError(false);
+
+        // Build the plans after settings load
+        setPlans([
+          {
+            id: 'monthly',
+            name: 'Monthly',
+            duration: `${data.monthlyDuration} Month`,
+            price: `₹${data.monthlyPrice}`,
+            originalPrice: `₹${data.monthlyPrice + 50}`,
+            discount: `${data.discountPercentage}%`,
+            delivery: 'Fast',
+            popular: false,
+            features: [
+              `${data.discountPercentage}% discount on all products`,
+              'Fast delivery (2-3 days)',
+              'Priority customer support',
+              'Free shipping on orders above ₹500',
+            ],
+          },
+          {
+            id: 'quarterly',
+            name: 'Quarterly',
+            duration: `${data.quarterlyDuration} Months`,
+            price: `₹${data.quarterlyPrice}`,
+            originalPrice: `₹${data.quarterlyPrice + 200}`,
+            discount: `${data.discountPercentage}%`,
+            delivery: 'Fast',
+            popular: true,
+            features: [
+              `${data.discountPercentage}% discount on all products`,
+              'Fast delivery (2-3 days)',
+              'Priority customer support',
+              'Free shipping on orders above ₹500',
+            ],
+          },
+          {
+            id: 'yearly',
+            name: 'Annual',
+            duration: `${data.yearlyDuration} Months`,
+            price: `₹${data.yearlyPrice}`,
+            originalPrice: `₹${data.yearlyPrice + 500}`,
+            discount: `${data.discountPercentage}%`,
+            delivery: 'Fast',
+            popular: false,
+            features: [
+              `${data.discountPercentage}% discount on all products`,
+              'Fast delivery (2-3 days)',
+              'Priority customer support',
+              'Free shipping on orders above ₹500',
+            ],
+          },
+        ]);
       })
       .catch(() => {
         setIsError(true);
@@ -36,38 +93,14 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
   }, []);
 
   // Handle Pay Now logic
-  const handlePayNowClick = async (planId: string) => {
+  const handlePayNowClick = async (planId: PlanType) => {
     if (!user) {
       setShowLoginModal(true);
     } else {
       // Find the selected plan object
       const selectedPlan = plans.find((p) => p.id === planId);
-      if (selectedPlan) {
-        navigate("/membership-payment", { state: { plan: selectedPlan } });
-      }
+      navigate("/membership-payment", { state: { plan: selectedPlan } });
     }
-  };
-
-  // Helper function to determine if a plan is popular (middle plan)
-  const isPopularPlan = (index: number, totalPlans: number) => {
-    return totalPlans === 3 ? index === 1 : index === Math.floor(totalPlans / 2);
-  };
-
-  // Helper function to format duration
-  const formatDuration = (duration: number) => {
-    if (duration === 1) return '1 Month';
-    if (duration < 12) return `${duration} Months`;
-    if (duration === 12) return '1 Year';
-    const years = Math.floor(duration / 12);
-    const months = duration % 12;
-    if (months === 0) return `${years} Year${years > 1 ? 's' : ''}`;
-    return `${years} Year${years > 1 ? 's' : ''} ${months} Month${months > 1 ? 's' : ''}`;
-  };
-
-  // Helper function to calculate original price with markup
-  const calculateOriginalPrice = (price: number) => {
-    const markup = Math.round(price * 0.2); // 20% markup
-    return price + markup;
   };
 
   // UI RENDER
@@ -140,38 +173,38 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
               Failed to load membership plans. Please try again later.
             </div>
           ) : (!isLoading && plans.length > 0) ? (
-            plans.map((plan, index) => (
+            plans.map((plan) => (
               <div
                 key={plan.id}
                 className={`relative rounded-2xl p-6 transition-all duration-300 ${
-                  isPopularPlan(index, plans.length) ? "border-2 lg:scale-105" : "border"
+                  plan.popular ? "border-2 lg:scale-105" : "border"
                 }`}
                 style={{
                   background: "rgba(255, 255, 255, 0.95)",
                   backdropFilter: "blur(10px)",
-                  borderColor: isPopularPlan(index, plans.length)
+                  borderColor: plan.popular
                     ? "#22c55e"
                     : "rgba(255, 255, 255, 0.3)",
-                  boxShadow: isPopularPlan(index, plans.length)
+                  boxShadow: plan.popular
                     ? "0 20px 40px -10px rgba(34, 197, 94, 0.3)"
                     : "0 10px 30px -5px rgba(0, 0, 0, 0.3)",
                   transform: "translateY(0)",
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.transform = "translateY(-5px)";
-                  e.currentTarget.style.boxShadow = isPopularPlan(index, plans.length)
+                  e.currentTarget.style.boxShadow = plan.popular
                     ? "0 25px 50px -10px rgba(34, 197, 94, 0.4)"
                     : "0 15px 40px -5px rgba(0, 0, 0, 0.4)";
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = isPopularPlan(index, plans.length)
+                  e.currentTarget.style.boxShadow = plan.popular
                     ? "0 20px 40px -10px rgba(34, 197, 94, 0.3)"
                     : "0 10px 30px -5px rgba(0, 0, 0, 0.3)";
                 }}
               >
                 {/* Popular badge */}
-                {isPopularPlan(index, plans.length) && (
+                {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
                     <div className="bg-green-brand text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
                       🌟 Most Popular
@@ -183,17 +216,17 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
                 <div className="relative z-10">
                   <div className="text-center mb-5">
                     <h3 className="text-xl font-bold text-gray-800 mb-2">
-                      {plan.type}
+                      {plan.name}
                     </h3>
                     <div className="flex items-center justify-center gap-2 mb-2">
                       <span className="text-sm text-gray-500 line-through">
-                        ₹{calculateOriginalPrice(plan.price)}
+                        {plan.originalPrice}
                       </span>
                       <div className="text-3xl font-bold text-green-brand">
-                        ₹{plan.price}
+                        {plan.price}
                       </div>
                     </div>
-                    <p className="text-gray-600 text-sm">for {formatDuration(plan.duration)}</p>
+                    <p className="text-gray-600 text-sm">for {plan.duration}</p>
                   </div>
                   {/* Key benefits cards */}
                   <div className="grid grid-cols-2 gap-3 mb-5">
@@ -205,7 +238,7 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
                       }}
                     >
                       <div className="text-lg font-bold text-green-brand mb-1">
-                        {plan.discountPercentage}%
+                        {plan.discount}
                       </div>
                       <div className="text-xs text-gray-600">Discount</div>
                     </div>
@@ -217,19 +250,14 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
                       }}
                     >
                       <div className="text-sm font-bold text-green-brand mb-1">
-                        Fast
+                        {plan.delivery}
                       </div>
                       <div className="text-xs text-gray-600">Delivery</div>
                     </div>
                   </div>
                   {/* Features list */}
                   <div className="space-y-2 mb-5">
-                    {[
-                      `${plan.discountPercentage}% discount on all products`,
-                      'Fast delivery (2-3 days)',
-                      'Priority customer support',
-                      'Free shipping on orders above ₹500',
-                    ].map((feature: string, featureIndex: number) => (
+                    {plan.features.map((feature: string, featureIndex: number) => (
                       <div key={featureIndex} className="flex items-start">
                         <div className="flex-shrink-0 w-5 h-5 bg-green-brand rounded-full flex items-center justify-center mr-3 mt-0.5">
                           <svg
@@ -253,7 +281,7 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
                   <button
                     className="button w-full py-3 px-6 rounded-xl font-semibold text-white bg-green-brand transition-all duration-300"
                     disabled={subscribingPlanId === plan.id || isLoading}
-                    onClick={() => handlePayNowClick(plan.id)}
+                    onClick={() => handlePayNowClick(plan.id as PlanType)}
                   >
                     {subscribingPlanId === plan.id ? "Processing..." : "Pay Now"}
                   </button>

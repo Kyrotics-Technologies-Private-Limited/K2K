@@ -60,21 +60,31 @@ export const CheckoutAddress = () => {
     fetchAddresses();
   }, [dispatch]);
 
-  // Calculate order summary whenever cart items change
+  // Calculate order summary whenever cart items change (GST-inclusive; no KP discount here)
   useEffect(() => {
+    const applyGst = (amount: number, gstPercentage?: number) => {
+      const gst = gstPercentage ?? 0;
+      return Math.floor(amount + (amount * gst) / 100);
+    };
     const subtotal = cartItems.reduce((total, item) => {
-      return total + (item.variant?.price || 0) * item.quantity;
+      const unit = item.variant?.price || 0;
+      const gst = item.variant?.gstPercentage;
+      const unitAfterGst = applyGst(unit, gst);
+      return total + unitAfterGst * item.quantity;
     }, 0);
 
-    const tax = subtotal * 0.18; // 18% GST
     const shipping = subtotal > 500 ? 0 : 40; // Free shipping above ₹500
 
     dispatch(
       updateOrderSummary({
         subtotal,
-        tax,
+        tax: 0,
         shipping,
-        total: subtotal + tax + shipping,
+        total: subtotal + shipping,
+        // Provide required fields with defaults; will be recalculated in Checkout.tsx
+        kpDiscountPercentage: 0,
+        kpDiscountAmount: 0,
+        originalTotal: subtotal + shipping,
       })
     );
   }, [cartItems, dispatch]);
@@ -480,7 +490,9 @@ export const CheckoutAddress = () => {
                       </div>
                       <div className="text-right">
                         <p className="font-medium">
-                          ₹{(item.variant?.price || 0) * item.quantity}
+                          ₹{(
+                            (item.variant ? Math.floor((item.variant.price + (item.variant.price * (item.variant.gstPercentage ?? 0) / 100))) : 0) * item.quantity
+                          ).toLocaleString("en-IN")}
                         </p>
                         {item.variant?.discount &&
                           item.variant.discount > 0 && (

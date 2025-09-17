@@ -34,6 +34,21 @@ export const Payment = () => {
   // Check if user is a KP member
   const isKPMember = orderSummary.kpDiscountPercentage > 0 && orderSummary.kpDiscountAmount > 0;
 
+  // Pricing helpers aligned with ProductDetail: apply KP discount first, then GST
+  const applyGst = (amount: number, gstPercentage?: number) => {
+    const gst = gstPercentage ?? 0;
+    return Math.floor(amount + (amount * gst) / 100);
+  };
+  const getRegularPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
+    applyGst(regularPrice, gstPercentage);
+  const getKPMemberPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
+    applyGst(
+      orderSummary.kpDiscountPercentage > 0
+        ? Math.floor(regularPrice - (regularPrice * orderSummary.kpDiscountPercentage) / 100)
+        : regularPrice,
+      gstPercentage
+    );
+
   const [error, setLocalError] = useState<string | null>(null);
 
   const handleBack = () => {
@@ -209,7 +224,7 @@ export const Payment = () => {
             <span>{itemsToCheckout.length}</span>
           </div>
           <div className="flex justify-between">
-            <span>Subtotal</span>
+            <span>Subtotal <span className="text-xs">(including GST)</span></span>
             <span>₹{orderSummary.subtotal.toFixed(2)}</span>
           </div>
           

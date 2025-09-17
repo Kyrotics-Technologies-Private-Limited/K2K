@@ -33,12 +33,12 @@ import AppProvider from "./AppProvider";
 
 //import PhoneAuth from "./components/PhoneAuth";
 
-import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
-import ProductListPage from "./pages/admin/ProductListPage";
+// import ProductDetailsPage from "./pages/admin/ProductDetailsPage";
+// import ProductListPage from "./pages/admin/ProductListPage";
 
 import { ToastContainer, Bounce } from 'react-toastify';
-import VariantDetailsPage from "./pages/admin/Variantdetailspage";
-import VariantEditPage from "./pages/admin/VariantEditPage";
+// import VariantDetailsPage from "./pages/admin/Variantdetailspage";
+// import VariantEditPage from "./pages/admin/VariantEditPage";
 import BlogPage from "./pages/BlogPage";
 import BlogDetailPage from "./pages/BlogDetailPage";
 import ScrollToTop from './components/common/ScrollToTop';
@@ -111,10 +111,10 @@ function App() {
             {/* Admin Routes */}
             <Route path="/admin" element={<Layout />}>
              
-              <Route path="products/:id" element={<ProductDetailsPage />} />
+              {/* <Route path="products/:id" element={<ProductDetailsPage />} />
               <Route path="productlist" element={<ProductListPage />} />
                <Route path="products/:productId/variants" element={<VariantDetailsPage/>} />
-               <Route path="products/:productId/variants/:variantId/edit" element={<VariantEditPage/>} />
+               <Route path="products/:productId/variants/:variantId/edit" element={<VariantEditPage/>} /> */}
               
               {/* Add other admin routes as needed */}
             </Route>
