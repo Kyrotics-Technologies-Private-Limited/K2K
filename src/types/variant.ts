@@ -10,4 +10,5 @@ export interface Variant {
     updatedAt?: Date;
     units_in_stock:number;
     gstPercentage?: number;
+    cessRate?: number;         // CESS rate for the variant
   }

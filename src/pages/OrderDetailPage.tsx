@@ -365,6 +365,11 @@ const OrderDetailPage = () => {
         const { url } = await invoiceApi.saveInvoice(order.id, pdfBlob);
         console.log('Invoice saved to storage:', url);
         
+        // Update local order state with the new invoice URL
+        if (order && url) {
+          dispatch(fetchOrderById(order.id)); // Refresh order to get updated invoiceUrl
+        }
+        
         // Download the PDF
         doc.save(`Invoice_${order.id.slice(-6)}.pdf`);
       } catch (err) {
@@ -612,38 +617,76 @@ const OrderDetailPage = () => {
                       <p className="text-sm text-gray-600">
                         Quantity: {item.quantity}
                       </p>
-                      {/* Show pricing with KP member discount */}
-                      {order.kp_discount_amount && order.kp_discount_amount > 0 && order.kp_discount_percentage ? (
-                        <div className="space-y-1">
-                          {/* Original price with GST (crossed out) */}
-                          <p className="text-sm text-gray-500 line-through">
+                      <div className="mt-2">
+                        {/* GST-inclusive price */}
+                        <p className="text-sm text-gray-700 font-medium">
+                          Price (incl. GST): ₹{(
+                            applyGst(
+                              item.unit_price || 0,
+                              (item as any).variant_id
+                                ? variantGst[(item as any).variant_id]
+                                : 0
+                            ) * (item.quantity || 0)
+                          ).toLocaleString("en-IN")}
+                        </p>
+                        {/* Show pricing with KP member discount */}
+                        {order.kp_discount_amount &&
+                        order.kp_discount_amount > 0 &&
+                        order.kp_discount_percentage ? (
+                          <div className="space-y-1">
+                            {/* Original price with GST (crossed out) */}
+                            <p className="text-sm text-gray-500 line-through">
+                              ₹{(
+                                applyGst(
+                                  item.unit_price || 0,
+                                  (item as any).variant_id
+                                    ? variantGst[(item as any).variant_id]
+                                    : 0
+                                ) * (item.quantity || 0)
+                              ).toLocaleString("en-IN")}
+                            </p>
+                            {/* KP Member price with GST */}
+                            <p className="text-lg font-semibold text-green-600">
+                              KP Member ({order.kp_discount_percentage}% off): ₹{(
+                                applyGst(
+                                  priceAfterKp(item.unit_price || 0),
+                                  (item as any).variant_id
+                                    ? variantGst[(item as any).variant_id]
+                                    : 0
+                                ) * (item.quantity || 0)
+                              ).toLocaleString("en-IN")}
+                            </p>
+                            {/* Savings amount (GST-inclusive) */}
+                            <p className="text-xs text-green-600">
+                              Save ₹{(
+                                (applyGst(
+                                  item.unit_price || 0,
+                                  (item as any).variant_id
+                                    ? variantGst[(item as any).variant_id]
+                                    : 0
+                                ) -
+                                  applyGst(
+                                    priceAfterKp(item.unit_price || 0),
+                                    (item as any).variant_id
+                                      ? variantGst[(item as any).variant_id]
+                                      : 0
+                                  )) * (item.quantity || 0)
+                              ).toLocaleString("en-IN")}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-sm font-medium">
                             ₹{(
-                              applyGst(item.unit_price || 0, (item as any).variant_id ? variantGst[(item as any).variant_id] : 0) * (item.quantity || 0)
-                            ).toLocaleString("en-IN")}
-                          </p>
-                          {/* KP Member price with GST */}
-                          <p className="text-lg font-semibold text-green-600">
-                            KP Member ({order.kp_discount_percentage}% off): ₹{(
-                              applyGst(priceAfterKp(item.unit_price || 0), (item as any).variant_id ? variantGst[(item as any).variant_id] : 0) * (item.quantity || 0)
-                            ).toLocaleString("en-IN")}
-                          </p>
-                          {/* Savings amount (GST-inclusive) */}
-                          <p className="text-xs text-green-600">
-                            Save ₹{(
-                              (
-                                applyGst(item.unit_price || 0, (item as any).variant_id ? variantGst[(item as any).variant_id] : 0) -
-                                applyGst(priceAfterKp(item.unit_price || 0), (item as any).variant_id ? variantGst[(item as any).variant_id] : 0)
+                              applyGst(
+                                item.unit_price || 0,
+                                (item as any).variant_id
+                                  ? variantGst[(item as any).variant_id]
+                                  : 0
                               ) * (item.quantity || 0)
                             ).toLocaleString("en-IN")}
                           </p>
-                        </div>
-                      ) : (
-                        <p className="text-sm font-medium">
-                          ₹{(
-                            applyGst(item.unit_price || 0, (item as any).variant_id ? variantGst[(item as any).variant_id] : 0) * (item.quantity || 0)
-                          ).toLocaleString("en-IN")}
-                        </p>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -788,18 +831,27 @@ const OrderDetailPage = () => {
                   Cancel Order
                 </Button>
               )}
-              {/* Invoice Download Button - unlimited downloads */}
+              {/* Invoice Download Button - checks for existing invoice */}
               <Button
                 variant="outline"
-                className={`w-full mt-2 ${order.status.toLowerCase() === "delivered"
+                className={`w-full mt-2 ${
+                  order.status.toLowerCase() === "delivered"
                     ? "bg-green-600 text-white hover:bg-green-700"
                     : "bg-gray-600 border-gray-900 text-black cursor-not-allowed"
-                  }`}
-                onClick={handleDownloadInvoice}
+                }`}
+                onClick={async () => {
+                  if (order.invoiceUrl) {
+                    // If invoice exists, open it in new tab
+                    window.open(order.invoiceUrl, '_blank');
+                  } else {
+                    // If no invoice exists, generate and save it
+                    await handleDownloadInvoice();
+                  }
+                }}
                 disabled={order.status.toLowerCase() !== "delivered"}
               >
                 <FileDown className="h-4 w-4 mr-2" />
-                Download Invoice
+                {order.invoiceUrl ? 'View Invoice' : 'Generate Invoice'}
               </Button>
 
             </CardContent>
