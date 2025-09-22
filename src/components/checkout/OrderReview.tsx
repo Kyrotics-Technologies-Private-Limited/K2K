@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { setStep } from "../../store/slices/checkoutSlice";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { orderApi } from "../../services/api/orderApi";
 
@@ -13,6 +13,21 @@ export const OrderReview = () => {
 
   // Check if user is a KP member
   const isKPMember = orderSummary.kpDiscountPercentage > 0 && orderSummary.kpDiscountAmount > 0;
+
+  // Pricing helpers aligned with ProductDetail: apply KP discount first, then GST
+  const applyGst = (amount: number, gstPercentage?: number) => {
+    const gst = gstPercentage ?? 0;
+    return Math.floor(amount + (amount * gst) / 100);
+  };
+  const getRegularPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
+    applyGst(regularPrice, gstPercentage);
+  const getKPMemberPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
+    applyGst(
+      orderSummary.kpDiscountPercentage > 0
+        ? Math.floor(regularPrice - (regularPrice * orderSummary.kpDiscountPercentage) / 100)
+        : regularPrice,
+      gstPercentage
+    );
 
   const handleBack = () => {
     dispatch(setStep(1));
@@ -122,22 +137,26 @@ export const OrderReview = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    {/* Show original price (small) */}
+                    {/* Regular price with GST (crossed out for members) */}
                     <p className="text-sm text-gray-500 line-through">
-                      ₹{(item.variant?.price || 0) * item.quantity}
+                      ₹{(
+                        getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
+                      ).toLocaleString("en-IN")}
                     </p>
-                    
-                    {/* Show KP Member Price for each item */}
+                    {/* KP Member Price (with GST) */}
                     {isKPMember && (
                       <p className="text-sm text-green-600">
-                        KP Member: ₹{Math.floor(((item.variant?.price || 0) * item.quantity) - (((item.variant?.price || 0) * item.quantity) * orderSummary.kpDiscountPercentage) / 100)}
+                        KP Member: ₹{(
+                          getKPMemberPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
+                        ).toLocaleString("en-IN")}
                       </p>
                     )}
-                    
-                    {/* Show regular price if not KP member */}
+                    {/* Regular price when not a member (with GST) */}
                     {!isKPMember && (
                       <p className="text-lg font-semibold">
-                        ₹{(item.variant?.price || 0) * item.quantity}
+                        ₹{(
+                          getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
+                        ).toLocaleString("en-IN")}
                       </p>
                     )}
                   </div>

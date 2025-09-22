@@ -3,19 +3,28 @@ import { MapPin, Award, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { AuthProvider } from "../../context/AuthContext";
 import PhoneAuth from "../authComponents/PhoneAuth";
+import { getAuth } from "firebase/auth";
 
 // Main component content
 const NatureTraceBannerContent: React.FC = () => {
   const { user } = useAuth();
   const [showLoginModal, setShowLoginModal] = React.useState(false);
 
-  const handleRedirect = () => {
+  const handleRedirect =async () => {
     if (!user) {
       setShowLoginModal(true);
       return;
     }
+    const auth = getAuth();
+    if (!auth.currentUser) {
+      console.error("User not authenticated");
+      return;
+    }
+    const idToken = await auth.currentUser.getIdToken();
+
     window.open(
-      "https://k2ktraceability.netlify.app/customer",
+      // `https://k2ktraceability.netlify.app/customer?token=${idToken}`,
+      `http://localhost:3000/customer?token=${idToken}`,
       "_blank",
       "noopener,noreferrer"
     );

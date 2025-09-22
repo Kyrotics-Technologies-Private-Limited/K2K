@@ -122,13 +122,24 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   }, [isAuthenticated, showLoginModal]);
 
   // Helper function to calculate KP member price (similar to ProductDetail)
+  // Pricing helpers: apply KP discount first (if member), then GST
+  const applyGst = (amount: number, gstPercentage?: number) => {
+    const gst = gstPercentage ?? 0;
+    return Math.floor(amount + (amount * gst) / 100);
+  };
+
+  const getRegularPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
+    applyGst(regularPrice, gstPercentage);
+
   const getKPMemberPrice = (regularPrice: number) => {
     if (kpDiscount > 0) {
-      const discountedPrice = Math.floor(regularPrice - (regularPrice * kpDiscount) / 100);
-      return discountedPrice;
+      return Math.floor(regularPrice - (regularPrice * kpDiscount) / 100);
     }
     return regularPrice;
   };
+
+  const getKPMemberPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
+    applyGst(getKPMemberPrice(regularPrice), gstPercentage);
 
   // Function to get the effective discount percentage
   const getEffectiveDiscount = () => {
@@ -260,20 +271,24 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     navigate("/checkout");
   };
 
-  // Calculate cart total with KP member discount
+  // Calculate cart total with GST and KP member discount (if applicable)
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => {
       const price = item.variant?.price || 0;
-      const discountedPrice = isKPMember ? getKPMemberPrice(price) : price;
-      return total + discountedPrice * item.quantity;
+      const gst = item.variant?.gstPercentage;
+      const unitPrice = isKPMember && effectiveDiscount > 0
+        ? getKPMemberPriceWithGST(price, gst)
+        : getRegularPriceWithGST(price, gst);
+      return total + unitPrice * item.quantity;
     }, 0);
   };
 
-  // Calculate original total without discount
+  // Calculate original total without KP discount (but GST-inclusive)
   const calculateOriginalTotal = () => {
     return cartItems.reduce((total, item) => {
       const price = item.variant?.price || 0;
-      return total + price * item.quantity;
+      const gst = item.variant?.gstPercentage;
+      return total + getRegularPriceWithGST(price, gst) * item.quantity;
     }, 0);
   };
 
@@ -482,14 +497,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                                   <p className="font-medium text-[#4A5D23]">
                                     ₹
                                     {(
-                                      getKPMemberPrice(item.variant.price) * item.quantity
+                                      getKPMemberPriceWithGST(item.variant.price, item.variant.gstPercentage) * item.quantity
                                     ).toLocaleString("en-IN")}
                                   </p>
                                   {/* Original Price (crossed out) */}
                                   <p className="text-xs text-gray-500 line-through">
                                     ₹
                                     {(
-                                      item.variant.price * item.quantity
+                                      getRegularPriceWithGST(item.variant.price, item.variant.gstPercentage) * item.quantity
                                     ).toLocaleString("en-IN")}
                                   </p>
                                   {/* KP Member Badge */}
@@ -498,7 +513,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                                   </p>
                                   {/* Savings amount */}
                                   <p className="text-xs text-green-700">
-                                    Save ₹{((item.variant.price - getKPMemberPrice(item.variant.price)) * item.quantity).toLocaleString("en-IN")}
+                                    Save ₹{((
+                                      getRegularPriceWithGST(item.variant.price, item.variant.gstPercentage) -
+                                      getKPMemberPriceWithGST(item.variant.price, item.variant.gstPercentage)
+                                    ) * item.quantity).toLocaleString("en-IN")}
                                   </p>
                                 </>
                               ) : (
@@ -507,7 +525,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                                   <p className="font-medium text-[#4A5D23]">
                                     ₹
                                     {(
-                                      item.variant.price * item.quantity
+                                      getRegularPriceWithGST(item.variant.price, item.variant.gstPercentage) * item.quantity
                                     ).toLocaleString("en-IN")}
                                   </p>
                                   {/* Show KP Member Price for non-members if discount is available */}
@@ -516,11 +534,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                                       <p className="text-xs text-green-600">
                                         KP Member: ₹
                                         {(
-                                          getKPMemberPrice(item.variant.price) * item.quantity
+                                          getKPMemberPriceWithGST(item.variant.price, item.variant.gstPercentage) * item.quantity
                                         ).toLocaleString("en-IN")}
                                       </p>
                                       <p className="text-xs text-gray-500">
-                                        Save {effectiveDiscount}%
+                                        Save ₹{((
+                                          getRegularPriceWithGST(item.variant.price, item.variant.gstPercentage) -
+                                          getKPMemberPriceWithGST(item.variant.price, item.variant.gstPercentage)
+                                        ) * item.quantity).toLocaleString("en-IN")}
                                       </p>
                                     </>
                                   )}
@@ -531,7 +552,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                                 <p className="text-xs text-gray-500 line-through">
                                   ₹
                                   {(
-                                    item.variant.originalPrice! * item.quantity
+                                    getRegularPriceWithGST(item.variant.originalPrice!, item.variant.gstPercentage) * item.quantity
                                   ).toLocaleString("en-IN")}
                                 </p>
                               )}

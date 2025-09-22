@@ -18,7 +18,7 @@
 
 // export default ProductPage;
 
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { ProductDetail } from "../components/products/ProductDetail";
 import { Product } from "../types/index";
 import {productApi} from "../services/api/productApi";
@@ -48,7 +48,7 @@ const ProductPage = () => {
         // Filter related products (same category, excluding current product)
         setRelatedProducts(
           allProducts
-            .filter((p) => p.id !== id && p.category === productData.category)
+            .filter((p: Product) => p.id !== id && p.category === productData.category)
             .slice(0, 4) // Limit to 4 related products
         );
         setError(null);

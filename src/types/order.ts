@@ -10,6 +10,10 @@ export interface OrderItem {
   variant_id?: string;
   quantity: number;
   unit_price: number;
+  original_price: number;              // Price from variant
+  gstPercentage?: number;     // GST percentage from variant
+  cessRate?: number;          // CESS rate from variant
+  discount?: number;          // Discount from variant
   created_at: string;
   name?: string;              // Added for frontend display
   image?: string;             // Added for frontend display
@@ -58,10 +62,16 @@ export interface Order {
   created_at: string;
   updated_at: string;
   tracking_number?: string;
+  processingDate?: string | any;    // Date and time when order started processing
+  shippedDate?: string | any;    // Date and time when order was shipped
+  deliveredDate?: string | any;    // Date and time when order was delivered
+  cancelledDate?: string | any;    // Date and time when order was cancelled
+  returnedDate?: string | any;    // Date and time when order was returned
   // KP Membership discount fields
   kp_discount_percentage?: number;
   kp_discount_amount?: number;
   original_total?: number;
+  invoiceUrl?: string; // URL to download/view invoice
 }
 
 export interface TrackingEvent {
@@ -102,6 +112,10 @@ export interface OrderItemPayload {
   image?: string;
   variant_name?: string;
   unit_price?: number;
+  price?: number;              // Price from variant
+  gstPercentage?: number;      // GST percentage from variant
+  cessRate?: number;           // CESS rate from variant
+  discount?: number;           // Discount from variant
 }
 
 export interface CreateOrderPayload {

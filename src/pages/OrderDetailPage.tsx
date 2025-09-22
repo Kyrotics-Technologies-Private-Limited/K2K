@@ -5,6 +5,8 @@ import { AppDispatch, RootState } from "../store/store";
 import { fetchOrderById, cancelOrder } from "../store/slices/orderSlice";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { invoiceApi } from "../services/api/invoiceApi";
+import variantApi from "../services/api/variantApi";
 import {
   ArrowLeft,
   PackageOpen,
@@ -32,12 +34,34 @@ const OrderDetailPage = () => {
   const [lastStatus, setLastStatus] = useState<string>("");
   // const [ setStatusUpdateTime] = useState<string>("");
   const [statusTimestamps, setStatusTimestamps] = useState<Record<string, string>>({});
+  const [variantGst, setVariantGst] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (orderId) {
       dispatch(fetchOrderById(orderId));
     }
   }, [dispatch, orderId]);
+
+  useEffect(() => {
+    const loadVariantGst = async () => {
+      if (!order?.items || order.items.length === 0) return;
+      const map: Record<string, number> = {};
+      for (const item of order.items as any[]) {
+        const variantId = item.variant_id;
+        const productId = item.product_id;
+        if (variantId && productId && map[variantId] === undefined) {
+          try {
+            const variant = await variantApi.getVariantById(productId, variantId);
+            map[variantId] = variant.gstPercentage ?? 0;
+          } catch {
+            map[variantId] = 0;
+          }
+        }
+      }
+      if (Object.keys(map).length) setVariantGst((prev) => ({ ...prev, ...map }));
+    };
+    loadVariantGst();
+  }, [order?.items]);
 
   // Initialize order placed timestamp when order loads
   useEffect(() => {
@@ -134,11 +158,31 @@ const OrderDetailPage = () => {
     });
   };
 
-  const formatTimestamp = (timestamp: string) => {
+  const formatTimestamp = (timestamp: any) => {
     if (!timestamp) return "";
+    
     try {
-      const date = new Date(timestamp);
-      if (isNaN(date.getTime())) return timestamp; // Return as-is if invalid date
+      let date: Date;
+      
+      // Handle Firebase Timestamp objects
+      if (timestamp && typeof timestamp === 'object') {
+        if (timestamp._seconds) {
+          // Firebase Timestamp with _seconds and _nanoseconds
+          date = new Date(timestamp._seconds * 1000);
+        } else if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+          // Firebase Timestamp object with toDate method
+          date = timestamp.toDate();
+        } else {
+          return "Invalid timestamp";
+        }
+      } else if (typeof timestamp === 'string') {
+        // Regular string timestamp
+        date = new Date(timestamp);
+      } else {
+        return "Invalid timestamp";
+      }
+      
+      if (isNaN(date.getTime())) return "Invalid date";
 
       const now = new Date();
       const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
@@ -156,28 +200,40 @@ const OrderDetailPage = () => {
         });
       }
     } catch (error) {
-      return timestamp;
+      return "Invalid timestamp";
     }
   };
 
+  // Pricing helpers: apply KP discount then GST
+  const applyGst = (amount: number, gstPercentage?: number) => {
+    const gst = gstPercentage ?? 0;
+    return Math.floor(amount + (amount * gst) / 100);
+  };
+  const priceAfterKp = (price: number) =>
+    order?.kp_discount_percentage && order.kp_discount_percentage > 0
+      ? Math.floor(price - (price * order.kp_discount_percentage) / 100)
+      : price;
+
   const calculatedSubtotal =
-    order?.items?.reduce(
-      (sum, item) => {
-        const itemPrice = (item.quantity || 0) * (item.unit_price || 0);
+    order?.items?.reduce((sum, item: any) => {
+      const unit = item.unit_price || 0;
+      const gst = item.variant_id ? variantGst[item.variant_id] : 0;
+      const unitMember = priceAfterKp(unit);
+      const unitWithGst = applyGst(unitMember, gst);
+      return sum + unitWithGst * (item.quantity || 0);
+    }, 0) || 0;
 
-        // Apply KP member discount if it exists
-        if (order.kp_discount_percentage && order.kp_discount_percentage > 0) {
-          const discountedItemPrice = Math.floor(itemPrice - (itemPrice * order.kp_discount_percentage) / 100);
-          return sum + discountedItemPrice;
-        }
+  const originalSubtotal =
+    order?.items?.reduce((sum, item: any) => {
+      const unit = item.unit_price || 0;
+      const gst = item.variant_id ? variantGst[item.variant_id] : 0;
+      const unitWithGst = applyGst(unit, gst);
+      return sum + unitWithGst * (item.quantity || 0);
+    }, 0) || 0;
 
-        return sum + itemPrice;
-      },
-      0
-    ) || 0;
   const calculatedShipping = calculatedSubtotal > 500 ? 0 : 40;
 
-  const handleDownloadInvoice = () => {
+  const handleDownloadInvoice = async () => {
     if (!order) return;
     // Only allow download if order is delivered
     if (order.status.toLowerCase() !== "delivered") {
@@ -185,14 +241,14 @@ const OrderDetailPage = () => {
     }
 
     const doc = new jsPDF();
-
+    
     // Correct logo path
     const logoUrl = `${window.location.origin}/images/K2K%20Logo.png`;
 
-    const addInvoiceData = (imageData?: string) => {
-      //  Logo
+    const generateAndSaveInvoice = async (imageData?: string) => {
+      // Generate PDF with logo
       if (imageData) {
-        doc.addImage(imageData, "PNG", 14, 10, 30, 30); // (x, y, width, height)
+        doc.addImage(imageData, "PNG", 14, 10, 30, 30);
       }
 
       //  Company Info
@@ -308,27 +364,71 @@ const OrderDetailPage = () => {
         290
       );
 
-      doc.save(`Invoice_${order.id.slice(-6)}.pdf`);
-    };
+      //  Company Info
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text("Kishan2Kitchen (K2K)", 50, 18);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text("www.kishan2kitchen.com", 50, 24);
+      doc.text("Email: support@kishan2kitchen.com", 50, 29);
+      doc.text("Phone: +91-9876543210", 50, 34);
+      doc.text("GSTIN: 27AABCU9603R1Z2", 50, 39);
 
-    // ✅ Load logo image
-    const img = new Image();
-    img.src = logoUrl;
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.drawImage(img, 0, 0);
-        const imageData = canvas.toDataURL("image/png");
-        addInvoiceData(imageData);
+      // Rest of the invoice generation...
+      // [Previous PDF generation code]
+      
+      // Convert PDF to blob and save to Firebase Storage
+      try {
+        const pdfBlob = doc.output('blob');
+        // Save to Firebase Storage
+        const { url } = await invoiceApi.saveInvoice(order.id, pdfBlob);
+        console.log('Invoice saved to storage:', url);
+        
+        // Update local order state with the new invoice URL
+        if (order && url) {
+          dispatch(fetchOrderById(order.id)); // Refresh order to get updated invoiceUrl
+        }
+        
+        // Download the PDF
+        doc.save(`Invoice_${order.id.slice(-6)}.pdf`);
+      } catch (err) {
+        console.error('Failed to save invoice to storage:', err);
+        // Still download even if storage fails
+        doc.save(`Invoice_${order.id.slice(-6)}.pdf`);
       }
     };
-    img.onerror = () => {
-      console.warn("Logo failed to load, generating without image.");
-      addInvoiceData(); // fallback
-    };
+
+    try {
+      // ✅ Load logo image
+      const img = new Image();
+      img.src = logoUrl;
+      
+      const loadImage = new Promise<void>((resolve) => {
+        img.onload = async () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0);
+            const imageData = canvas.toDataURL("image/png");
+            await generateAndSaveInvoice(imageData);
+          }
+          resolve();
+        };
+        
+        img.onerror = async () => {
+          console.warn("Logo failed to load, generating without image.");
+          await generateAndSaveInvoice();
+          resolve();
+        };
+      });
+
+      await loadImage;
+    } catch (err) {
+      console.error('Error generating invoice:', err);
+    }
   };
 
   if (loading) {
@@ -398,12 +498,15 @@ const OrderDetailPage = () => {
                 </div>
                 <span className="text-sm font-medium">Order Placed</span>
                   <span className="text-xs text-gray-500 mt-1">
-                    {statusTimestamps['pending']
-                      ? formatTimestamp(statusTimestamps['pending'])
-                      : statusTimestamps['confirmed']
-                        ? formatTimestamp(statusTimestamps['confirmed'])
-                        : 'Not available'}
+                    {order.created_at ? formatTimestamp(order.created_at) : 'Not available'}
                   </span>
+                  {/* <span className="text-xs text-gray-600">
+                    {order.created_at ? new Date(order.created_at).toLocaleTimeString('en-IN', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true
+                    }) : ''}
+                  </span> */}
                 <span className="text-xs text-gray-400">
                   {(order.status === "processing" || order.status === "shipped" || order.status === "delivered") ? 'Completed' : (order.status === "pending" || order.status === "confirmed" ? 'Pending' : '')}
                 </span>
@@ -426,9 +529,9 @@ const OrderDetailPage = () => {
                 </div>
                 <span className="text-sm font-medium">Processing</span>
                   <span className="text-xs text-gray-500 mt-1">
-                    {statusTimestamps['processing']
-                      ? formatTimestamp(statusTimestamps['processing'])
-                      : 'Not available'}
+                    {order.processingDate ? formatTimestamp(order.processingDate) : 
+                     (order.status === "processing" || order.status === "shipped" || order.status === "delivered") ? 
+                     formatTimestamp(order.processingDate) : 'Not available'}
                   </span>
                 <span className="text-xs text-gray-400">
                   {(order.status === "shipped" || order.status === "delivered") ? 'Completed' : (order.status === "processing" ? 'Processing' : 'Pending')}
@@ -452,9 +555,9 @@ const OrderDetailPage = () => {
                 </div>
                 <span className="text-sm font-medium">Shipped</span>
                   <span className="text-xs text-gray-500 mt-1">
-                    {statusTimestamps['shipped']
-                      ? formatTimestamp(statusTimestamps['shipped'])
-                      : 'Not available'}
+                    {order.shippedDate ? formatTimestamp(order.shippedDate) : 
+                     (order.status === "shipped" || order.status === "delivered") ? 
+                     'Shipped' : 'Not available'}
                   </span>
                 <span className="text-xs text-gray-400">
                   {(order.status === "delivered") ? 'Completed' : (order.status === "shipped" ? 'Shipped' : 'Pending')}
@@ -478,9 +581,8 @@ const OrderDetailPage = () => {
                 </div>
                 <span className="text-sm font-medium">Delivered</span>
                   <span className="text-xs text-gray-500 mt-1">
-                    {statusTimestamps['delivered']
-                      ? formatTimestamp(statusTimestamps['delivered'])
-                      : 'Not available'}
+                    {order.deliveredDate ? formatTimestamp(order.deliveredDate) : 
+                     order.status === "delivered" ? 'Delivered' : 'Not available'}
                   </span>
                 <span className="text-xs text-gray-400">
                   {(order.status === "delivered") ? 'Delivered' : 'Pending'}
@@ -537,27 +639,76 @@ const OrderDetailPage = () => {
                       <p className="text-sm text-gray-600">
                         Quantity: {item.quantity}
                       </p>
-                      {/* Show pricing with KP member discount */}
-                      {order.kp_discount_amount && order.kp_discount_amount > 0 && order.kp_discount_percentage ? (
-                        <div className="space-y-1">
-                          {/* Original price (crossed out) */}
-                          <p className="text-sm text-gray-500 line-through">
-                            ₹{item.quantity * (item.unit_price || 0)}
-                          </p>
-                          {/* KP Member price */}
-                          <p className="text-lg font-semibold text-green-600">
-                            KP Member ({order.kp_discount_percentage}% off): ₹{Math.floor((item.quantity * (item.unit_price || 0)) - ((item.quantity * (item.unit_price || 0)) * order.kp_discount_percentage / 100))}
-                          </p>
-                          {/* Savings amount */}
-                          <p className="text-xs text-green-600">
-                            Save ₹{Math.floor((item.quantity * (item.unit_price || 0)) * order.kp_discount_percentage / 100)}
-                          </p>
-                        </div>
-                      ) : (
-                        <p className="text-sm font-medium">
-                          ₹{item.quantity * (item.unit_price || 0)}
+                      <div className="mt-2">
+                        {/* GST-inclusive price */}
+                        <p className="text-sm text-gray-700 font-medium">
+                          Price (incl. GST): ₹{(
+                            applyGst(
+                              item.unit_price || 0,
+                              (item as any).variant_id
+                                ? variantGst[(item as any).variant_id]
+                                : 0
+                            ) * (item.quantity || 0)
+                          ).toLocaleString("en-IN")}
                         </p>
-                      )}
+                        {/* Show pricing with KP member discount */}
+                        {order.kp_discount_amount &&
+                        order.kp_discount_amount > 0 &&
+                        order.kp_discount_percentage ? (
+                          <div className="space-y-1">
+                            {/* Original price with GST (crossed out) */}
+                            <p className="text-sm text-gray-500 line-through">
+                              ₹{(
+                                applyGst(
+                                  item.unit_price || 0,
+                                  (item as any).variant_id
+                                    ? variantGst[(item as any).variant_id]
+                                    : 0
+                                ) * (item.quantity || 0)
+                              ).toLocaleString("en-IN")}
+                            </p>
+                            {/* KP Member price with GST */}
+                            <p className="text-lg font-semibold text-green-600">
+                              KP Member ({order.kp_discount_percentage}% off): ₹{(
+                                applyGst(
+                                  priceAfterKp(item.unit_price || 0),
+                                  (item as any).variant_id
+                                    ? variantGst[(item as any).variant_id]
+                                    : 0
+                                ) * (item.quantity || 0)
+                              ).toLocaleString("en-IN")}
+                            </p>
+                            {/* Savings amount (GST-inclusive) */}
+                            <p className="text-xs text-green-600">
+                              Save ₹{(
+                                (applyGst(
+                                  item.unit_price || 0,
+                                  (item as any).variant_id
+                                    ? variantGst[(item as any).variant_id]
+                                    : 0
+                                ) -
+                                  applyGst(
+                                    priceAfterKp(item.unit_price || 0),
+                                    (item as any).variant_id
+                                      ? variantGst[(item as any).variant_id]
+                                      : 0
+                                  )) * (item.quantity || 0)
+                              ).toLocaleString("en-IN")}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-sm font-medium">
+                            ₹{(
+                              applyGst(
+                                item.unit_price || 0,
+                                (item as any).variant_id
+                                  ? variantGst[(item as any).variant_id]
+                                  : 0
+                              ) * (item.quantity || 0)
+                            ).toLocaleString("en-IN")}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -629,8 +780,8 @@ const OrderDetailPage = () => {
                   <span>{order.items?.length ?? 0} items</span>
                 </div>
                 <div className="flex justify-between py-2 border-b">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span>₹{calculatedSubtotal}</span>
+                  <span className="text-gray-600">Subtotal <span className="text-xs">(including GST)</span></span>
+                  <span>₹{calculatedSubtotal.toLocaleString("en-IN")}</span>
                 </div>
 
                 {/* Show KP Member Discount Information */}
@@ -638,12 +789,8 @@ const OrderDetailPage = () => {
                   <>
                     <div className="flex justify-between py-2 border-b text-gray-500">
                       <span>Original Subtotal</span>
-                      <span className="line-through">₹{(calculatedSubtotal + order.kp_discount_amount).toFixed(2)}</span>
+                      <span className="line-through">₹{(originalSubtotal).toLocaleString("en-IN")}</span>
                     </div>
-                    {/* <div className="flex justify-between py-2 border-b text-green-600">
-                      <span>KP Member Discount ({order.kp_discount_percentage}%)</span>
-                      <span>-₹{order.kp_discount_amount.toFixed(2)}</span>
-                    </div> */}
                   </>
                 )}
                 <div className="flex justify-between py-2 border-b">
@@ -652,7 +799,7 @@ const OrderDetailPage = () => {
                 </div>
                 <div className="flex justify-between border-b py-2 font-medium">
                   <span>Total</span>
-                  <span>₹{order.total_amount}</span>
+                  <span>₹{(order.total_amount || (calculatedSubtotal + calculatedShipping)).toLocaleString("en-IN")}</span>
                 </div>
 
                 {/* Show total savings for KP members */}
@@ -706,18 +853,27 @@ const OrderDetailPage = () => {
                   Cancel Order
                 </Button>
               )}
-              {/* Invoice Download Button - unlimited downloads */}
+              {/* Invoice Download Button - checks for existing invoice */}
               <Button
                 variant="outline"
-                className={`w-full mt-2 ${order.status.toLowerCase() === "delivered"
+                className={`w-full mt-2 ${
+                  order.status.toLowerCase() === "delivered"
                     ? "bg-green-600 text-white hover:bg-green-700"
                     : "bg-gray-600 border-gray-900 text-black cursor-not-allowed"
-                  }`}
-                onClick={handleDownloadInvoice}
+                }`}
+                onClick={async () => {
+                  if (order.invoiceUrl) {
+                    // If invoice exists, open it in new tab
+                    window.open(order.invoiceUrl, '_blank');
+                  } else {
+                    // If no invoice exists, generate and save it
+                    await handleDownloadInvoice();
+                  }
+                }}
                 disabled={order.status.toLowerCase() !== "delivered"}
               >
                 <FileDown className="h-4 w-4 mr-2" />
-                Download Invoice
+                {order.invoiceUrl ? 'View Invoice' : 'Generate Invoice'}
               </Button>
 
             </CardContent>
