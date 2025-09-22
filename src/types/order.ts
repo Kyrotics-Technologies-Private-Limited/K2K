@@ -62,6 +62,11 @@ export interface Order {
   created_at: string;
   updated_at: string;
   tracking_number?: string;
+  processingDate?: string | any;    // Date and time when order started processing
+  shippedDate?: string | any;    // Date and time when order was shipped
+  deliveredDate?: string | any;    // Date and time when order was delivered
+  cancelledDate?: string | any;    // Date and time when order was cancelled
+  returnedDate?: string | any;    // Date and time when order was returned
   // KP Membership discount fields
   kp_discount_percentage?: number;
   kp_discount_amount?: number;
