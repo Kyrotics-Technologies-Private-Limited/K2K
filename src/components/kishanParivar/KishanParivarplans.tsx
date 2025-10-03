@@ -6,85 +6,56 @@ import { useNavigate } from 'react-router-dom';
 import PhoneAuth from '../authComponents/PhoneAuth';
 import { X } from 'lucide-react';
 import { membershipApi } from '../../services/api/membershipApi';
-import { MembershipSettings } from '../../types/membership';
 
 interface KishanParivarFormProps {
   targetRef: RefObject<HTMLDivElement | null>;
 }
 
-type PlanType = "monthly" | "quarterly" | "yearly";
+type PlanType = string; // Now can be any plan ID from the database
 
 const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Local component state for membership settings, loading and error
-  const [settings, setSettings] = useState<MembershipSettings | null>(null);
-  const [plans, setPlans] = useState<any[]>([]);
+  // Local component state for membership plans, loading and error
+  const [displayPlans, setDisplayPlans] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [subscribingPlanId, setSubscribingPlanId] = useState<PlanType | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // Fetch membership settings on mount
+  // Fetch membership plans on mount
   useEffect(() => {
     setIsLoading(true);
-    membershipApi.getSettings()
+    membershipApi.getPlans()
       .then((data) => {
-        setSettings(data);
         setIsError(false);
 
-        // Build the plans after settings load
-        setPlans([
-          {
-            id: 'monthly',
-            name: 'Monthly',
-            duration: `${data.monthlyDuration} Month`,
-            price: `₹${data.monthlyPrice}`,
-            originalPrice: `₹${data.monthlyPrice + 50}`,
-            discount: `${data.discountPercentage}%`,
+        // Transform the plans from the new API format to display format
+        const transformedPlans = data.map((plan, index) => {
+          // Determine if this plan should be marked as popular (e.g., middle option)
+          const isPopular = index === 1; // Mark second plan as popular, or customize logic here
+          
+          return {
+            id: plan.id,
+            name: plan.type,
+            duration: `${plan.duration} ${plan.duration === 1 ? 'Month' : 'Months'}`,
+            price: `₹${plan.price}`,
+            originalPrice: `₹${plan.price + (plan.duration * 50)}`, // Dynamic original price calculation
+            discount: `${plan.discountPercentage}%`,
             delivery: 'Fast',
-            popular: false,
+            popular: isPopular,
             features: [
-              `${data.discountPercentage}% discount on all products`,
+              `${plan.discountPercentage}% discount on all products`,
               'Fast delivery (2-3 days)',
               'Priority customer support',
               'Free shipping on orders above ₹500',
             ],
-          },
-          {
-            id: 'quarterly',
-            name: 'Quarterly',
-            duration: `${data.quarterlyDuration} Months`,
-            price: `₹${data.quarterlyPrice}`,
-            originalPrice: `₹${data.quarterlyPrice + 200}`,
-            discount: `${data.discountPercentage}%`,
-            delivery: 'Fast',
-            popular: true,
-            features: [
-              `${data.discountPercentage}% discount on all products`,
-              'Fast delivery (2-3 days)',
-              'Priority customer support',
-              'Free shipping on orders above ₹500',
-            ],
-          },
-          {
-            id: 'yearly',
-            name: 'Annual',
-            duration: `${data.yearlyDuration} Months`,
-            price: `₹${data.yearlyPrice}`,
-            originalPrice: `₹${data.yearlyPrice + 500}`,
-            discount: `${data.discountPercentage}%`,
-            delivery: 'Fast',
-            popular: false,
-            features: [
-              `${data.discountPercentage}% discount on all products`,
-              'Fast delivery (2-3 days)',
-              'Priority customer support',
-              'Free shipping on orders above ₹500',
-            ],
-          },
-        ]);
+            description: plan.description, // Include description for additional info
+          };
+        });
+        
+        setDisplayPlans(transformedPlans);
       })
       .catch(() => {
         setIsError(true);
@@ -97,9 +68,14 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
     if (!user) {
       setShowLoginModal(true);
     } else {
-      // Find the selected plan object
-      const selectedPlan = plans.find((p) => p.id === planId);
-      navigate("/membership-payment", { state: { plan: selectedPlan } });
+      setSubscribingPlanId(planId);
+      try {
+        // Find the selected plan object from displayPlans
+        const selectedPlan = displayPlans.find((p) => p.id === planId);
+        navigate("/membership-payment", { state: { plan: selectedPlan } });
+      } finally {
+        setSubscribingPlanId(null);
+      }
     }
   };
 
@@ -172,8 +148,8 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
             <div className="col-span-3 text-center text-red-400 text-lg">
               Failed to load membership plans. Please try again later.
             </div>
-          ) : (!isLoading && plans.length > 0) ? (
-            plans.map((plan) => (
+          ) : (!isLoading && displayPlans.length > 0) ? (
+            displayPlans.map((plan) => (
               <div
                 key={plan.id}
                 className={`relative rounded-2xl p-6 transition-all duration-300 ${
