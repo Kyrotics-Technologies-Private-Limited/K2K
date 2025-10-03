@@ -8,6 +8,7 @@ import { updateOrderSummary } from "../store/slices/checkoutSlice";
 import { ShoppingBag } from "lucide-react";
 import { membershipApi } from "../services/api/membershipApi";
 import { MembershipStatus } from "../types/membership";
+import { isActiveKPMember } from "../lib/utils";
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -43,13 +44,16 @@ export const CheckoutPage = () => {
         if (isAuthenticated) {
           try {
             const membershipStatus: MembershipStatus = await membershipApi.getStatus();
-            isKPMember = !!(membershipStatus?.isMember && membershipStatus.membershipEnd);
+            isKPMember = isActiveKPMember(membershipStatus);
             
-            // Get discount percentage
-            if (membershipStatus?.discountPercentage && membershipStatus.discountPercentage > 0) {
+            // Get discount percentage - only if membership is active
+            if (isKPMember && membershipStatus?.discountPercentage && membershipStatus.discountPercentage > 0) {
               kpDiscountPercentage = membershipStatus.discountPercentage;
+            } else if (!isKPMember) {
+              // If membership is expired, set discount to 0
+              kpDiscountPercentage = 0;
             } else {
-              // Fallback to plans if no discount in user status
+              // Fallback to plans if no discount in user status (only for active members)
               try {
                 const plans = await membershipApi.getPlans();
                 if (plans && plans.length > 0) {

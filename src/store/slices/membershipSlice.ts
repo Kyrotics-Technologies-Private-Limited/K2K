@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { membershipApi } from '../../services/api/membershipApi';
 import { MembershipSettings, MembershipPlan, MembershipStatus } from '../../types/membership';
 import { RootState } from '../store';
+import { isActiveKPMember } from '../../lib/utils';
 
 // Thunks
 
@@ -130,7 +131,7 @@ export const membershipSlice = createSlice({
         state.loadingStatus = true; // Use status loading, since this impacts it
         state.errorStatus = null;
       })
-      .addCase(subscribeMembership.fulfilled, (state, action) => {
+      .addCase(subscribeMembership.fulfilled, (state) => {
         state.loadingStatus = false;
         // The actual status refresh happens in the thunk above
       })
@@ -149,10 +150,18 @@ export default membershipSlice.reducer;
 export const selectMembershipStatus = (state: RootState) => state.membership.status;
 export const selectMembershipSettings = (state: RootState) => state.membership.settings;
 export const selectMembershipPlans = (state: RootState) => state.membership.plans;
-export const selectIsMember = (state: RootState) => !!(state.membership.status?.isMember);
+
+export const selectIsMember = (state: RootState) => isActiveKPMember(state.membership.status);
 export const selectKPDiscount = (state: RootState) => {
+  // Only give discount if membership is active (not expired)
+  const membershipStatus = state.membership.status;
+  
+  if (!isActiveKPMember(membershipStatus)) {
+    return 0; // Return 0% discount for expired/inactive memberships
+  }
+  
   // Try to get discount from user's membership status first, then from plans
-  const userDiscount = state.membership.status?.discountPercentage;
+  const userDiscount = membershipStatus?.discountPercentage;
   if (userDiscount !== undefined) return userDiscount;
   
   // Fallback to first plan's discount if available
