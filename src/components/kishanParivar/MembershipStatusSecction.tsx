@@ -18,7 +18,8 @@ function getDaysLeft(membershipEnd: any): number | null {
   if (!endDate || isNaN(endDate.getTime())) return null;
   const now = new Date();
   const diffTime = endDate.getTime() - now.getTime();
-  return diffTime > 0 ? Math.ceil(diffTime / (1000 * 60 * 60 * 24)) : 0;
+  const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return daysLeft > 0 ? daysLeft : null; // Return null for expired memberships
 }
 
 function formatMembershipType(type: string | null | undefined): string {
@@ -102,11 +103,42 @@ const MembershipStatusSection: React.FC = () => {
   // Hide the component if loading or not logged in
   if (!isLoggedIn || isLoading) return null;
 
-  // ============= MEMBER VIEW =============
+  // ============= ACTIVE MEMBER VIEW =============
   if (status && status.isMember && status.membershipEnd) {
     const daysLeft = getDaysLeft(status.membershipEnd);
     const typeLabel = formatMembershipType(status.membershipType);
     const isExpiringSoon = typeof daysLeft === "number" && daysLeft <= 7;
+    const isExpired = daysLeft === null; // Membership has expired
+    
+    // If membership is expired, show expired UI instead of member UI
+    if (isExpired) {
+      return (
+        <div className="flex items-center justify-center h-auto py-12 sm:py-16 px-4 bg-[#fffbe8]">
+          <div className="w-full max-w-7xl bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="p-8 sm:p-10 flex flex-col justify-center">
+                {/* <div className="mb-1 text-sm font-semibold tracking-wider text-red-600">
+                  MEMBERSHIP EXPIRED
+                </div> */}
+                <h1 className="mb-4 text-3xl sm:text-4xl font-bold leading-tight text-red-700">
+                  Membership Has Expired
+                </h1>
+                <p className="mb-6 text-lg text-gray-600">
+                  Your {typeLabel} membership with Kishan Parivar has expired. Renew now to continue enjoying exclusive benefits!
+                </p>
+                <div className="space-y-3 mb-6">
+                  <FeatureItem text="Special discounts on all products" />
+                  <FeatureItem text="Fast delivery service" />
+                  <FeatureItem text="Priority customer support" />
+                  <FeatureItem text="Free shipping on orders above ₹500" />
+                </div>
+              </div>
+              <StatusImage isExpiringSoon={true} />
+            </div>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="flex items-center justify-center h-auto py-12 sm:py-16 px-4 bg-[#fffbe8]">
         <div className="w-full max-w-7xl bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
@@ -122,7 +154,7 @@ const MembershipStatusSection: React.FC = () => {
                   : "ACTIVE MEMBERSHIP"}
               </div>
               <h1 className="mb-4 text-3xl sm:text-4xl font-bold leading-tight">
-                {typeof daysLeft === "number" ? daysLeft : "—"} Days Remaining
+                {typeof daysLeft === "number" ? `${daysLeft}` : "—"} Days Remaining
               </h1>
               <p className="mb-6 text-lg text-gray-600">
                 Your {typeLabel} membership with Kishan Parivar

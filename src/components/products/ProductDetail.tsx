@@ -31,6 +31,7 @@ import PhoneAuth from "../authComponents/PhoneAuth";
 import { AuthProvider } from "../../context/AuthContext";
 import { membershipApi } from "../../services/api/membershipApi";
 import { MembershipStatus, MembershipSettings } from "../../types/membership";
+import { isActiveKPMember } from "../../lib/utils";
 
 interface ProductDetailProps {
   product: Product | undefined;
@@ -137,9 +138,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
     );
   }
 
-  const isMember = !!(
-    membershipStatus?.isMember && membershipStatus.membershipEnd
-  );
+  const isMember = isActiveKPMember(membershipStatus);
   
   // Get discount percentage - prioritize user's membership discount, then fallback to plans
   const kpDiscount = membershipStatus?.discountPercentage ?? 

@@ -14,6 +14,7 @@ import PhoneAuth from "../authComponents/PhoneAuth";
 import { toast } from "react-toastify";
 import { membershipApi } from "../../services/api/membershipApi";
 import { MembershipStatus } from "../../types/membership";
+import { isActiveKPMember } from "../../lib/utils";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -152,8 +153,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     return kpDiscount;
   };
 
-  // Check if user is a KP member (similar to ProductDetail logic)
-  const isKPMember = !!(membershipStatus?.isMember && membershipStatus.membershipEnd);
+  // Check if user is an active KP member (not expired)
+  const isKPMember = isActiveKPMember(membershipStatus);
 
   // Get the effective discount for calculations
   const effectiveDiscount = getEffectiveDiscount();
