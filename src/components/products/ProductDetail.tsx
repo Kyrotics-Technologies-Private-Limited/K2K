@@ -823,6 +823,50 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
           </div>
         </div>
 
+        {/* Product Quality Badges */}
+        <div className="mt-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* 300+ Farmer Empowered Badge */}
+            <div className="flex flex-col items-center text-center p-6 bg-white rounded-xl">
+              <div className="w-20 h-20 mb-4 hover:scale-110 transition-transform duration-300 cursor-pointer">
+                <img 
+                  src="/assets/productbadgeimg/300+ Farmer empowered (1).png" 
+                  alt="300+ Farmer Empowered" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">300+ Farmer Empowered</h3>
+              {/* <p className="text-sm text-gray-600">Supporting local farming communities across India</p> */}
+            </div>
+
+            {/* Procured from Birbhum Badge */}
+            <div className="flex flex-col items-center text-center p-6 bg-white rounded-xl">
+              <div className="w-20 h-20 mb-4 hover:scale-110 transition-transform duration-300 cursor-pointer">
+                <img 
+                  src="/assets/productbadgeimg/PROCURED FROM BIRBHUM (1).png" 
+                  alt="Procured from Birbhum" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Procured from Birbhum</h3>
+              {/* <p className="text-sm text-gray-600">Directly sourced from Birbhum district, West Bengal</p> */}
+            </div>
+
+            {/* Zero Adulteration Badge */}
+            <div className="flex flex-col items-center text-center p-6 bg-white rounded-xl">
+              <div className="w-20 h-20 mb-4 hover:scale-110 transition-transform duration-300 cursor-pointer">
+                <img 
+                  src="/assets/productbadgeimg/Zero Adulteration (3).png" 
+                  alt="Zero Adulteration" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Zero Adulteration</h3>
+              {/* <p className="text-sm text-gray-600">100% pure and authentic products guaranteed</p> */}
+            </div>
+          </div>
+        </div>
+
         {/* Benefits Banner */}
         <BenefitsBanner product={product} />
 
