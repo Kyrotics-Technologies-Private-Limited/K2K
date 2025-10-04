@@ -136,7 +136,7 @@ const AllProductPage = () => {
       </div>
 
       {/* Banner Section */}
-      <div className="max-w-7xl mx-auto px-4">
+      {/* <div className="max-w-7xl mx-auto px-4">
         <div
           className="relative rounded-xl shadow-lg p-6 md:p-8 my-4 bg-cover bg-center min-h-[350px] md:h-[400px] flex items-center"
           style={{
@@ -250,7 +250,7 @@ const AllProductPage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       <div id="product-grid-section" className="max-w-7xl mx-auto px-4">
         {loading ? (
           <ProductGrid products={products} />

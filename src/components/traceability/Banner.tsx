@@ -69,11 +69,11 @@ const NatureTraceBannerContent: React.FC = () => {
           <div className="flex justify-center space-x-6 mb-16">
             <button
               onClick={handleRedirect}
-              className="button flex items-center justify-center px-10 py-5 bg-white text-green-800 font-bold rounded-full 
+              className="button flex items-center justify-center px-10 py-5 bg-white text-xl text-green-800 font-bold rounded-full 
                          hover:bg-green-100 transition-all duration-300 
                          transform hover:-translate-y-2 shadow-2xl hover:shadow-xl"
             >
-              Explore Our Traceability
+              Check Test Report
             </button>
           </div>
 

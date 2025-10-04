@@ -259,7 +259,7 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
                     disabled={subscribingPlanId === plan.id || isLoading}
                     onClick={() => handlePayNowClick(plan.id as PlanType)}
                   >
-                    {subscribingPlanId === plan.id ? "Processing..." : "Pay Now"}
+                    {subscribingPlanId === plan.id ? "Processing..." : "Join Now"}
                   </button>
                 </div>
               </div>
