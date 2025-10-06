@@ -397,52 +397,138 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
-          {/* Image Gallery */}
-          <div className="space-y-4">
-            <div className="relative aspect-square rounded-lg overflow-hidden">
-              <img
-                src={product.images.gallery[selectedImage]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-              <button
-                onClick={() =>
-                  setSelectedImage((prev) =>
-                    prev === 0 ? product.images.gallery.length - 1 : prev - 1
-                  )
-                }
-                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() =>
-                  setSelectedImage((prev) =>
-                    prev === product.images.gallery.length - 1 ? 0 : prev + 1
-                  )
-                }
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="flex gap-2 overflow-x-auto p-2">
-              {product.images.gallery.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden ${
-                    selectedImage === index ? "ring-2 ring-green-800" : ""
-                  }`}
-                >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-8 pb-8">
+          {/* Image Gallery - Sticky Left Side */}
+          <div className="sticky top-8 self-start">
+            <div className="flex gap-4">
+              {/* Thumbnail Gallery - Left Side */}
+              <div className="flex flex-col gap-2 overflow-y-auto max-h-[500px] p-2">
+                {product.images.gallery.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`flex-shrink-0 w-16 h-16 overflow-hidden ${
+                      selectedImage === index ? "ring-2 ring-green-800" : ""
+                    }`}
+                  >
+                    <img
+                      src={image}
+                      alt={`${product.name} thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+              
+              {/* Main Image Container */}
+              <div className="flex-1 flex flex-col">
+                {/* Main Image */}
+                <div className="relative h-[500px] overflow-hidden">
                   <img
-                    src={image}
-                    alt={`${product.name} thumbnail ${index + 1}`}
+                    src={product.images.gallery[selectedImage]}
+                    alt={product.name}
                     className="w-full h-full object-cover"
                   />
-                </button>
-              ))}
+                  <button
+                    onClick={() =>
+                      setSelectedImage((prev) =>
+                        prev === 0 ? product.images.gallery.length - 1 : prev - 1
+                      )
+                    }
+                    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() =>
+                      setSelectedImage((prev) =>
+                        prev === product.images.gallery.length - 1 ? 0 : prev + 1
+                      )
+                    }
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                {/* Quantity Selector and Action Buttons */}
+                {variants.length > 0 && (
+                  <div className="flex items-center space-x-3 mt-4">
+                    {/* Quantity Selector */}
+                    <div className="flex border border-gray-300 rounded-xl">
+                      <button
+                        onClick={() => handleUpdateQuantity("decrement")}
+                        className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
+                        disabled={loading || quantity <= 1}
+                      >
+                        -
+                      </button>
+                      <span className="text-xl font-medium w-12 text-center mt-1">
+                        {quantity}
+                      </span>
+                      <button
+                        onClick={() => handleUpdateQuantity("increment")}
+                        className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
+                        disabled={
+                          loading ||
+                          quantity >=
+                            (variants[selectedVariant]?.units_in_stock || 1)
+                        }
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    {/* Add to Cart and Buy Now Buttons */}
+                    {product.stockStatus === "out_of_stock" ? (
+                      <div className="flex-1 bg-gray-100 rounded-lg p-4 text-center">
+                        <p className="text-gray-600 font-medium">
+                          Currently Out of Stock
+                        </p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Please check back later or contact us for availability
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <button
+                          onClick={handleAddToCartClick}
+                          className="button flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
+                          disabled={
+                            !variants[selectedVariant]?.inStock || addingToCart
+                          }
+                        >
+                          {addingToCart ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-t-2 border-green-800 rounded-full animate-spin"></div>
+                              Adding...
+                            </div>
+                          ) : (
+                            <>
+                              <ShoppingCart className="w-5 h-5" />
+                              Add to Cart
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={handleBuyNowClick}
+                          className="button flex-1 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
+                          disabled={!variants[selectedVariant].inStock || loading}
+                        >
+                          {loading ? (
+                            "Processing..."
+                          ) : (
+                            <>
+                              <CreditCard className="w-5 h-5" />
+                              Buy Now
+                            </>
+                          )}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -743,77 +829,6 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                     Hurry, only {variants[selectedVariant].units_in_stock} left!
                   </h2>
                 )}
-                <div className="flex items-center space-x-3">
-                  <div className="flex border border-gray-300 rounded-xl">
-                    <button
-                      onClick={() => handleUpdateQuantity("decrement")}
-                      className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
-                      disabled={loading || quantity <= 1}
-                    >
-                      -
-                    </button>
-                    <span className="text-xl font-medium w-12 text-center mt-1">
-                      {quantity}
-                    </span>
-                    <button
-                      onClick={() => handleUpdateQuantity("increment")}
-                      className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
-                      disabled={
-                        loading ||
-                        quantity >=
-                          (variants[selectedVariant]?.units_in_stock || 1)
-                      }
-                    >
-                      +
-                    </button>
-                  </div>
-                  {product.stockStatus === "out_of_stock" ? (
-                    <div className="flex-1 bg-gray-100 rounded-lg p-4 text-center">
-                      <p className="text-gray-600 font-medium">
-                        Currently Out of Stock
-                      </p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Please check back later or contact us for availability
-                      </p>
-                    </div>
-                  ) : (
-                    <>
-                      <button
-                        onClick={handleAddToCartClick}
-                        className="button flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
-                        disabled={
-                          !variants[selectedVariant]?.inStock || addingToCart
-                        }
-                      >
-                        {addingToCart ? (
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 border-2 border-t-2 border-green-800 rounded-full animate-spin"></div>
-                            Adding...
-                          </div>
-                        ) : (
-                          <>
-                            <ShoppingCart className="w-5 h-5" />
-                            Add to Cart
-                          </>
-                        )}
-                      </button>
-                      <button
-                        onClick={handleBuyNowClick}
-                        className="button flex-1 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
-                        disabled={!variants[selectedVariant].inStock || loading}
-                      >
-                        {loading ? (
-                          "Processing..."
-                        ) : (
-                          <>
-                            <CreditCard className="w-5 h-5" />
-                            Buy Now
-                          </>
-                        )}
-                      </button>
-                    </>
-                  )}
-                </div>
               </>
             )}
             <div>
@@ -827,7 +842,12 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
         <div className="mt-8 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* 300+ Farmer Empowered Badge */}
-            <div className="flex flex-col items-center text-center p-6 bg-white rounded-xl">
+            <div 
+              className="flex flex-col items-center text-center p-6 rounded-xl"
+              style={{
+                background: 'linear-gradient(to bottom, #f0f9ff, #e0f2fe, #bae6fd)'
+              }}
+            >
               <div className="w-20 h-20 mb-4 hover:scale-110 transition-transform duration-300 cursor-pointer">
                 <img 
                   src="/assets/productbadgeimg/300+ Farmer empowered (1).png" 
@@ -840,7 +860,12 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
             </div>
 
             {/* Procured from Birbhum Badge */}
-            <div className="flex flex-col items-center text-center p-6 bg-white rounded-xl">
+            <div 
+              className="flex flex-col items-center text-center p-6 rounded-xl"
+              style={{
+                background: 'linear-gradient(to bottom, #f0f9ff, #e0f2fe, #bae6fd)'
+              }}
+            >
               <div className="w-20 h-20 mb-4 hover:scale-110 transition-transform duration-300 cursor-pointer">
                 <img 
                   src="/assets/productbadgeimg/PROCURED FROM BIRBHUM (1).png" 
@@ -853,7 +878,12 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
             </div>
 
             {/* Zero Adulteration Badge */}
-            <div className="flex flex-col items-center text-center p-6 bg-white rounded-xl">
+            <div 
+              className="flex flex-col items-center text-center p-6 rounded-xl"
+              style={{
+                background: 'linear-gradient(to bottom, #f0f9ff, #e0f2fe, #bae6fd)'
+              }}
+            >
               <div className="w-20 h-20 mb-4 hover:scale-110 transition-transform duration-300 cursor-pointer">
                 <img 
                   src="/assets/productbadgeimg/Zero Adulteration (3).png" 
