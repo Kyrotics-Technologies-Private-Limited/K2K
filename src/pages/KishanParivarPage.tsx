@@ -5,6 +5,7 @@ import KishanParivarForm from '../components/kishanParivar/KishanParivarplans';
 import KishanParivarHero from '../components/kishanParivar/KishanParivarHero';
 // import FeaturesKishanParivar from '../components/kishanParivar/FeaturesKishanParivar';
 import MembershipStatusSection from '@/components/kishanParivar/MembershipStatusSecction';
+import RecognizedBy from '../components/homePageComponents/RecognizedBy';
 
 
 
@@ -42,6 +43,7 @@ const KishanParivarPage = () => {
         {/* <FeaturesKishanParivar scrollToTarget={scrollToTarget} /> */}
         {/* <KishanParivarForm targetRef={targetRef} /> */}
       </div>
+      <RecognizedBy />
     </AuthProvider>
   );
 };

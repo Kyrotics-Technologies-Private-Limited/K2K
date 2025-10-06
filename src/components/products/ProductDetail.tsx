@@ -845,7 +845,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
             <div 
               className="flex flex-col items-center text-center p-6 rounded-xl"
               style={{
-                background: 'linear-gradient(to bottom, #f0f9ff, #e0f2fe, #bae6fd)'
+                background: 'linear-gradient(to bottom, #ffffff, #f0fdf4, #fef3c7)'
               }}
             >
               <div className="w-20 h-20 mb-4 hover:scale-110 transition-transform duration-300 cursor-pointer">
@@ -863,7 +863,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
             <div 
               className="flex flex-col items-center text-center p-6 rounded-xl"
               style={{
-                background: 'linear-gradient(to bottom, #f0f9ff, #e0f2fe, #bae6fd)'
+                background: 'linear-gradient(to bottom, #ffffff, #f0fdf4, #fef3c7)'
               }}
             >
               <div className="w-20 h-20 mb-4 hover:scale-110 transition-transform duration-300 cursor-pointer">
@@ -881,7 +881,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
             <div 
               className="flex flex-col items-center text-center p-6 rounded-xl"
               style={{
-                background: 'linear-gradient(to bottom, #f0f9ff, #e0f2fe, #bae6fd)'
+                background: 'linear-gradient(to bottom, #ffffff, #f0fdf4, #fef3c7)'
               }}
             >
               <div className="w-20 h-20 mb-4 hover:scale-110 transition-transform duration-300 cursor-pointer">

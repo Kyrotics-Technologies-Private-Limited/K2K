@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+
 import { Package, Truck, Star, CheckCircle } from 'lucide-react';
 import { ProductGrid } from '../components/products/ProductGrid';
 import { productApi } from '../services/api/productApi';
 import { Product } from '../types';
+import RecognizedBy from '../components/homePageComponents/RecognizedBy';
 
 const TryOurSamplePage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -54,22 +55,26 @@ const TryOurSamplePage: React.FC = () => {
         </div>
         
         {/* Try Our Sample Button */}
-                {/* Try Our Sample Button */}
-                <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
-          <Link
-            to="/all-products"
-            className="bg-green-600 text-white py-3 px-8  rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-200"
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
+          <button
+            onClick={() => {
+              const element = document.getElementById('product-cards');
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+            className="bg-green-600 text-white py-3 px-8 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-200"
           >
             Try Our Sample
-          </Link>
+          </button>
         </div>
       </div>
 
       {/* Product Grid Section */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div id="product-grid" className="max-w-7xl mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-4">
-            Try Our Products
+            Try Our Sample
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Explore our range of authentic, farm-fresh products. Click on any product to learn more and place your sample order.
@@ -91,7 +96,9 @@ const TryOurSamplePage: React.FC = () => {
             </button>
           </div>
         ) : (
-          <ProductGrid products={products} />
+          <div id="product-cards">
+            <ProductGrid products={products} />
+          </div>
         )}
       </div>
 
@@ -105,80 +112,90 @@ const TryOurSamplePage: React.FC = () => {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-green-600" />
+            <div className="text-center p-6 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-green-50 cursor-pointer">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 transition-all duration-300 hover:bg-green-200 hover:scale-110">
+                <CheckCircle className="w-8 h-8 text-green-600 transition-colors duration-300 hover:text-green-700" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2 transition-colors duration-300 hover:text-green-700">
                 Quality Assurance
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-sm transition-colors duration-300 hover:text-gray-700">
                 Experience our premium quality before committing to larger quantities
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Truck className="w-8 h-8 text-green-600" />
+            <div className="text-center p-6 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-green-50 cursor-pointer">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 transition-all duration-300 hover:bg-green-200 hover:scale-110">
+                <Truck className="w-8 h-8 text-green-600 transition-colors duration-300 hover:text-green-700" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2 transition-colors duration-300 hover:text-green-700">
                 Free Shipping
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-sm transition-colors duration-300 hover:text-gray-700">
                 All sample orders include free shipping across India
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Star className="w-8 h-8 text-green-600" />
+            <div className="text-center p-6 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-green-50 cursor-pointer">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 transition-all duration-300 hover:bg-green-200 hover:scale-110">
+                <Star className="w-8 h-8 text-green-600 transition-colors duration-300 hover:text-green-700" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2 transition-colors duration-300 hover:text-green-700">
                 Risk-Free Trial
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-sm transition-colors duration-300 hover:text-gray-700">
                 Try our products without any commitment or subscription
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Package className="w-8 h-8 text-green-600" />
+            <div className="text-center p-6 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-green-50 cursor-pointer">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 transition-all duration-300 hover:bg-green-200 hover:scale-110">
+                <Package className="w-8 h-8 text-green-600 transition-colors duration-300 hover:text-green-700" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2 transition-colors duration-300 hover:text-green-700">
                 Perfect Size
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-sm transition-colors duration-300 hover:text-gray-700">
                 Sample sizes perfect for testing and tasting our products
               </p>
             </div>
           </div>
         </div>
 
-        {/* CTA Section */}
-        <div className="bg-green-600 rounded-2xl p-8 text-center text-white">
-          <h2 className="text-3xl font-bold mb-4">
+        {/* CTA Section
+        <div 
+          className="rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 text-center text-black"
+          style={{
+            backgroundImage: 'url(/assets/tryOurSample/try_our_sample3.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold  mb-3 sm:mb-4 md:mb-6">
             Ready to Experience Quality?
           </h2>
-          <p className="text-xl mb-6 text-green-100">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-4 sm:mb-5 md:mb-6 text-gray-700 px-2 sm:px-4">
             Order your sample today and taste the difference of authentic, farm-fresh products
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2 sm:px-4">
             <Link
               to="/all-products"
-              className="bg-white text-green-600 py-3 px-8 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
+              className="bg-white text-green-600 py-2 sm:py-3 px-4 sm:px-6 md:px-8 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200 text-sm sm:text-base"
             >
               Browse All Products
             </Link>
             <Link
               to="/kishanParivarPage"
-              className="bg-green-700 text-white py-3 px-8 rounded-lg font-semibold hover:bg-green-800 transition-colors duration-200"
+              className="bg-green-700 text-white py-2 sm:py-3 px-4 sm:px-6 md:px-8 rounded-lg font-semibold hover:bg-green-800 transition-colors duration-200 text-sm sm:text-base"
             >
               Join Kishan Parivar
             </Link>
           </div>
-        </div>
+        </div> */}
       </div>
+      
+      <RecognizedBy />
     </div>
   );
 };
