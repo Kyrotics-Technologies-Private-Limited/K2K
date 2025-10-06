@@ -55,25 +55,6 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
 
   return (
     <div className="bg-inherit">
-      {/* Category Filters */}
-      <div className="flex flex-col md:flex-row justify-center items-center gap-4 py-6">
-        <div className="flex flex-wrap gap-3 justify-center">
-          {categories.map(category => (
-            <button
-              key={category}
-              onClick={() => handleCategoryClick(category)}
-              className={`button px-6 py-2 rounded-full border-2 border-green-700 transition-all ${
-                activeCategory === category
-                  ? 'bg-[#0d6b1e] text-[#FFD87D]'
-                  : 'bg-white hover:bg-gray-50'
-              }`}
-            >
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
-  
       {/* Product Grid */}
       <div className="py-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

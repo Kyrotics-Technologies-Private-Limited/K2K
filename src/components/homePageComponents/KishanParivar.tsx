@@ -27,10 +27,10 @@ const KishanParivar: React.FC = () => {
       </div>
 
       {/* Main Card Component */}
-      <div className="bg-white rounded-2xl border border-gray-300 shadow-xl overflow-hidden w-full max-w-3xl">
+      <div className="bg-white rounded-2xl border border-gray-300 shadow-xl overflow-hidden w-full max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row justify-start">
           {/* Card Section - Left Side */}
-          <div className="w-full lg:w-[320px] p-4 bg-green-brand flex flex-col justify-between">
+          <div className="w-full lg:w-[500px] p-6 bg-green-brand flex flex-col justify-between">
             <div className="flex justify-between items-start mb-2">
               <div className="flex items-center gap-2">
                 <img
@@ -53,7 +53,7 @@ const KishanParivar: React.FC = () => {
             </div>
 
             {/* Card Design */}
-            <div className="relative bg-gradient-to-br from-green-600 to-green-800 rounded-lg p-3 w-full h-24 shadow-lg mb-3 overflow-hidden">
+            <div className="relative bg-gradient-to-br from-green-600 to-green-800 rounded-lg p-4 w-full h-28 shadow-lg mb-4 overflow-hidden">
               {/* Decorative elements */}
               <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-green-700/20"></div>
               <div className="absolute -bottom-4 -left-4 w-20 h-20 rounded-full bg-green-500/20"></div>
@@ -95,7 +95,7 @@ const KishanParivar: React.FC = () => {
           </div>
 
           {/* Features Section - Right Side */}
-          <div className="w-full lg:flex-1 p-8 lg:p-12 bg-white">
+          <div className="w-full lg:w-[calc(100%-500px)] p-8 lg:p-10 bg-white">
             {/* <div className="mb-3 flex items-center gap-2 text-green-brand">
               <Droplets size={24} />
               <span className="text-base font-medium tracking-wide">EXCLUSIVE OFFER</span>
@@ -113,37 +113,37 @@ const KishanParivar: React.FC = () => {
                 {
                   icon: <CheckCircle size={24} className="text-green-brand" />,
                   heading: "Freshly Prepared After Your Order",
-                  // text: "We prioritize your family's health. Every item is freshly prepared only after you place an order — ensuring maximum freshness, nutrition, and health benefits for you and your loved ones.",
+                  text: "We prioritize your family's health. Every item is freshly prepared only after you place an order — ensuring maximum freshness, nutrition, and health benefits for you and your loved ones.",
                   highlight: true,
                 },
                 {
                   icon: <CheckCircle size={22} className="text-green-brand" />,
-                  heading: "Flat 15% Off — Always",
-                  // text: "Enjoy savings from day one. With the Kishan Parivar Card, you receive a flat 10% discount on every purchase — no coupons, no conditions.",
+                  heading: "Flat 10% Off — Always",
+                  text: "Enjoy savings from day one. With the Kishan Parivar Card, you receive a flat 10% discount on every purchase — no coupons, no conditions.",
                   highlight: true,
                 },
                 {
                   icon: <CheckCircle size={22} className="text-green-brand" />,
                   heading: "Your Health, Our Promise",
-                  // text: "We go beyond food. As a member, you'll gain access to exclusive wellness guides, diet tips, and lifestyle insights curated by health experts — helping you live a healthier, happier life.",
+                  text: "We go beyond food. As a member, you'll gain access to exclusive wellness guides, diet tips, and lifestyle insights curated by health experts — helping you live a healthier, happier life.",
                   highlight: true,
                 },
                 {
                   icon: <CheckCircle size={22} className="text-green-brand" />,
                   heading: "Free Health Check-ups",
-                  // text: "Loyalty comes with care. Spend ₹1,00,000 in a year and unlock two complimentary health check-ups annually — for you and your family.",
+                  text: "Loyalty comes with care. Spend ₹1,00,000 in a year and unlock two complimentary health check-ups annually — for you and your family.",
                   highlight: true,
                 },
               ].map((item, index) => (
-                <li key={index} className="flex items-start gap-2">
+                <li key={index} className="flex items-start gap-3">
                   {item.icon}
                   <div className="flex-1">
                     <h3 className="text-sm font-semibold text-green-800 mb-2">
                       {item.heading}
                     </h3>
-                    {/* <p className="text-base text-gray-600 leading-relaxed">
+                    <p className="text-sm text-gray-600 leading-relaxed">
                       {item.text}
-                    </p> */}
+                    </p>
                   </div>
                 </li>
               ))}
@@ -156,10 +156,13 @@ const KishanParivar: React.FC = () => {
                 className="button bg-green-brand text-white font-semibold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg flex-1 text-center"
               >
                 Join Now
-              </Link>
-              <button className="button border-2 border-green-brand text-green-brand hover:bg-green-50 font-medium py-3 px-6 rounded-lg transition-colors flex-1 text-center">
+              </Link >
+              <Link
+                to="/kishanParivarPage"
+                className="button border-2 border-green-brand text-green-brand hover:bg-green-50 font-medium py-3 px-6 rounded-lg transition-colors flex-1 text-center"
+              >
                 Know More
-              </button>
+              </Link>
             </div>
 
             <div className="mt-6 flex items-center gap-2 text-gray-500 text-sm">
