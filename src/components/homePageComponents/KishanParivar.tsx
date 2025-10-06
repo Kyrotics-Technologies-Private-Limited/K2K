@@ -155,10 +155,10 @@ const KishanParivar: React.FC = () => {
                 to="/kishanParivarPage#membership-plans"
                 className="button bg-green-brand text-white font-semibold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg flex-1 text-center"
               >
-                Subscribe Now
+                Join Now
               </Link>
               <button className="button border-2 border-green-brand text-green-brand hover:bg-green-50 font-medium py-3 px-6 rounded-lg transition-colors flex-1 text-center">
-                Learn More
+                Know More
               </button>
             </div>
 

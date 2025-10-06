@@ -46,7 +46,7 @@ const Hero = () => {
               <img
                 src={slide.image}
                 alt={`Banner ${index + 1}`}
-                className="w-full h-full object-cover sm:h-auto sm:w-full md:h-[80vh] lg:h-[76vh]"
+                className="w-full h-full object-contain sm:h-auto sm:w-full md:h-auto md:w-full lg:h-auto lg:w-full"
                 loading="eager"
               />
             </a>
