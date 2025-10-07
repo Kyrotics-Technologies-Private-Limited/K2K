@@ -41,6 +41,16 @@ const OrderDetailPage = () => {
     }
   }, [dispatch, orderId]);
 
+  // Debug: Log order data to see what fields are available
+  useEffect(() => {
+    if (order) {
+      console.log('Order data:', order);
+      console.log('Processing Date:', order.processingDate);
+      console.log('Shipped Date:', order.shippedDate);
+      console.log('Delivered Date:', order.deliveredDate);
+    }
+  }, [order]);
+
   useEffect(() => {
     const loadVariantGst = async () => {
       if (!order?.items || order.items.length === 0) return;
@@ -157,6 +167,29 @@ const OrderDetailPage = () => {
     });
   };
 
+  // Helper function to get the best available timestamp for a status
+  const getStatusTimestamp = (status: string) => {
+    if (!order) return 'Not available';
+    
+    switch (status) {
+      case 'placed':
+        return order.created_at ? formatTimestamp(order.created_at) : 'Not available';
+      case 'processing':
+        return order.processingDate ? formatTimestamp(order.processingDate) : 
+               (order.status === "processing" || order.status === "shipped" || order.status === "delivered") ?
+                 formatTimestamp(order.updated_at) : 'Not available';
+      case 'shipped':
+        return order.shippedDate ? formatTimestamp(order.shippedDate) :
+               (order.status === "shipped" || order.status === "delivered") ?
+                 formatTimestamp(order.updated_at) : 'Not available';
+      case 'delivered':
+        return order.deliveredDate ? formatTimestamp(order.deliveredDate) :
+               order.status === "delivered" ? formatTimestamp(order.updated_at) : 'Not available';
+      default:
+        return 'Not available';
+    }
+  };
+
   const formatTimestamp = (timestamp: any) => {
     if (!timestamp) return "";
 
@@ -187,15 +220,31 @@ const OrderDetailPage = () => {
       const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
 
       if (diffInHours < 1) {
-        return "Just now";
+        return date.toLocaleDateString("en-IN", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true
+        });
       } else if (diffInHours < 24) {
-        return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+        return date.toLocaleDateString("en-IN", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true
+        });
       } else {
         return date.toLocaleDateString("en-IN", {
           day: "numeric",
           month: "short",
+          year: "numeric",
           hour: "2-digit",
           minute: "2-digit",
+          hour12: true
         });
       }
     } catch (error) {
@@ -497,7 +546,7 @@ const OrderDetailPage = () => {
                 </div>
                 <span className="text-sm font-medium">Order Placed</span>
                 <span className="text-xs text-gray-500 mt-1">
-                  {order.created_at ? formatTimestamp(order.created_at) : 'Not available'}
+                  {getStatusTimestamp('placed')}
                 </span>
                 {/* <span className="text-xs text-gray-600">
                     {order.created_at ? new Date(order.created_at).toLocaleTimeString('en-IN', {
@@ -528,9 +577,7 @@ const OrderDetailPage = () => {
                 </div>
                 <span className="text-sm font-medium">Processing</span>
                 <span className="text-xs text-gray-500 mt-1">
-                  {order.processingDate ? formatTimestamp(order.processingDate) :
-                    (order.status === "processing" || order.status === "shipped" || order.status === "delivered") ?
-                      formatTimestamp(order.processingDate) : 'Not available'}
+                  {getStatusTimestamp('processing')}
                 </span>
                 <span className="text-xs text-gray-400">
                   {(order.status === "shipped" || order.status === "delivered") ? 'Completed' : (order.status === "processing" ? 'Processing' : 'Pending')}
@@ -554,9 +601,7 @@ const OrderDetailPage = () => {
                 </div>
                 <span className="text-sm font-medium">Shipped</span>
                 <span className="text-xs text-gray-500 mt-1">
-                  {order.shippedDate ? formatTimestamp(order.shippedDate) :
-                    (order.status === "shipped" || order.status === "delivered") ?
-                      'Shipped' : 'Not available'}
+                  {getStatusTimestamp('shipped')}
                 </span>
                 <span className="text-xs text-gray-400">
                   {(order.status === "delivered") ? 'Completed' : (order.status === "shipped" ? 'Shipped' : 'Pending')}
@@ -580,8 +625,7 @@ const OrderDetailPage = () => {
                 </div>
                 <span className="text-sm font-medium">Delivered</span>
                 <span className="text-xs text-gray-500 mt-1">
-                  {order.deliveredDate ? formatTimestamp(order.deliveredDate) :
-                    order.status === "delivered" ? 'Delivered' : 'Not available'}
+                  {getStatusTimestamp('delivered')}
                 </span>
                 <span className="text-xs text-gray-400">
                   {(order.status === "delivered") ? 'Delivered' : 'Pending'}
