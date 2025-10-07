@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-
 import { Package, Truck, Star, CheckCircle } from 'lucide-react';
 import { ProductGrid } from '../components/products/ProductGrid';
 import { productApi } from '../services/api/productApi';

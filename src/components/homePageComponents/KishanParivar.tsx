@@ -1,6 +1,6 @@
 
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   CheckCircle,
   CreditCard,
@@ -12,6 +12,35 @@ import {
 import { Link } from "react-router-dom";
 
 const KishanParivar: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const featuresRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        } else {
+          setIsVisible(false);
+        }
+      },
+      {
+        threshold: 0.1, // Trigger when 10% of the element is visible
+        rootMargin: '0px 0px -50px 0px' // Start animation slightly before element is fully visible
+      }
+    );
+
+    if (featuresRef.current) {
+      observer.observe(featuresRef.current);
+    }
+
+    return () => {
+      if (featuresRef.current) {
+        observer.unobserve(featuresRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="bg-[rgba(255,255,255,0.75)] py-16 px-4">
       {/* New Heading Section */}
@@ -108,7 +137,7 @@ const KishanParivar: React.FC = () => {
             </p> */}
 
             {/* Enhanced Features List */}
-            <ul className="space-y-8 mb-12">
+            <ul ref={featuresRef} className="space-y-8 mb-12">
               {[
                 {
                   icon: <CheckCircle size={24} className="text-green-brand" />,
@@ -135,7 +164,15 @@ const KishanParivar: React.FC = () => {
                   highlight: true,
                 },
               ].map((item, index) => (
-                <li key={index} className="flex items-start gap-3">
+                <li 
+                  key={index} 
+                  className={`flex items-start gap-3 transition-all duration-500 ease-in-out ${
+                    isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-24'
+                  }`}
+                  style={{
+                    transitionDelay: isVisible ? `${index * 0.2}s` : `${(3 - index) * 0.1}s`,
+                  }}
+                >
                   {item.icon}
                   <div className="flex-1">
                     <h3 className="text-sm font-semibold text-green-800 mb-2">
@@ -148,6 +185,7 @@ const KishanParivar: React.FC = () => {
                 </li>
               ))}
             </ul>
+
 
             {/* Enhanced CTA */}
             <div className="flex flex-col sm:flex-row gap-4">

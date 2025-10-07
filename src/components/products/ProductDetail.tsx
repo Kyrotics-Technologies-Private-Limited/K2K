@@ -744,7 +744,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                         onClick={() => setShowPricePopup(true)}
                         className="button flex items-center gap-2 text-md text-green-800 hover:text-black border border-gray-300 rounded-lg px-3 py-2"
                       >
-                        Know your price
+                        Know our price
                         <Info size={16} />
                       </button>
                       {showPricePopup && (
