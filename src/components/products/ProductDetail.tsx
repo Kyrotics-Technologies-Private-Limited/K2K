@@ -8,13 +8,13 @@ import {
   Info,
   X,
   ArrowLeft,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Product } from "../../types";
 import { ProductCard } from "./ProductCard";
-import { ProductBadges } from "./Productbadge";
 import { BenefitsBanner } from "./InformationBanner";
-import { HealthBenefits } from "./HealthBenefits";
 import RecognizedBy from "../homePageComponents/RecognizedBy";
 import { useAppDispatch } from "../../store/store";
 import {
@@ -57,6 +57,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
   const [success, setSuccess] = useState<string | null>(null);
   const { user } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isBenefitsOpen, setIsBenefitsOpen] = useState(true);
   const navigate = useNavigate();
 
   // Membership state
@@ -136,6 +137,22 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
         <p>Loading...</p>
       </div>
     );
+  }
+
+  // Debug: Log product data to check if healthBadges are present
+  console.log('Product data:', product);
+  console.log('Product healthBadges:', product.healthBadges);
+  console.log('Health badges count:', product.healthBadges?.length || 0);
+  
+  if (product.healthBadges && product.healthBadges.length > 0) {
+    product.healthBadges.forEach((badge, idx) => {
+      console.log(`Health Badge ${idx}:`, {
+        title: badge.title,
+        description: badge.description,
+        image: badge.image,
+        fullBadge: badge
+      });
+    });
   }
 
   const isMember = isActiveKPMember(membershipStatus);
@@ -557,7 +574,24 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
               </div>
             </div>
 
-            <ProductBadges product={product} />
+            {/* Product Badges */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 py-6">
+              {product.badges.map((badge, index) => (
+                <div 
+                  key={index}
+                  className="flex flex-col items-center text-center group"
+                >
+                  <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-2 transform transition-transform group-hover:scale-110">
+                    <img 
+                      src={badge.image} 
+                      alt={badge.text} 
+                      className="w-16 h-16" 
+                    />
+                  </div>
+                  <span className="text-sm font-medium text-green-800">{badge.text}</span>
+                </div>
+              ))}
+            </div>
 
             <div>
               <h2 className="text-xl font-semibold mb-4">Select Variant</h2>
@@ -901,7 +935,63 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
         <BenefitsBanner product={product} />
 
         {/* Health Benefits */}
-        <HealthBenefits product={product} />
+        {product.healthBadges && product.healthBadges.length > 0 && (
+          <div className="mt-8">
+            <button 
+              onClick={() => setIsBenefitsOpen(!isBenefitsOpen)}
+              className="w-full flex items-center justify-between"
+            >
+              <div className="text-left">
+                <h2 className="text-3xl uppercase font-bold font-cormorant text-gray-800">Benefits</h2>
+              </div>
+              {isBenefitsOpen ? (
+                <ChevronUp className="w-6 h-6 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-6 h-6 text-gray-500" />
+              )}
+            </button>
+
+            <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
+              isBenefitsOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+            }`}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+                {product.healthBadges.map((healthBadges, index) => {
+                  console.log(`Health Badge ${index}:`, healthBadges);
+                  console.log(`Icon URL for ${healthBadges.title}:`, healthBadges.image);
+                  
+                  return (
+                    <div key={index} className="flex items-start space-x-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-20 h-20 rounded-full border-2 border-green-700 flex items-center justify-center p-3 bg-green-50 shadow-sm">
+                          {healthBadges.image && (
+                            <img
+                              src={healthBadges.image}
+                              alt={healthBadges.title}
+                              className="w-full h-full object-contain"
+                              onLoad={() => console.log(`Image loaded successfully for ${healthBadges.title}`)}
+                              onError={(e) => {
+                                console.error(`Image failed to load for ${healthBadges.title}:`, healthBadges.image);
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-2xl font-bold font-cormorant text-gray-600 mb-2">
+                          {healthBadges.title}
+                        </h4>
+                        <p className="text-gray-800 text-base leading-relaxed">
+                          {healthBadges.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Related Products */}
         <div className="mt-8">
