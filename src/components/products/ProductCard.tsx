@@ -51,6 +51,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
     fetchProductVariants();
   }, [product.id]);
 
+  // GST helpers: no membership here; show regular price including GST
+  const applyGst = (amount: number, gstPercentage?: number) => {
+    const gst = gstPercentage ?? 0;
+    return Math.floor(amount + (amount * gst) / 100);
+  };
+
+  const getRegularPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
+    applyGst(regularPrice, gstPercentage);
+
   const handleProductClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -75,8 +84,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
     );
   }
 
-  // Find the variant with the lowest price
-  const lowestPriceVariant = variants.reduce((min, v) => (v.price < min.price ? v : min), variants[0] || null);
+  // Find the variant with the lowest GST-inclusive regular price
+  const lowestPriceVariant = variants.length > 0
+    ? variants.reduce((min, v) => {
+        const vPrice = getRegularPriceWithGST(v.price, v.gstPercentage);
+        const mPrice = min ? getRegularPriceWithGST(min.price, min.gstPercentage) : Number.POSITIVE_INFINITY;
+        return vPrice < mPrice ? v : min;
+      }, variants[0])
+    : null;
 
   return (
     <Link
@@ -121,11 +136,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
           <div className="flex flex-col">
             <div className="flex items-baseline gap-1.5">
               <span className="text-base font-bold text-black">
-                ₹{lowestPriceVariant ? lowestPriceVariant.price.toLocaleString("en-IN") : "-"}
+                ₹{lowestPriceVariant ? getRegularPriceWithGST(
+                  lowestPriceVariant.price,
+                  lowestPriceVariant.gstPercentage
+                ).toLocaleString("en-IN") : "-"}
               </span>
               {lowestPriceVariant?.originalPrice && (
                 <span className="text-xs line-through text-gray-500">
-                  ₹{lowestPriceVariant.originalPrice.toLocaleString("en-IN")}
+                  ₹{getRegularPriceWithGST(
+                    lowestPriceVariant.originalPrice,
+                    lowestPriceVariant.gstPercentage
+                  ).toLocaleString("en-IN")}
                 </span>
               )}
               {lowestPriceVariant?.discount && (

@@ -6,6 +6,10 @@ interface OrderSummary {
   tax: number;
   shipping: number;
   total: number;
+  // KP Member discount fields
+  kpDiscountPercentage: number;
+  kpDiscountAmount: number;
+  originalTotal: number;
 }
 
 interface CheckoutState {
@@ -29,6 +33,9 @@ const initialState: CheckoutState = {
     tax: 0,
     shipping: 0,
     total: 0,
+    kpDiscountPercentage: 0,
+    kpDiscountAmount: 0,
+    originalTotal: 0,
   },
   paymentMethod: null,
   isProcessing: false,

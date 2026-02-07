@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
+import RecognizedBy from '../components/homePageComponents/RecognizedBy';
 
 const AboutUs: React.FC = () => {
   useEffect(() => {
@@ -179,6 +180,7 @@ const AboutUs: React.FC = () => {
           </motion.div>
         </div>
       </section>
+      <RecognizedBy />
     </div>
   );
 };

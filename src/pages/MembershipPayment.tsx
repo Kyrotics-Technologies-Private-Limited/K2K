@@ -1,15 +1,75 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { membershipApi } from "../services/api/membershipApi";
+import { MembershipPlan } from "../types/membership";
+
+// Type for the transformed plan object from KishanParivarplans component
+type DisplayPlan = {
+  id: string;
+  name: string;
+  duration: string;
+  price: string;
+  originalPrice: string;
+  discount: string;
+  delivery: string;
+  popular: boolean;
+  features: string[];
+  description?: string;
+};
 
 const MembershipPayment: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  // Get selected plan from navigation state
-  const plan = location.state?.plan;
+  // Get selected plan from navigation state - can be either MembershipPlan or DisplayPlan
+  const plan = location.state?.plan as MembershipPlan | DisplayPlan;
   const [paymentMethod, setPaymentMethod] = useState<"card" | "upi" | "credit" | "debit" | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Helper functions to safely extract data from either plan format
+  const getPlanId = (plan: MembershipPlan | DisplayPlan): string => {
+    return plan.id;
+  };
+
+  const getPlanType = (plan: MembershipPlan | DisplayPlan): string => {
+    if ('type' in plan) {
+      return plan.type; // MembershipPlan format
+    } else {
+      return plan.name; // DisplayPlan format
+    }
+  };
+
+  const getPlanPrice = (plan: MembershipPlan | DisplayPlan): string => {
+    if ('type' in plan) {
+      return `₹${plan.price}`; // MembershipPlan format - convert number to string
+    } else {
+      return plan.price; // DisplayPlan format - already a string
+    }
+  };
+
+  const getPlanDuration = (plan: MembershipPlan | DisplayPlan): string => {
+    if ('type' in plan) {
+      return `${plan.duration} ${plan.duration === 1 ? 'Month' : 'Months'}`; // MembershipPlan format
+    } else {
+      return plan.duration; // DisplayPlan format - already formatted
+    }
+  };
+
+  const getPlanDiscount = (plan: MembershipPlan | DisplayPlan): string => {
+    if ('type' in plan) {
+      return `${plan.discountPercentage}%`; // MembershipPlan format
+    } else {
+      return plan.discount; // DisplayPlan format
+    }
+  };
+
+  const getPlanDescription = (plan: MembershipPlan | DisplayPlan): string => {
+    if ('description' in plan && plan.description) {
+      return plan.description; // Return description if available
+    } else {
+      return getPlanType(plan); // Fallback to name/type
+    }
+  };
 
   if (!plan) {
     return (
@@ -39,7 +99,8 @@ const MembershipPayment: React.FC = () => {
     setError(null);
     
     try {
-      const response = await membershipApi.subscribe(plan.id);
+      const planId = getPlanId(plan);
+      const response = await membershipApi.subscribe(planId);
       console.log("Membership subscribe response:", response);
       setIsProcessing(false);
       navigate("/membership-success");
@@ -70,23 +131,23 @@ const MembershipPayment: React.FC = () => {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-600">Plan Name:</span>
-                <span className="font-semibold text-green-700">{plan.name}</span>
+                <span className="font-semibold text-green-700">{getPlanType(plan)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Duration:</span>
-                <span className="font-semibold">{plan.duration}</span>
+                <span className="font-semibold">{getPlanDuration(plan)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Final Price:</span>
-                <span className="font-bold text-xl text-green-700">{plan.price}</span>
+                <span className="font-bold text-xl text-green-700">{getPlanPrice(plan)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Discount:</span>
-                <span className="font-semibold text-green-600">{plan.discount}</span>
+                <span className="font-semibold text-green-600">{getPlanDiscount(plan)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Benefits:</span>
-                <span className="font-semibold text-green-600">Premium Access</span>
+                <span className="text-gray-600">Description:</span>
+                <span className="font-semibold text-gray-800">{getPlanDescription(plan)}</span>
               </div>
             </div>
           </div>
@@ -261,7 +322,7 @@ const MembershipPayment: React.FC = () => {
                 Processing Payment...
               </>
             ) : (
-              `Proceed to Pay (${plan.price})`
+              `Proceed to Pay (${getPlanPrice(plan)})`
             )}
           </button>
         </div>

@@ -170,7 +170,6 @@ const OrdersPage = () => {
         <h1 className="text-2xl font-bold text-gray-900 mb-2">My Orders</h1>
         <p className="text-gray-600">Track and manage your orders</p>
       </div>
-
       <div className="grid gap-6">
         {sortedOrders.map((order) => (
           <Card key={order.id}>

@@ -128,6 +128,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             </div>
 
             {[
+              ["try-our-sample", "Try Our Sample"],
               ["kishanParivarPage", "Kishan Parivar"],
               ["traceability", "Traceability"],
               ["our-story", "Our Story"],
@@ -276,6 +277,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               ))}
 
               {[
+                ["try-our-sample", "Try Our Sample"],
                 ["kishanParivarPage", "Kishan Parivar"],
                 ["traceability", "Traceability"],
                 ["our-story", "Our Story"],

@@ -2,6 +2,7 @@ import Banner from "../components/traceability/Banner";
 import ShippingWithTestReport from "../components/traceability/ShippingWithTestReport";
 import Sourcing from "../components/traceability/Sourcing";
 import Warehousing from "../components/traceability/Warehousing";
+import RecognizedBy from '../components/homePageComponents/RecognizedBy';
 
 const Traceability = () => {
   return (
@@ -10,6 +11,7 @@ const Traceability = () => {
       <Sourcing/>
       <Warehousing/>
       <ShippingWithTestReport/>
+      <RecognizedBy />
     </div>
   );
 };

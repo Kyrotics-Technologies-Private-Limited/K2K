@@ -60,6 +60,21 @@ export const OrderSuccess = () => {
                     ₹{total?.toFixed(2)}
                   </dd>
                 </div>
+                
+                {/* KP Member Discount Information */}
+                {order?.kp_discount_amount && order.kp_discount_amount > 0 && (
+                  <>
+                    <div className="flex justify-between text-green-600">
+                      <dt className="text-sm">KP Member Discount ({order.kp_discount_percentage}%)</dt>
+                      <dd className="text-sm font-medium">-₹{order.kp_discount_amount.toFixed(2)}</dd>
+                    </div>
+                    <div className="flex justify-between text-gray-500">
+                      <dt className="text-sm">Original Total</dt>
+                      <dd className="text-sm line-through">₹{order.original_total?.toFixed(2)}</dd>
+                    </div>
+                  </>
+                )}
+                
                 <div className="flex justify-between">
                   <dt className="text-sm text-gray-600">Payment Method</dt>
                   <dd className="text-sm font-medium text-gray-900">

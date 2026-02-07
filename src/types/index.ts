@@ -25,10 +25,10 @@ export interface Product {
       image: string;
       type: "organic" | "natural" | "premium" | "limited";
     }[];
-    benefits: {
+    healthBadges: {
       title: string;
       description: string;
-      icon: string;
+      image: string;
     }[];
   }
   

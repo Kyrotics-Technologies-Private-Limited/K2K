@@ -6,13 +6,16 @@ import { OrderReview } from "../components/checkout/OrderReview";
 import { Payment } from "../components/checkout/Payment";
 import { updateOrderSummary } from "../store/slices/checkoutSlice";
 import { ShoppingBag } from "lucide-react";
+import { membershipApi } from "../services/api/membershipApi";
+import { MembershipStatus } from "../types/membership";
+import { isActiveKPMember } from "../lib/utils";
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { currentStep } = useAppSelector((state) => state.checkout);
   const { buyNowItem, cartItems } = useAppSelector((state) => state.cart);
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
   // Scroll to top when step changes
   useEffect(() => {
@@ -31,22 +34,98 @@ export const CheckoutPage = () => {
       return;
     }
 
-    // If buyNowItem exists, calculate summary for it, else for cart
-    const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
-    const subtotal = itemsToCheckout.reduce((total, item) => {
-      return total + (item.variant?.price || 0) * item.quantity;
-    }, 0);
-    const tax = subtotal * 0.18; // 18% GST
-    const shipping = subtotal > 500 ? 0 : 40; // Free shipping above ₹500
-    dispatch(
-      updateOrderSummary({
-        subtotal,
-        tax,
-        shipping,
-        total: subtotal + shipping,
-      })
-    );
-  }, [cartItems, buyNowItem, dispatch, navigate, user]);
+    // Calculate order summary with KP member discount and GST-inclusive pricing per item
+    const calculateOrderSummary = async () => {
+      try {
+        // Get membership status
+        let kpDiscountPercentage = 0;
+        let isKPMember = false;
+        
+        if (isAuthenticated) {
+          try {
+            const membershipStatus: MembershipStatus = await membershipApi.getStatus();
+            isKPMember = isActiveKPMember(membershipStatus);
+            
+            // Get discount percentage - only if membership is active
+            if (isKPMember && membershipStatus?.discountPercentage && membershipStatus.discountPercentage > 0) {
+              kpDiscountPercentage = membershipStatus.discountPercentage;
+            } else if (!isKPMember) {
+              // If membership is expired, set discount to 0
+              kpDiscountPercentage = 0;
+            } else {
+              // Fallback to plans if no discount in user status (only for active members)
+              try {
+                const plans = await membershipApi.getPlans();
+                if (plans && plans.length > 0) {
+                  kpDiscountPercentage = plans[0].discountPercentage || 0;
+                }
+              } catch (planError) {
+                console.error("Failed to fetch membership plans for fallback:", planError);
+              }
+            }
+          } catch (error) {
+            console.error("Failed to fetch membership status:", error);
+          }
+        }
+
+        // If buyNowItem exists, calculate summary for it, else for cart
+        const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
+        
+        // Helpers inline
+        const applyGst = (amount: number, gstPercentage?: number) => {
+          const gst = gstPercentage ?? 0;
+          return Math.floor(amount + (amount * gst) / 100);
+        };
+        const priceAfterKp = (price: number) =>
+          isKPMember && kpDiscountPercentage > 0
+            ? Math.floor(price - (price * kpDiscountPercentage) / 100)
+            : price;
+
+        // Calculate GST-inclusive subtotal
+        const subtotal = itemsToCheckout.reduce((total, item) => {
+          const unit = item.variant?.price || 0;
+          const gst = item.variant?.gstPercentage;
+          const unitAfterKp = priceAfterKp(unit);
+          const unitAfterGst = applyGst(unitAfterKp, gst);
+          return total + unitAfterGst * item.quantity;
+        }, 0);
+
+        // Original subtotal (GST-inclusive, without KP discount)
+        const originalSubtotal = itemsToCheckout.reduce((total, item) => {
+          const unit = item.variant?.price || 0;
+          const gst = item.variant?.gstPercentage;
+          const unitAfterGst = applyGst(unit, gst);
+          return total + unitAfterGst * item.quantity;
+        }, 0);
+
+        // KP discount amount as difference between original GST-inclusive and member GST-inclusive
+        const kpDiscountAmount = Math.max(originalSubtotal - subtotal, 0);
+
+        // Shipping rule based on GST-inclusive subtotal
+        const shipping = subtotal > 500 ? 0 : 40; // Free shipping above ₹500
+
+        // Final totals
+        const finalTotal = subtotal + shipping;
+        const originalTotal = originalSubtotal + shipping;
+
+        dispatch(
+          updateOrderSummary({
+            subtotal,
+            tax: 0,
+            shipping,
+            total: finalTotal,
+            kpDiscountPercentage,
+            kpDiscountAmount,
+            originalTotal,
+          })
+        );
+      } catch (error) {
+        console.error("Error calculating order summary:", error);
+      }
+    };
+
+    calculateOrderSummary();
+  }, [cartItems, buyNowItem, dispatch, navigate, user, isAuthenticated]);
 
   if (cartItems.length === 0 && !buyNowItem) {
     return (

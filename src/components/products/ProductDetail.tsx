@@ -7,15 +7,16 @@ import {
   Star,
   Info,
   X,
+  ArrowLeft,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Product } from "../../types";
 import { ProductCard } from "./ProductCard";
-import { ProductBadges } from "./Productbadge";
 import { BenefitsBanner } from "./InformationBanner";
-import { HealthBenefits } from "./HealthBenefits";
 import RecognizedBy from "../homePageComponents/RecognizedBy";
-import { useAppDispatch, useAppSelector } from "../../store/store";
+import { useAppDispatch } from "../../store/store";
 import {
   addToCart,
   setBuyNowItem,
@@ -30,6 +31,7 @@ import PhoneAuth from "../authComponents/PhoneAuth";
 import { AuthProvider } from "../../context/AuthContext";
 import { membershipApi } from "../../services/api/membershipApi";
 import { MembershipStatus, MembershipSettings } from "../../types/membership";
+import { isActiveKPMember } from "../../lib/utils";
 
 interface ProductDetailProps {
   product: Product | undefined;
@@ -55,6 +57,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
   const [success, setSuccess] = useState<string | null>(null);
   const { user } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isBenefitsOpen, setIsBenefitsOpen] = useState(true);
   const navigate = useNavigate();
 
   // Membership state
@@ -136,14 +139,54 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
     );
   }
 
-  const isMember = !!(
-    membershipStatus?.isMember && membershipStatus.membershipEnd
-  );
-  const kpDiscount = kpSettings?.discountPercentage ?? 0;
-  const getFinalPrice = (regularPrice: number) =>
+  // Debug: Log product data to check if healthBadges are present
+  console.log('Product data:', product);
+  console.log('Product healthBadges:', product.healthBadges);
+  console.log('Health badges count:', product.healthBadges?.length || 0);
+  
+  if (product.healthBadges && product.healthBadges.length > 0) {
+    product.healthBadges.forEach((badge, idx) => {
+      console.log(`Health Badge ${idx}:`, {
+        title: badge.title,
+        description: badge.description,
+        image: badge.image,
+        fullBadge: badge
+      });
+    });
+  }
+
+  const isMember = isActiveKPMember(membershipStatus);
+  
+  // Get discount percentage - prioritize user's membership discount, then fallback to plans
+  const kpDiscount = membershipStatus?.discountPercentage ?? 
+    (kpSettings && kpSettings.length > 0 ? kpSettings[0].discountPercentage : 0);
+  
+  // Pricing helpers: apply KP membership discount first, then GST
+  const applyGst = (amount: number, gstPercentage?: number) => {
+    const gst = gstPercentage ?? 0;
+    return Math.floor(amount + (amount * gst) / 100);
+  };
+
+  const getPriceAfterKpDiscount = (regularPrice: number) =>
     isMember && kpDiscount > 0
-      ? Math.round(regularPrice - (regularPrice * kpDiscount) / 100)
+      ? Math.floor(regularPrice - (regularPrice * kpDiscount) / 100)
       : regularPrice;
+
+  const getFinalPriceWithGST = (regularPrice: number, gstPercentage?: number) => {
+    const discounted = getPriceAfterKpDiscount(regularPrice);
+    return applyGst(discounted, gstPercentage);
+  };
+
+  // Helper function to get KP member price for non-members
+  const getKPMemberPriceWithGST = (regularPrice: number, gstPercentage?: number) => {
+    const discounted = kpDiscount > 0
+      ? Math.floor(regularPrice - (regularPrice * kpDiscount) / 100)
+      : regularPrice;
+    return applyGst(discounted, gstPercentage);
+  };
+
+  const getRegularPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
+    applyGst(regularPrice, gstPercentage);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -205,7 +248,10 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
               <span>
                 ₹
                 {(
-                  getFinalPrice(variants[selectedVariant].price) * quantity
+                  getFinalPriceWithGST(
+                    variants[selectedVariant].price,
+                    variants[selectedVariant].gstPercentage
+                  ) * quantity
                 ).toLocaleString("en-IN")}
               </span>
             </div>
@@ -345,6 +391,17 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4">
+        {/* Back Navigation */}
+        <div className="pt-6 pb-4">
+          <Link
+            to="/all-products"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-green-800 transition-colors duration-200"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back to All Products</span>
+          </Link>
+        </div>
+
         {/* Status messages */}
         {error && (
           <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4">
@@ -357,52 +414,138 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
-          {/* Image Gallery */}
-          <div className="space-y-4">
-            <div className="relative aspect-square rounded-lg overflow-hidden">
-              <img
-                src={product.images.gallery[selectedImage]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-              <button
-                onClick={() =>
-                  setSelectedImage((prev) =>
-                    prev === 0 ? product.images.gallery.length - 1 : prev - 1
-                  )
-                }
-                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() =>
-                  setSelectedImage((prev) =>
-                    prev === product.images.gallery.length - 1 ? 0 : prev + 1
-                  )
-                }
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="flex gap-2 overflow-x-auto p-2">
-              {product.images.gallery.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden ${
-                    selectedImage === index ? "ring-2 ring-green-800" : ""
-                  }`}
-                >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-8 pb-8">
+          {/* Image Gallery - Sticky Left Side */}
+          <div className="sticky top-8 self-start">
+            <div className="flex gap-4">
+              {/* Thumbnail Gallery - Left Side */}
+              <div className="flex flex-col gap-2 overflow-y-auto max-h-[500px] p-2">
+                {product.images.gallery.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`flex-shrink-0 w-16 h-16 overflow-hidden ${
+                      selectedImage === index ? "ring-2 ring-green-800" : ""
+                    }`}
+                  >
+                    <img
+                      src={image}
+                      alt={`${product.name} thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+              
+              {/* Main Image Container */}
+              <div className="flex-1 flex flex-col">
+                {/* Main Image */}
+                <div className="relative h-[500px] overflow-hidden">
                   <img
-                    src={image}
-                    alt={`${product.name} thumbnail ${index + 1}`}
+                    src={product.images.gallery[selectedImage]}
+                    alt={product.name}
                     className="w-full h-full object-cover"
                   />
-                </button>
-              ))}
+                  <button
+                    onClick={() =>
+                      setSelectedImage((prev) =>
+                        prev === 0 ? product.images.gallery.length - 1 : prev - 1
+                      )
+                    }
+                    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() =>
+                      setSelectedImage((prev) =>
+                        prev === product.images.gallery.length - 1 ? 0 : prev + 1
+                      )
+                    }
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                {/* Quantity Selector and Action Buttons */}
+                {variants.length > 0 && (
+                  <div className="flex items-center space-x-3 mt-4">
+                    {/* Quantity Selector */}
+                    <div className="flex border border-gray-300 rounded-xl">
+                      <button
+                        onClick={() => handleUpdateQuantity("decrement")}
+                        className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
+                        disabled={loading || quantity <= 1}
+                      >
+                        -
+                      </button>
+                      <span className="text-xl font-medium w-12 text-center mt-1">
+                        {quantity}
+                      </span>
+                      <button
+                        onClick={() => handleUpdateQuantity("increment")}
+                        className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
+                        disabled={
+                          loading ||
+                          quantity >=
+                            (variants[selectedVariant]?.units_in_stock || 1)
+                        }
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    {/* Add to Cart and Buy Now Buttons */}
+                    {product.stockStatus === "out_of_stock" ? (
+                      <div className="flex-1 bg-gray-100 rounded-lg p-4 text-center">
+                        <p className="text-gray-600 font-medium">
+                          Currently Out of Stock
+                        </p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Please check back later or contact us for availability
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <button
+                          onClick={handleAddToCartClick}
+                          className="button flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
+                          disabled={
+                            !variants[selectedVariant]?.inStock || addingToCart
+                          }
+                        >
+                          {addingToCart ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-t-2 border-green-800 rounded-full animate-spin"></div>
+                              Adding...
+                            </div>
+                          ) : (
+                            <>
+                              <ShoppingCart className="w-5 h-5" />
+                              Add to Cart
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={handleBuyNowClick}
+                          className="button flex-1 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
+                          disabled={!variants[selectedVariant].inStock || loading}
+                        >
+                          {loading ? (
+                            "Processing..."
+                          ) : (
+                            <>
+                              <CreditCard className="w-5 h-5" />
+                              Buy Now
+                            </>
+                          )}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -431,7 +574,24 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
               </div>
             </div>
 
-            <ProductBadges product={product} />
+            {/* Product Badges */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 py-6">
+              {product.badges.map((badge, index) => (
+                <div 
+                  key={index}
+                  className="flex flex-col items-center text-center group"
+                >
+                  <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-2 transform transition-transform group-hover:scale-110">
+                    <img 
+                      src={badge.image} 
+                      alt={badge.text} 
+                      className="w-16 h-16" 
+                    />
+                  </div>
+                  <span className="text-sm font-medium text-green-800">{badge.text}</span>
+                </div>
+              ))}
+            </div>
 
             <div>
               <h2 className="text-xl font-semibold mb-4">Select Variant</h2>
@@ -447,7 +607,10 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
                   {variants.map((variant, index) => {
-                    const discounted = getFinalPrice(variant.price);
+                    const discountedWithGst = getFinalPriceWithGST(
+                      variant.price,
+                      variant.gstPercentage
+                    );
                     return (
                       <button
                         key={variant.id}
@@ -485,10 +648,13 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                           {isMember && kpDiscount > 0 ? (
                             <div className="flex flex-wrap items-baseline gap-1">
                               <span className="text-lg font-bold text-green-800">
-                                ₹{discounted.toLocaleString("en-IN")}
+                                ₹{discountedWithGst.toLocaleString("en-IN")}
                               </span>
                               <span className="text-base font-medium text-gray-500 line-through">
-                                ₹{variant.price.toLocaleString("en-IN")}
+                                ₹{getRegularPriceWithGST(
+                                  variant.price,
+                                  variant.gstPercentage
+                                ).toLocaleString("en-IN")}
                               </span>
                               <span className="text-xs font-semibold bg-green-50 text-green-700 px-1.5 py-0.5 rounded">
                                 {kpDiscount}% KP Member
@@ -498,14 +664,18 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                             <>
                               <div className="flex flex-wrap items-baseline gap-1">
                                 <span className="text-lg font-bold text-gray-900">
-                                  ₹{variant.price.toLocaleString("en-IN")}
+                                  ₹{getRegularPriceWithGST(
+                                    variant.price,
+                                    variant.gstPercentage
+                                  ).toLocaleString("en-IN")}
                                 </span>
                                 {variant.originalPrice && (
                                   <span className="text-sm line-through text-gray-500">
                                     ₹
-                                    {variant.originalPrice.toLocaleString(
-                                      "en-IN"
-                                    )}
+                                    {getRegularPriceWithGST(
+                                      variant.originalPrice,
+                                      variant.gstPercentage
+                                    ).toLocaleString("en-IN")}
                                   </span>
                                 )}
                                 {variant.discount && (
@@ -518,15 +688,16 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                               {kpDiscount > 0 && (
                                 <div className="flex items-baseline gap-1 mt-0.5">
                                   <Link
-                                    to="/kishanParivarPage"
+                                    to="/kishan-parivar"
                                     className="flex items-baseline gap-1 hover:underline"
                                     style={{ color: "#15803d" }}
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     <span className="text-sm font-bold text-green-700">
                                       ₹
-                                      {Math.round(
-                                        variant.price - (variant.price * kpDiscount) / 100
+                                      {getKPMemberPriceWithGST(
+                                        variant.price,
+                                        variant.gstPercentage
                                       ).toLocaleString("en-IN")}
                                     </span>
                                     <span className="text-xs font-bold text-green-600">
@@ -552,16 +723,18 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                     <div className="flex flex-row gap-4 relative">
                       <span className="text-4xl font-bold text-black">
                         ₹
-                        {getFinalPrice(
-                          variants[selectedVariant].price
+                        {getFinalPriceWithGST(
+                          variants[selectedVariant].price,
+                          variants[selectedVariant].gstPercentage
                         ).toLocaleString("en-IN")}
                       </span>
                       {isMember && kpDiscount > 0 && (
                         <span className="text-lg font-bold text-gray-500 line-through pt-2">
                           ₹
-                          {variants[selectedVariant].price.toLocaleString(
-                            "en-IN"
-                          )}
+                          {getRegularPriceWithGST(
+                            variants[selectedVariant].price,
+                            variants[selectedVariant].gstPercentage
+                          ).toLocaleString("en-IN")}
                         </span>
                       )}
                       <span className="text-lg font-bold text-gray-500 pt-2">
@@ -571,138 +744,125 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                           </span>
                         )}
                       </span>
-                      <div className="relative">
-                        <button
-                          onClick={() => setShowPricePopup(true)}
-                          className="button flex items-center gap-2 pt-2 hover:text-green-800"
-                        >
-                          Know your price
-                          <Info />
-                        </button>
-                        {showPricePopup && (
-                          <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg p-4 w-64 z-50">
-                            <button
-                              onClick={() => setShowPricePopup(false)}
-                              className="button absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                            <h2 className="text-lg font-bold text-gray-800 mb-3">
-                              Price Details
-                            </h2>
-                            <div className="space-y-3">
+                    </div>
+                  </div>
+                  
+                  {/* KP Member Price for Regular Users */}
+                  {!isMember && kpDiscount > 0 && (
+                    <div className="mt-3 flex items-center gap-2">
+                      <span className="text-lg font-medium text-gray-600">
+                        KP Member Price:
+                      </span>
+                      <span className="text-xl font-bold text-green-700">
+                        ₹{getKPMemberPriceWithGST(
+                          variants[selectedVariant].price,
+                          variants[selectedVariant].gstPercentage
+                        ).toLocaleString("en-IN")}
+                      </span>
+                      <span className="text-sm font-medium text-green-600">
+                        (Save {kpDiscount}%)
+                      </span>
+                      <Link
+                        to="/kishanParivarPage"
+                        className="ml-2 text-sm font-medium text-green-700 hover:text-green-800 underline"
+                      >
+                        Become a Member
+                      </Link>
+                    </div>
+                  )}
+                  
+                  {/* Know Your Price Section */}
+                  <div className="mt-4">
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowPricePopup(true)}
+                        className="button flex items-center gap-2 text-md text-green-800 hover:text-black border border-gray-300 rounded-lg px-3 py-2"
+                      >
+                        Know our price
+                        <Info size={16} />
+                      </button>
+                      {showPricePopup && (
+                        <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg p-4 w-64 z-50 border border-gray-200">
+                          <button
+                            onClick={() => setShowPricePopup(false)}
+                            className="button absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                          <h2 className="text-lg font-bold text-gray-800 mb-3">
+                            Price Details
+                          </h2>
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center border-b pb-2">
+                              <span className="text-sm text-gray-600">
+                                Regular Price
+                              </span>
+                              <span className="text-sm font-semibold text-gray-500 line-through">
+                                ₹
+                                {getRegularPriceWithGST(
+                                  variants[selectedVariant].price,
+                                  variants[selectedVariant].gstPercentage
+                                ).toLocaleString("en-IN")}
+                              </span>
+                            </div>
+                            {isMember && kpDiscount > 0 && (
                               <div className="flex justify-between items-center border-b pb-2">
                                 <span className="text-sm text-gray-600">
-                                  Regular Price
+                                  KP Member ({kpDiscount}% OFF)
                                 </span>
-                                <span className="text-sm font-semibold text-gray-500 line-through">
+                                <span className="text-base font-bold text-green-800">
                                   ₹
-                                  {variants[
-                                    selectedVariant
-                                  ].price.toLocaleString("en-IN")}
+                                  {getFinalPriceWithGST(
+                                    variants[selectedVariant].price,
+                                    variants[selectedVariant].gstPercentage
+                                  ).toLocaleString("en-IN")}
                                 </span>
                               </div>
-                              {isMember && kpDiscount > 0 && (
+                            )}
+                            {!isMember && kpDiscount > 0 && (
+                              <div className="space-y-2">
                                 <div className="flex justify-between items-center border-b pb-2">
                                   <span className="text-sm text-gray-600">
-                                    KP Member ({kpDiscount}% OFF)
+                                    KP Member Price
                                   </span>
                                   <span className="text-base font-bold text-green-800">
-                                    ₹
-                                    {getFinalPrice(
-                                      variants[selectedVariant].price
+                                    ₹{getKPMemberPriceWithGST(
+                                      variants[selectedVariant].price,
+                                      variants[selectedVariant].gstPercentage
                                     ).toLocaleString("en-IN")}
                                   </span>
                                 </div>
-                              )}
-                              {!isMember && kpDiscount > 0 && (
-                                <div className="text-xs text-green-800">
-                                  Become a KP member for instant savings!
+                                <div className="text-xs text-green-800 bg-green-50 p-2 rounded">
+                                  <strong>Become a KP member for instant savings!</strong>
+                                  <br />
+                                  Save ₹{(
+                                    getRegularPriceWithGST(
+                                      variants[selectedVariant].price,
+                                      variants[selectedVariant].gstPercentage
+                                    ) -
+                                    getKPMemberPriceWithGST(
+                                      variants[selectedVariant].price,
+                                      variants[selectedVariant].gstPercentage
+                                    )
+                                  ).toLocaleString("en-IN")} on this product
                                 </div>
-                              )}
-                            </div>
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-                {variants[selectedVariant].units_in_stock <= 10 && (
+                {variants[selectedVariant].units_in_stock <= 0 ? (
+                  <h2 className="text-red-600 font-extrabold text-base">
+                    Product is out of stock
+                  </h2>
+                ) : variants[selectedVariant].units_in_stock <= 10 && (
                   <h2 className="text-red-600 font-extrabold animate-bounce text-base">
                     Hurry, only {variants[selectedVariant].units_in_stock} left!
                   </h2>
                 )}
-                <div className="flex items-center space-x-3">
-                  <div className="flex border border-gray-300 rounded-xl">
-                    <button
-                      onClick={() => handleUpdateQuantity("decrement")}
-                      className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
-                      disabled={loading || quantity <= 1}
-                    >
-                      -
-                    </button>
-                    <span className="text-xl font-medium w-12 text-center mt-1">
-                      {quantity}
-                    </span>
-                    <button
-                      onClick={() => handleUpdateQuantity("increment")}
-                      className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
-                      disabled={
-                        loading ||
-                        quantity >=
-                          (variants[selectedVariant]?.units_in_stock || 1)
-                      }
-                    >
-                      +
-                    </button>
-                  </div>
-                  {product.stockStatus === "out_of_stock" ? (
-                    <div className="flex-1 bg-gray-100 rounded-lg p-4 text-center">
-                      <p className="text-gray-600 font-medium">
-                        Currently Out of Stock
-                      </p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Please check back later or contact us for availability
-                      </p>
-                    </div>
-                  ) : (
-                    <>
-                      <button
-                        onClick={handleAddToCartClick}
-                        className="button flex-1 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300"
-                        disabled={
-                          !variants[selectedVariant]?.inStock || addingToCart
-                        }
-                      >
-                        {addingToCart ? (
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 border-2 border-t-2 border-green-800 rounded-full animate-spin"></div>
-                            Adding...
-                          </div>
-                        ) : (
-                          <>
-                            <ShoppingCart className="w-5 h-5" />
-                            Add to Cart
-                          </>
-                        )}
-                      </button>
-                      <button
-                        onClick={handleBuyNowClick}
-                        className="button flex-1 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
-                        disabled={!variants[selectedVariant].inStock || loading}
-                      >
-                        {loading ? (
-                          "Processing..."
-                        ) : (
-                          <>
-                            <CreditCard className="w-5 h-5" />
-                            Buy Now
-                          </>
-                        )}
-                      </button>
-                    </>
-                  )}
-                </div>
               </>
             )}
             <div>
@@ -712,11 +872,126 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
           </div>
         </div>
 
+        {/* Product Quality Badges */}
+        <div className="mt-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* 300+ Farmer Empowered Badge */}
+            <div 
+              className="flex flex-col items-center text-center p-6 rounded-xl"
+              style={{
+                background: 'linear-gradient(to bottom, #ffffff, #f0fdf4, #fef3c7)'
+              }}
+            >
+              <div className="w-20 h-20 mb-4 hover:scale-110 transition-transform duration-300 cursor-pointer">
+                <img 
+                  src="/assets/productbadgeimg/300+ Farmer empowered (1).png" 
+                  alt="300+ Farmer Empowered" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">300+ Farmer Empowered</h3>
+              {/* <p className="text-sm text-gray-600">Supporting local farming communities across India</p> */}
+            </div>
+
+            {/* Procured from Birbhum Badge */}
+            <div 
+              className="flex flex-col items-center text-center p-6 rounded-xl"
+              style={{
+                background: 'linear-gradient(to bottom, #ffffff, #f0fdf4, #fef3c7)'
+              }}
+            >
+              <div className="w-20 h-20 mb-4 hover:scale-110 transition-transform duration-300 cursor-pointer">
+                <img 
+                  src="/assets/productbadgeimg/PROCURED FROM BIRBHUM (1).png" 
+                  alt="Procured from Birbhum" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Procured from Birbhum</h3>
+              {/* <p className="text-sm text-gray-600">Directly sourced from Birbhum district, West Bengal</p> */}
+            </div>
+
+            {/* Zero Adulteration Badge */}
+            <div 
+              className="flex flex-col items-center text-center p-6 rounded-xl"
+              style={{
+                background: 'linear-gradient(to bottom, #ffffff, #f0fdf4, #fef3c7)'
+              }}
+            >
+              <div className="w-20 h-20 mb-4 hover:scale-110 transition-transform duration-300 cursor-pointer">
+                <img 
+                  src="/assets/productbadgeimg/Zero Adulteration (3).png" 
+                  alt="Zero Adulteration" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Zero Adulteration</h3>
+              {/* <p className="text-sm text-gray-600">100% pure and authentic products guaranteed</p> */}
+            </div>
+          </div>
+        </div>
+
         {/* Benefits Banner */}
         <BenefitsBanner product={product} />
 
         {/* Health Benefits */}
-        <HealthBenefits product={product} />
+        {product.healthBadges && product.healthBadges.length > 0 && (
+          <div className="mt-8">
+            <button 
+              onClick={() => setIsBenefitsOpen(!isBenefitsOpen)}
+              className="w-full flex items-center justify-between"
+            >
+              <div className="text-left">
+                <h2 className="text-3xl uppercase font-bold font-cormorant text-gray-800">Benefits</h2>
+              </div>
+              {isBenefitsOpen ? (
+                <ChevronUp className="w-6 h-6 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-6 h-6 text-gray-500" />
+              )}
+            </button>
+
+            <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
+              isBenefitsOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+            }`}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+                {product.healthBadges.map((healthBadges, index) => {
+                  console.log(`Health Badge ${index}:`, healthBadges);
+                  console.log(`Icon URL for ${healthBadges.title}:`, healthBadges.image);
+                  
+                  return (
+                    <div key={index} className="flex items-start space-x-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-20 h-20 rounded-full border-2 border-green-700 flex items-center justify-center p-3 bg-green-50 shadow-sm">
+                          {healthBadges.image && (
+                            <img
+                              src={healthBadges.image}
+                              alt={healthBadges.title}
+                              className="w-full h-full object-contain"
+                              onLoad={() => console.log(`Image loaded successfully for ${healthBadges.title}`)}
+                              onError={(e) => {
+                                console.error(`Image failed to load for ${healthBadges.title}:`, healthBadges.image);
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-2xl font-bold font-cormorant text-gray-600 mb-2">
+                          {healthBadges.title}
+                        </h4>
+                        <p className="text-gray-800 text-base leading-relaxed">
+                          {healthBadges.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Related Products */}
         <div className="mt-8">

@@ -3,19 +3,28 @@ import { MapPin, Award, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { AuthProvider } from "../../context/AuthContext";
 import PhoneAuth from "../authComponents/PhoneAuth";
+import { getAuth } from "firebase/auth";
 
 // Main component content
 const NatureTraceBannerContent: React.FC = () => {
   const { user } = useAuth();
   const [showLoginModal, setShowLoginModal] = React.useState(false);
 
-  const handleRedirect = () => {
+  const handleRedirect =async () => {
     if (!user) {
       setShowLoginModal(true);
       return;
     }
+    const auth = getAuth();
+    if (!auth.currentUser) {
+      console.error("User not authenticated");
+      return;
+    }
+    const idToken = await auth.currentUser.getIdToken();
+
     window.open(
-      "https://k2ktraceability.netlify.app/customer",
+      // `https://k2ktraceability.netlify.app/customer?token=${idToken}`,
+      `http://localhost:3000/customer?token=${idToken}`,
       "_blank",
       "noopener,noreferrer"
     );
@@ -60,11 +69,11 @@ const NatureTraceBannerContent: React.FC = () => {
           <div className="flex justify-center space-x-6 mb-16">
             <button
               onClick={handleRedirect}
-              className="button flex items-center justify-center px-10 py-5 bg-white text-green-800 font-bold rounded-full 
+              className="button flex items-center justify-center px-10 py-5 bg-white text-xl text-green-800 font-bold rounded-full 
                          hover:bg-green-100 transition-all duration-300 
                          transform hover:-translate-y-2 shadow-2xl hover:shadow-xl"
             >
-              Explore Our Traceability
+              Check Test Report
             </button>
           </div>
 
@@ -98,8 +107,9 @@ const NatureTraceBannerContent: React.FC = () => {
             <h2 className="text-2xl font-semibold text-green-700 text-center mb-4">
               Login with Kishan2Kitchen
             </h2>
-            <PhoneAuth
-              onSuccess={() => {
+            <PhoneAuth />
+            <button
+              onClick={() => {
                 setShowLoginModal(false);
                 window.open(
                   "https://yourcompanywebsite.com",

@@ -54,7 +54,7 @@ const INDIAN_STATES = [
 
 export const SelectStep = () => {
   const dispatch = useAppDispatch();
-  const { addresses, selectedAddress, isAddingNewAddress } = useAppSelector(
+  const { addresses, selectedAddress, isAddingNewAddress, orderSummary } = useAppSelector(
     (state) => state.checkout
   );
   const { buyNowItem, cartItems, activeCartId } = useAppSelector(
@@ -89,20 +89,23 @@ export const SelectStep = () => {
     [buyNowItem, cartItems]
   );
 
-  // Local order summary calculation for itemsToCheckout
-  const localOrderSummary = useMemo(() => {
-    const subtotal = itemsToCheckout.reduce((total, item) => {
-      return total + (item.variant?.price || 0) * item.quantity;
-    }, 0);
-    const tax = 0; // GST removed
-    const shipping = subtotal > 500 ? 0 : 40;
-    return {
-      subtotal,
-      tax,
-      shipping,
-      total: subtotal + shipping,
-    };
-  }, [itemsToCheckout]);
+  // Check if user is a KP member
+  const isKPMember = orderSummary.kpDiscountPercentage > 0 && orderSummary.kpDiscountAmount > 0;
+
+  // Pricing helpers aligned with ProductDetail: apply KP discount first, then GST
+  const applyGst = (amount: number, gstPercentage?: number) => {
+    const gst = gstPercentage ?? 0;
+    return Math.floor(amount + (amount * gst) / 100);
+  };
+  const getRegularPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
+    applyGst(regularPrice, gstPercentage);
+  const getKPMemberPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
+    applyGst(
+      orderSummary.kpDiscountPercentage > 0
+        ? Math.floor(regularPrice - (regularPrice * orderSummary.kpDiscountPercentage) / 100)
+        : regularPrice,
+      gstPercentage
+    );
 
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -713,15 +716,28 @@ export const SelectStep = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">
-                          ₹{(item.variant?.price || 0) * item.quantity}
+                        {/* Regular price with GST (crossed out for members) */}
+                        <p className="text-sm text-gray-500 line-through">
+                          ₹{(
+                            getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
+                          ).toLocaleString("en-IN")}
                         </p>
-                        {item.variant?.discount &&
-                          item.variant.discount > 0 && (
-                            <p className="text-sm text-green-600">
-                              {item.variant.discount}% off
-                            </p>
-                          )}
+                        {/* KP Member Price (with GST) */}
+                        {isKPMember && (
+                          <p className="text-sm text-green-600">
+                            KP Member: ₹{(
+                              getKPMemberPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
+                            ).toLocaleString("en-IN")}
+                          </p>
+                        )}
+                        {/* Regular price when not a member (with GST) */}
+                        {!isKPMember && (
+                          <p className="text-lg font-semibold">
+                            ₹{(
+                              getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
+                            ).toLocaleString("en-IN")}
+                          </p>
+                        )}
                       </div>
                     </>
                   )}
@@ -738,21 +754,48 @@ export const SelectStep = () => {
                 <span>
                   Subtotal <span className="text-xs ">(including GST)</span>
                 </span>
-                <span>₹{localOrderSummary.subtotal.toFixed(2)}</span>
+                <span>₹{orderSummary.subtotal.toFixed(2)}</span>
               </div>
+              
+              {/* Show original subtotal for KP members */}
+              {isKPMember && (
+                <div className="flex justify-between text-gray-500">
+                  <span>Original Subtotal</span>
+                  <span className="line-through">₹{(orderSummary.subtotal + orderSummary.kpDiscountAmount).toFixed(2)}</span>
+                </div>
+              )}
               
               <div className="flex justify-between">
                 <span>Shipping</span>
                 <span>
-                  {localOrderSummary.shipping === 0
+                  {orderSummary.shipping === 0
                     ? "Free"
-                    : `₹${localOrderSummary.shipping.toFixed(2)}`}
+                    : `₹${orderSummary.shipping.toFixed(2)}`}
                 </span>
               </div>
               <div className="flex justify-between font-semibold text-lg pt-2 border-t">
                 <span>Total</span>
-                <span>₹{localOrderSummary.total.toFixed(2)}</span>
+                <div className="text-right">
+                  {isKPMember ? (
+                    <>
+                      <span className="text-green-600">₹{orderSummary.total.toFixed(2)}</span>
+                      <div className="text-sm text-gray-500 line-through">
+                        ₹{orderSummary.originalTotal.toFixed(2)}
+                      </div>
+                    </>
+                  ) : (
+                    <span>₹{orderSummary.total.toFixed(2)}</span>
+                  )}
+                </div>
               </div>
+              
+              {/* Show total savings from KP membership */}
+              {isKPMember && (
+                <div className="flex justify-between text-green-600 font-medium pt-2 border-t">
+                  <span>Total Saved with KP Membership</span>
+                  <span>₹{orderSummary.kpDiscountAmount.toFixed(2)}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

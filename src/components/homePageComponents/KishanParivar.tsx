@@ -1,30 +1,54 @@
 
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   CheckCircle,
   CreditCard,
   Tractor,
   Sun,
-  Droplets,
+  // Droplets,
   ShieldCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const KishanParivar: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const featuresRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        } else {
+          setIsVisible(false);
+        }
+      },
+      {
+        threshold: 0.1, // Trigger when 10% of the element is visible
+        rootMargin: '0px 0px -50px 0px' // Start animation slightly before element is fully visible
+      }
+    );
+
+    if (featuresRef.current) {
+      observer.observe(featuresRef.current);
+    }
+
+    return () => {
+      if (featuresRef.current) {
+        observer.unobserve(featuresRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <div className="bg-[rgba(255,255,255,0.75)] py-16 px-4 flex flex-col items-center justify-center">
+    <div className="bg-[rgba(255,255,255,0.75)] py-16 px-4">
       {/* New Heading Section */}
-      <div className="text-center max-w-3xl mb-12 px-4">
-        {/* <div className="inline-flex items-center justify-center mb-4">
-          <div className="w-12 h-1 bg-green-300 mr-3"></div>
-          <Leaf className="text-green-600" size={20} />
-          <div className="w-12 h-1 bg-green-300 ml-3"></div>
-        </div> */}
+      <div className="max-w-3xl mb-12 px-4 mx-auto text-center">
         <h1 className="text-black text-2xl md:text-3xl lg:text-4xl font-semibold">
           The Kishan Parivar Advantage
         </h1>
-        <p className="text-sm md:text-base text-gray-800/90 mx-auto mt-2">
+        <p className="text-sm md:text-base text-gray-800/90 mt-2 max-w-xl mx-auto">
           India's premier agricultural subscription program designed to empower
           farmers with financial tools, insurance benefits, and exclusive
           rewards.
@@ -32,133 +56,136 @@ const KishanParivar: React.FC = () => {
       </div>
 
       {/* Main Card Component */}
-      <div className="bg-white rounded-2xl border border-gray-300 shadow-xl overflow-hidden w-full max-w-6xl mx-4 lg:mx-10">
-        <div className="flex flex-col md:flex-row">
+      <div className="bg-white rounded-2xl border border-gray-300 shadow-xl overflow-hidden w-full max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row justify-start">
           {/* Card Section - Left Side */}
-          <div className="w-full md:w-2/5 p-8 bg-green-brand flex flex-col justify-between">
-            <div className="flex justify-between items-start mb-6">
+          <div className="w-full lg:w-[500px] p-6 bg-green-brand flex flex-col justify-between">
+            <div className="flex justify-between items-start mb-2">
               <div className="flex items-center gap-2">
                 <img
                   src="/assets/images/K2K Logo.png"
                   alt="Kishan2Kitchen Logo"
-                  className="h-20 w-20 bg-white object-cover mr-1 rounded-md"
+                  className="h-8 w-8 bg-white object-cover rounded-md"
                 />
                 <div>
-                  <h3 className="text-2xl font-bold text-white">
+                  <h3 className="text-md font-bold text-white pt-1">
                     Kishan Parivar
                   </h3>
-                  <p className="text-green-200 text-sm">
-                    Premium Farming Membership
+                  <p className="text-green-200 text-[14px] pt-2">
+                    Eat Fresh • Live Healthy • Save More
                   </p>
                 </div>
               </div>
-              <div className="bg-green-800 p-2 rounded-lg">
-                <CreditCard size={24} className="text-green-100" />
+              <div className="bg-green-800 p-1 rounded-lg">
+                <CreditCard size={14} className="text-green-100" />
               </div>
             </div>
 
             {/* Card Design */}
-            <div className="relative bg-gradient-to-br from-green-600 to-green-800 rounded-xl p-6 w-full h-48 shadow-lg mb-8 overflow-hidden">
+            <div className="relative bg-gradient-to-br from-green-600 to-green-800 rounded-lg p-4 w-full h-28 shadow-lg mb-4 overflow-hidden">
               {/* Decorative elements */}
-              <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-green-700/20"></div>
-              <div className="absolute -bottom-8 -left-8 w-28 h-28 rounded-full bg-green-500/20"></div>
+              <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-green-700/20"></div>
+              <div className="absolute -bottom-4 -left-4 w-20 h-20 rounded-full bg-green-500/20"></div>
 
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <div className="flex justify-between items-center">
-                  <Tractor className="text-green-200" size={24} />
-                  <Sun className="text-yellow-300" size={24} />
+                  <Tractor className="text-green-200" size={16} />
+                  <Sun className="text-yellow-300" size={16} />
                 </div>
 
                 <div>
-                  <p className="text-green-100 text-lg tracking-wider mb-2">
+                  <p className="text-green-100 text-xs tracking-wider mb-1">
                     •••• •••• •••• 1234
                   </p>
                   <div className="flex justify-between items-end">
                     <div>
-                      <p className="text-green-200 text-xs uppercase tracking-wider">
+                      <p className="text-green-200 text-[10px] uppercase tracking-wider">
                         Card Holder
                       </p>
-                      <p className="text-white font-medium">
+                      <p className="text-white font-medium text-xs">
                         Kishan Kumar Pandit
                       </p>
                     </div>
                     <div>
-                      <p className="text-green-200 text-xs uppercase tracking-wider">
+                      <p className="text-green-200 text-[10px] uppercase tracking-wider">
                         Valid Thru
                       </p>
-                      <p className="text-white font-medium">03/30</p>
+                      <p className="text-white font-medium text-xs">03/30</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-green-100">
-              <ShieldCheck size={18} className="text-green-300" />
-              <p className="text-sm">Secure & Verified Membership</p>
+            <div className="flex items-center gap-1.5 text-green-100">
+              <ShieldCheck size={12} className="text-green-300" />
+              <p className="text-[10px]">Secure & Verified Membership</p>
             </div>
           </div>
 
           {/* Features Section - Right Side */}
-          <div className="w-full md:w-3/5 p-8 md:p-10 bg-white">
-            <div className="mb-2 flex items-center gap-2 text-green-brand">
-              <Droplets size={20} />
-              <span className="text-sm font-medium">EXCLUSIVE OFFER</span>
-            </div>
-            <h2 className="text-base sm:text-lg md:text-2xl font-bold text-gray-800 mb-4">
-              Elevate Your Farming Journey
+          <div className="w-full lg:w-[calc(100%-500px)] p-8 lg:p-10 bg-white">
+            {/* <div className="mb-3 flex items-center gap-2 text-green-brand">
+              <Droplets size={24} />
+              <span className="text-base font-medium tracking-wide">EXCLUSIVE OFFER</span>
+            </div> */}
+            <h2 className="text-xl  font-bold text-gray-800 mb-6">
+              Become a Member of Kishan Parivar
             </h2>
-            <p className="text-gray-600 mb-8 text-lg">
-              Join India's most trusted agricultural community and unlock
-              premium benefits designed to grow your success.
-            </p>
+            {/* <p className="text-gray-600 mb-8 text-xm">
+    
+            </p> */}
 
             {/* Enhanced Features List */}
-            <ul className="space-y-5 mb-10">
+            <ul ref={featuresRef} className="space-y-8 mb-12">
               {[
                 {
-                  icon: <CheckCircle size={22} className="text-green-brand" />,
-                  text: "Low-interest agricultural loans with flexible repayment",
-                  highlight: false,
-                },
-                {
-                  icon: <CheckCircle size={22} className="text-green-brand" />,
-                  text: "Comprehensive crop insurance at special rates",
-                  highlight: false,
-                },
-                {
-                  icon: <CheckCircle size={22} className="text-green-brand" />,
-                  text: "5% bonus reward points on all agri-input purchases",
+                  icon: <CheckCircle size={24} className="text-green-brand" />,
+                  heading: "Freshly Prepared After Your Order",
+                  text: "We prioritize your family's health. Every item is freshly prepared only after you place an order — ensuring maximum freshness, nutrition, and health benefits for you and your loved ones.",
                   highlight: true,
                 },
                 {
                   icon: <CheckCircle size={22} className="text-green-brand" />,
-                  text: "Priority access to government subsidy programs",
-                  highlight: false,
+                  heading: "Flat 10% Off — Always",
+                  text: "Enjoy savings from day one. With the Kishan Parivar Card, you receive a flat 10% discount on every purchase — no coupons, no conditions.",
+                  highlight: true,
                 },
                 {
                   icon: <CheckCircle size={22} className="text-green-brand" />,
-                  text: "Personalized harvest payment schedules",
-                  highlight: false,
+                  heading: "Your Health, Our Promise",
+                  text: "We go beyond food. As a member, you'll gain access to exclusive wellness guides, diet tips, and lifestyle insights curated by health experts — helping you live a healthier, happier life.",
+                  highlight: true,
                 },
                 {
                   icon: <CheckCircle size={22} className="text-green-brand" />,
-                  text: "Free agri-tech consultation sessions",
+                  heading: "Free Health Check-ups",
+                  text: "Loyalty comes with care. Spend ₹1,00,000 in a year and unlock two complimentary health check-ups annually — for you and your family.",
                   highlight: true,
                 },
               ].map((item, index) => (
-                <li key={index} className="flex items-start gap-4">
+                <li 
+                  key={index} 
+                  className={`flex items-start gap-3 transition-all duration-500 ease-in-out ${
+                    isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-24'
+                  }`}
+                  style={{
+                    transitionDelay: isVisible ? `${index * 0.2}s` : `${(3 - index) * 0.1}s`,
+                  }}
+                >
                   {item.icon}
-                  <span
-                    className={`text-gray-700 ${
-                      item.highlight ? "font-semibold text-green-brand" : ""
-                    }`}
-                  >
-                    {item.text}
-                  </span>
+                  <div className="flex-1">
+                    <h3 className="text-sm font-semibold text-green-800 mb-2">
+                      {item.heading}
+                    </h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {item.text}
+                    </p>
+                  </div>
                 </li>
               ))}
             </ul>
+
 
             {/* Enhanced CTA */}
             <div className="flex flex-col sm:flex-row gap-4">
@@ -166,11 +193,14 @@ const KishanParivar: React.FC = () => {
                 to="/kishanParivarPage#membership-plans"
                 className="button bg-green-brand text-white font-semibold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg flex-1 text-center"
               >
-                Subscribe Now
+                Join Now
+              </Link >
+              <Link
+                to="/kishanParivarPage"
+                className="button border-2 border-green-brand text-green-brand hover:bg-green-50 font-medium py-3 px-6 rounded-lg transition-colors flex-1 text-center"
+              >
+                Know More
               </Link>
-              <button className="button border-2 border-green-brand text-green-brand hover:bg-green-50 font-medium py-3 px-6 rounded-lg transition-colors flex-1 text-center">
-                Learn More
-              </button>
             </div>
 
             <div className="mt-6 flex items-center gap-2 text-gray-500 text-sm">
