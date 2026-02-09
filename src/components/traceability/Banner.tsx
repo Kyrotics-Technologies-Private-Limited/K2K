@@ -36,15 +36,14 @@ const NatureTraceBannerContent: React.FC = () => {
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage:
-            'url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2560&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")',
+          backgroundImage: 'url("/assets/bannerimg/tracability_banner.png")',
           backgroundPosition: "center",
           backgroundSize: "cover",
         }}
       />
 
       {/* Dark Gradient Overlay */}
-      <div className="absolute inset-0 bg-green-brand/40"></div>
+      <div className="absolute inset-0 bg-green-brand/20"></div>
 
       {/* Main Content */}
       <div className="container mx-auto px-6 relative z-10">
@@ -58,10 +57,10 @@ const NatureTraceBannerContent: React.FC = () => {
           </div>
 
           <h1 className="text-6xl font-bold text-white mb-6 tracking-tight drop-shadow-xl">
-            Trace Your Natural Journey
+            Trace Your Food Journey
           </h1>
 
-          <p className="text-2xl text-white/90 max-w-3xl mx-auto mb-12 leading-relaxed drop-shadow-xl bg-black/20 rounded-xl ">
+          <p className="text-2xl text-white/95 max-w-3xl mx-auto mb-12 leading-relaxed drop-shadow-2xl bg-black/10 rounded-xl px-4 py-2">
             Uncover the story behind every product. From farm to table, we
             guarantee transparency, quality, and authenticity in every drop.
           </p>
@@ -73,21 +72,21 @@ const NatureTraceBannerContent: React.FC = () => {
                          hover:bg-green-100 transition-all duration-300 
                          transform hover:-translate-y-2 shadow-2xl hover:shadow-xl"
             >
-              Check Test Report
+              Check The Test Report
             </button>
           </div>
 
           {/* Trust Indicators */}
           <div className="flex justify-center items-center space-x-12">
-            <div className="flex items-center space-x-3 bg-white/10 px-6 py-3 rounded-full backdrop-blur-sm">
+            <div className="flex items-center space-x-3 bg-green-brand border-2 border-green-brand/80 px-6 py-3 rounded-full shadow-2xl hover:bg-green-brand/90 transition-all duration-300 hover:scale-105">
               <MapPin className="h-6 w-6 text-white" />
-              <span className="text-white font-medium">
-                100+ Sourcing Locations
+              <span className="text-white font-bold text-base">
+                Direct from Rural india
               </span>
             </div>
-            <div className="flex items-center space-x-3 bg-white/10 px-6 py-3 rounded-full backdrop-blur-sm">
+            <div className="flex items-center space-x-3 bg-green-brand border-2 border-green-brand/80 px-6 py-3 rounded-full shadow-2xl hover:bg-green-brand/90 transition-all duration-300 hover:scale-105">
               <Award className="h-6 w-6 text-white" />
-              <span className="text-white font-medium">Certified Organic</span>
+              <span className="text-white font-bold text-base">Zero Adultration</span>
             </div>
           </div>
         </div>
