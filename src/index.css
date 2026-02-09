@@ -86,6 +86,34 @@
   transform: scale(1.2) !important;
 }
 
+/* Farmer banner: 3D depth without rotation (stays rectangle, no trapezium) */
+.slider-3d-wrapper {
+  perspective: 1200px;
+  padding: 1.5rem 0;
+}
+
+.slider-3d {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  transform: translateZ(20px);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    0 8px 16px rgba(0, 0, 0, 0.06),
+    0 20px 40px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.slider-3d-wrapper:hover .slider-3d {
+  transform: translateZ(32px);
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.05),
+    0 16px 32px rgba(0, 0, 0, 0.08),
+    0 32px 64px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
 @theme inline {
  --radius-sm: calc(var(--radius) - 4px);
  --radius-md: calc(var(--radius) - 2px);

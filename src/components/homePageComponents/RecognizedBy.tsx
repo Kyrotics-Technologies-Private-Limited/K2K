@@ -17,11 +17,14 @@ interface CompanyLogo {
 }
 
 const companyLogos: CompanyLogo[] = [
-  { id: 1, name: "Microsoft", logo: "/assets/logos/microsoft.png" },
-  { id: 2, name: "Google", logo: "/assets/logos/google.png" },
-  { id: 3, name: "Amazon", logo: "/assets/logos/amazon.png" },
-  { id: 4, name: "IBM", logo: "/assets/logos/ibm.png" },
-  { id: 5, name: "Apple", logo: "/assets/logos/apple.webp" },
+  { id: 1, name: "AFBIC-IITKGP", logo: "/assets/logos/AFBIC.png" },
+  { id: 2, name: "IITKGP", logo: "/assets/logos/IITKGP.png" },
+  { id: 3, name: "ISI Kolkata", logo: "/assets/logos/ISI-kolkata.png" },
+  { id: 4, name: "DPIIT", logo: "/assets/logos/DPIIT.png" },
+  { id: 5, name: "MSME", logo: "/assets/logos/MSME.png" },
+  { id: 6, name: "Start Up India", logo: "/assets/logos/Start Up India.png" },
+  { id: 7, name: "Nasscom 10k Startups", logo: "/assets/logos/Nasscom 10k Startups.png" },
+  { id: 8, name: "STPI", logo: "/assets/logos/STPI.png" },
 ];
 
 const allLogos = [...companyLogos, ...companyLogos];
@@ -30,8 +33,8 @@ const RecognizedBy: React.FC = () => {
   return (
     <section className="bg-white w-full overflow-hidden">
       <div className="flex items-center">
-        <div className="flex-shrink-0 px-6 md:px-8">
-          <h2 className="text-lg md:text-xl font-semibold text-green-brand whitespace-nowrap">
+        <div className="flex-shrink-0 px-6 md:px-8 flex items-center border-l-4 border-green-brand pl-4">
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-green-brand via-emerald-600 to-green-800 whitespace-nowrap font-cormorant">
             Recognized By
           </h2>
         </div>
@@ -46,14 +49,19 @@ const RecognizedBy: React.FC = () => {
               {allLogos.map((company, index) => (
                 <div
                   key={`${company.id}-${index}`}
-                  className="flex-shrink-0 mx-8 md:mx-12 transition-all duration-300"
+                  className="flex-shrink-0 mx-8 md:mx-12 transition-all duration-300 flex flex-col items-center gap-2"
                 >
-                  <img
-                    src={company.logo}
-                    alt={`${company.name} logo`}
-                    className="h-10 md:h-14 w-auto object-contain"
-                    loading="lazy"
-                  />
+                  <div className="logo-3d">
+                    <img
+                      src={company.logo}
+                      alt={`${company.name} logo`}
+                      className="h-10 md:h-14 w-auto object-contain"
+                      loading="lazy"
+                    />
+                  </div>
+                  <span className="text-xs md:text-sm font-semibold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-green-brand to-emerald-700 text-center whitespace-nowrap">
+                    {company.name}
+                  </span>
                 </div>
               ))}
             </div>
@@ -75,6 +83,27 @@ const RecognizedBy: React.FC = () => {
         
         .animate-scroll:hover {
           animation-play-state: paused;
+        }
+        
+        .logo-3d {
+          perspective: 800px;
+          transform-style: preserve-3d;
+        }
+        
+        .logo-3d img {
+          display: block;
+          transition: transform 0.25s ease, filter 0.25s ease;
+          transform: rotateY(-4deg) rotateX(2deg) translateZ(0);
+          filter: drop-shadow(4px 6px 8px rgba(0,0,0,0.18))
+                  drop-shadow(8px 12px 16px rgba(0,0,0,0.14))
+                  drop-shadow(14px 20px 24px rgba(0,0,0,0.1));
+        }
+        
+        .animate-scroll .logo-3d:hover img {
+          transform: rotateY(-4deg) rotateX(2deg) translateZ(8px) scale(1.02);
+          filter: drop-shadow(6px 8px 10px rgba(0,0,0,0.2))
+                  drop-shadow(12px 16px 20px rgba(0,0,0,0.15))
+                  drop-shadow(20px 28px 30px rgba(0,0,0,0.12));
         }
       `}</style>
     </section>
