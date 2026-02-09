@@ -1,56 +1,56 @@
 // import { Variant } from "./variant";
 
 export interface Product {
-    id: string;
-    name: string;
-    price: {
-      amount: number;
-      currency: "INR";
-     
-    };
-    description: string;
-    // ingredients: string[];
-    origin: string;
-    category: "ghee" | "oils" | "honey";
-    images: {
-      main: string;
-      gallery: string[];
-      banner:string;
-    };
-    stockStatus: "in_stock" | "low_stock" | "out_of_stock";
-    ratings: number;
-    reviews: number;
-    badges: {
-      text: string;
-      image: string;
-      type: "organic" | "natural" | "premium" | "limited";
-    }[];
-    healthBadges: {
-      title: string;
-      description: string;
-      image: string;
-    }[];
-  }
-  
-  export type SortOption = "price_high" | "price_low" | "popularity" | "newest";
-  
-  export interface CartItem extends Product {
-    quantity: number;
-    selectedVariant: number;
-  }
-  
-  export interface FilterState {
-    category: string[];
-    priceRange: [number, number];
-    availability: ("in_stock" | "low_stock")[];
-    searchQuery: string;
-    sortBy: SortOption;
-  }
+  id: string;
+  name: string;
+  price: {
+    amount: number;
+    currency: "INR";
 
-  export interface ProductVariant {
-    weight: string;
-    price: number;
-    inStock: boolean;
-    originalPrice?: number;
-    discount?: number;
-  }
+  };
+  description: string;
+  // ingredients: string[];
+  origin: string;
+  category: string;
+  images: {
+    main: string;
+    gallery: string[];
+    banner: string;
+  };
+  stockStatus: "in_stock" | "low_stock" | "out_of_stock";
+  ratings: number;
+  reviews: number;
+  badges: {
+    text: string;
+    image: string;
+    type: "organic" | "natural" | "premium" | "limited";
+  }[];
+  healthBadges: {
+    title: string;
+    description: string;
+    image: string;
+  }[];
+}
+
+export type SortOption = "price_high" | "price_low" | "popularity" | "newest";
+
+export interface CartItem extends Product {
+  quantity: number;
+  selectedVariant: number;
+}
+
+export interface FilterState {
+  category: string[];
+  priceRange: [number, number];
+  availability: ("in_stock" | "low_stock")[];
+  searchQuery: string;
+  sortBy: SortOption;
+}
+
+export interface ProductVariant {
+  weight: string;
+  price: number;
+  inStock: boolean;
+  originalPrice?: number;
+  discount?: number;
+}
