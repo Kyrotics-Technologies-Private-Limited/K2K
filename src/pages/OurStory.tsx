@@ -11,9 +11,9 @@ const AboutUs: React.FC = () => {
     <div className="bg-white min-h-screen">
       {/* Hero Section */}
       <section
-        className="relative w-full h-[70vh] flex items-center justify-center text-center text-white"
+        className="relative w-full h-[75vh] flex items-center justify-center text-center text-white"
         style={{
-          backgroundImage: "url(/assets/images/ourstory.png)",
+          backgroundImage: "url(/assets/images/our_story.png)",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
