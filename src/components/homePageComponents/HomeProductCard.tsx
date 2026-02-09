@@ -69,7 +69,13 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
     );
   }
 
-  const lowestPriceVariant = variants.reduce((min, v) => (v.price < min.price ? v : min), variants[0] || null);
+  const lowestPriceVariant = variants.length > 0
+    ? variants.reduce((min, v) => (v.price < min.price ? v : min), variants[0])
+    : null;
+
+  const imageSrc = product?.images?.main ?? product?.images?.gallery?.[0] ?? "";
+
+  if (!product) return null;
 
   return (
     <div className="group bg-white border-0.5 border-grey-50 rounded-md shadow-md overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md relative w-full h-full flex flex-col min-h-0">
@@ -79,12 +85,18 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
       className="flex flex-col h-full"
     >
       <div className="aspect-[39/37] overflow-hidden relative flex-shrink-0">
-        <img
-          src={product.images.main}
-          alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          loading="lazy"
-        />
+        {imageSrc ? (
+          <img
+            src={imageSrc}
+            alt={product.name ?? "Product"}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
+            No image
+          </div>
+        )}
         {/* Show lowest price variant info */}
         {lowestPriceVariant && (
           <div className="text-xs text-gray-600 mb-1">

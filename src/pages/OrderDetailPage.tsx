@@ -7,6 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 // import { invoiceApi } from "../services/api/invoiceApi";
 import variantApi from "../services/api/variantApi";
+import { reviewApi } from "../services/api/reviewApi";
+import { getUnreviewedDeliveredProducts } from "../lib/deliveredOrderReview";
+import type { ProductToReview } from "../lib/deliveredOrderReview";
+import { DeliveredOrderReviewModal } from "../components/products/DeliveredOrderReviewModal";
+import { toast } from "react-toastify";
 import {
   ArrowLeft,
   PackageOpen,
@@ -17,6 +22,7 @@ import {
   FileDown,
   ShoppingCart,
   CheckCircle,
+  Star,
 } from "lucide-react";
 
 
@@ -34,6 +40,9 @@ const OrderDetailPage = () => {
   // const [ setStatusUpdateTime] = useState<string>("");
   const [statusTimestamps, setStatusTimestamps] = useState<Record<string, string>>({});
   const [variantGst, setVariantGst] = useState<Record<string, number>>({});
+  const [productsToReview, setProductsToReview] = useState<ProductToReview[]>([]);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [loadingUnreviewed, setLoadingUnreviewed] = useState(false);
 
   useEffect(() => {
     if (orderId) {
@@ -154,6 +163,26 @@ const OrderDetailPage = () => {
         console.error("Failed to cancel order:", error);
         alert("Failed to cancel order. Please try again.");
       }
+    }
+  };
+
+  const handleRateOrder = async () => {
+    if (!order || order.status?.toLowerCase() !== "delivered" || !order.items?.length) return;
+    setLoadingUnreviewed(true);
+    try {
+      const myReviews = await reviewApi.getMyReviews();
+      const reviewedIds = myReviews.map((r) => r.productId);
+      const unreviewed = getUnreviewedDeliveredProducts([order], reviewedIds);
+      if (unreviewed.length > 0) {
+        setProductsToReview(unreviewed);
+        setReviewModalOpen(true);
+      } else {
+        toast.info("You've already reviewed all items from this order.");
+      }
+    } catch {
+      toast.error("Could not load review options. Please try again.");
+    } finally {
+      setLoadingUnreviewed(false);
     }
   };
 
@@ -965,11 +994,44 @@ const OrderDetailPage = () => {
                  Download Invoice
                </Button>
 
+               {order.status.toLowerCase() === "delivered" && order.items?.length > 0 && (
+                 <Button
+                   variant="outline"
+                   className="w-full mt-2 border-green-600 text-green-700 hover:bg-green-50"
+                   onClick={handleRateOrder}
+                   disabled={loadingUnreviewed}
+                 >
+                   {loadingUnreviewed ? (
+                     <span className="flex items-center justify-center gap-2">
+                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />
+                       Loading...
+                     </span>
+                   ) : (
+                     <>
+                       <Star className="h-4 w-4 mr-2" />
+                       Rate your order
+                     </>
+                   )}
+                 </Button>
+               )}
 
             </CardContent>
           </Card>
         </div>
       </div>
+
+      <DeliveredOrderReviewModal
+        open={reviewModalOpen}
+        onOpenChange={setReviewModalOpen}
+        productsToReview={productsToReview}
+        onReviewSubmitted={(productId) => {
+          setProductsToReview((prev) => {
+            const next = prev.filter((p) => p.productId !== productId);
+            if (next.length === 0) setReviewModalOpen(false);
+            return next;
+          });
+        }}
+      />
     </div>
   );
 };
