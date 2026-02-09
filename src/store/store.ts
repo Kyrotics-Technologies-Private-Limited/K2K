@@ -42,7 +42,8 @@ import authReducer from "./slices/authSlice";
 import cartReducer from "./slices/cartSlice";
 import checkoutReducer from "./slices/checkoutSlice";
 import orderReducer from "./slices/orderSlice";
-import membershipReducer from "./slices/membershipSlice"; // << ADD THIS LINE
+import membershipReducer from "./slices/membershipSlice";
+import productReducer from "./slices/productSlice";
 
 export const store = configureStore({
   reducer: {
@@ -50,7 +51,8 @@ export const store = configureStore({
     cart: cartReducer,
     checkout: checkoutReducer,
     order: orderReducer,
-    membership: membershipReducer,  // << REGISTER THE SLICE
+    membership: membershipReducer,
+    products: productReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

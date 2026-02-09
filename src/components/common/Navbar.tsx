@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Menu,
   X,
@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from "../../store/store";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import PhoneAuth from "../authComponents/PhoneAuth";
 import { signOut } from "../../store/slices/authSlice";
+import { fetchProducts } from "../../store/slices/productSlice";
 
 interface NavbarProps {
   onCartClick?: () => void;
@@ -22,13 +23,21 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showProductDropdown, setShowProductDropdown] = useState(false);
   const location = useLocation();
+  const dispatch = useAppDispatch();
 
   // Get auth state from Redux
-  const { user, isAuthenticated} = useAppSelector(
+  const { user, isAuthenticated } = useAppSelector(
     (state) => state.auth
   );
   const cart = useAppSelector((state) => state.cart);
+  const { categories } = useAppSelector((state) => state.products);
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
   if (!cart) {
     console.error("Cart is not available in the Redux store.");
     return null;
@@ -38,7 +47,6 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
     0
   );
 
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const displayName = user?.name || "User";
@@ -86,44 +94,55 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
           <div className="hidden lg:flex items-stretch space-x-4 xl:space-x-8 h-16">
             <Link
               to="/"
-              className={`text-sm xl:text-base transition px-4 flex items-center h-16 ${
-                location.pathname === "/"
-                  ? "bg-green-100 text-green-800 font-medium"
-                  : "text-gray-500 hover:text-black"
-              }`}
+              className={`text-sm xl:text-base transition px-4 flex items-center h-16 ${location.pathname === "/"
+                ? "bg-green-100 text-green-800 font-medium"
+                : "text-gray-500 hover:text-black"
+                }`}
             >
               Home
             </Link>
 
-            <div className="relative group">
+            <div
+              className="relative"
+              onMouseEnter={() => setShowProductDropdown(true)}
+              onMouseLeave={() => setShowProductDropdown(false)}
+            >
               <div className="flex items-center h-16">
                 <Link
                   to="/all-products"
-                  className={`text-sm xl:text-base transition px-4 flex items-center h-full ${
-                    location.pathname === "/all-products" ||
-                    location.pathname.startsWith("/product/")
+                  className={`text-sm xl:text-base transition px-4 flex items-center h-full ${location.pathname === "/all-products" ||
+                      location.pathname.startsWith("/product/")
                       ? "bg-green-100 text-green-800 font-medium"
                       : "text-gray-500 hover:text-black"
-                  }`}
+                    }`}
                 >
                   All Products
                 </Link>
-                <ChevronDown className="ml-1 h-4 w-4 group-hover:rotate-180 transition-transform" />
+                <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${showProductDropdown ? 'rotate-180' : ''}`} />
               </div>
-              <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                {["oils", "ghee", "honey", "natural"].map((type) => (
-                  <Link
-                    key={type}
-                    to={
-                      type === "natural"
-                        ? "/all-products"
-                        : `/all-products?category=${type}`
-                    }
-                    className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600"
-                  >
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </Link>
-                ))}
+              <div className={`absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 transition-all duration-200 ${showProductDropdown ? 'opacity-100 visible' : 'opacity-0 invisible'
+                }`}>
+                <Link
+                  to="/all-products"
+                  className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600"
+                  onClick={() => setShowProductDropdown(false)}
+                >
+                  All Categories
+                </Link>
+                {categories.length > 0 ? (
+                  categories.map((type) => (
+                    <Link
+                      key={type}
+                      to={`/all-products?category=${type}`}
+                      className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600"
+                      onClick={() => setShowProductDropdown(false)}
+                    >
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </Link>
+                  ))
+                ) : (
+                  <div className="block px-4 py-2 text-gray-500">Loading...</div>
+                )}
               </div>
             </div>
 
@@ -137,11 +156,10 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               <Link
                 key={path}
                 to={`/${path}`}
-                className={`text-sm xl:text-base transition px-4 flex items-center h-16 ${
-                  location.pathname === `/${path}`
-                    ? "bg-green-100 text-green-800 font-medium"
-                    : "text-gray-500 hover:text-black"
-                }`}
+                className={`text-sm xl:text-base transition px-4 flex items-center h-16 ${location.pathname === `/${path}`
+                  ? "bg-green-100 text-green-800 font-medium"
+                  : "text-gray-500 hover:text-black"
+                  }`}
               >
                 {label}
               </Link>
@@ -233,11 +251,10 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             <div className="space-y-1">
               <Link
                 to="/"
-                className={`block py-2 px-3 rounded-md ${
-                  location.pathname === "/"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
+                className={`block py-2 px-3 rounded-md ${location.pathname === "/"
+                  ? "bg-green-100 text-green-700 font-medium"
+                  : "text-gray-700 hover:bg-gray-50"
+                  }`}
                 onClick={() => setIsOpen(false)}
               >
                 Home
@@ -245,36 +262,46 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
 
               <Link
                 to="/all-products"
-                className={`block py-2 px-3 rounded-md ${
-                  location.pathname === "/all-products" ||
+                className={`block py-2 px-3 rounded-md ${location.pathname === "/all-products" ||
                   location.pathname.startsWith("/product/")
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
+                  ? "bg-green-100 text-green-700 font-medium"
+                  : "text-gray-700 hover:bg-gray-50"
+                  }`}
                 onClick={() => setIsOpen(false)}
               >
                 All Products
               </Link>
 
-              {["oils", "ghee", "honey", "natural"].map((type) => (
-                <Link
-                  key={type}
-                  to={
-                    type === "natural"
-                      ? "/all-products"
-                      : `/all-products?category=${type}`
-                  }
-                  className={`block py-2 px-3 pl-6 text-sm rounded-md ${
-                    location.pathname === "/all-products" &&
-                    location.search === `?category=${type}`
+              <Link
+                to="/all-products"
+                className={`block py-2 px-3 pl-6 text-sm rounded-md ${location.pathname === "/all-products" && !location.search
+                  ? "bg-green-100 text-green-700 font-medium"
+                  : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                onClick={() => setIsOpen(false)}
+              >
+                All Categories
+              </Link>
+              {categories.length > 0 ? (
+                categories.map((type) => (
+                  <Link
+                    key={type}
+                    to={`/all-products?category=${type}`}
+                    className={`block py-2 px-3 pl-6 text-sm rounded-md ${location.pathname === "/all-products" &&
+                      location.search === `?category=${type}`
                       ? "bg-green-100 text-green-700 font-medium"
                       : "text-gray-600 hover:bg-gray-50"
-                  }`}
-                  onClick={() => setIsOpen(false)}
-                >
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </Link>
-              ))}
+                      }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </Link>
+                ))
+              ) : (
+                <div className="block py-2 px-3 pl-6 text-sm text-gray-500">
+                  Loading...
+                </div>
+              )}
 
               {[
                 ["try-our-sample", "Try Our Sample"],
@@ -286,11 +313,10 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                 <Link
                   key={path}
                   to={`/${path}`}
-                  className={`block py-2 px-3 rounded-md ${
-                    location.pathname === `/${path}`
-                      ? "bg-green-100 text-green-700 font-medium"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
+                  className={`block py-2 px-3 rounded-md ${location.pathname === `/${path}`
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-700 hover:bg-gray-50"
+                    }`}
                   onClick={() => setIsOpen(false)}
                 >
                   {label}
