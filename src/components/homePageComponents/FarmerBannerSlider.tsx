@@ -25,17 +25,8 @@ const FarmerBannerSlider = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="w-full py-12 md:py-16 px-4 bg-white">
+    <section className="w-full py-4 md:py-8 px-4 bg-white">
       <div className="max-w-7xl mx-auto">
-        {/* Section accent */}
-        <div className="flex items-center justify-center gap-3 mb-6">
-          <span className="h-px w-12 bg-emerald-300/80 rounded-full" />
-          <span className="text-sm font-medium tracking-widest uppercase text-emerald-700/80">
-            Our Mission
-          </span>
-          <span className="h-px w-12 bg-emerald-300/80 rounded-full" />
-        </div>
-
         {/* 3D effect: depth without tilt (no trapezium) */}
         <div className="slider-3d-wrapper">
           <div className="slider-3d">
@@ -68,7 +59,7 @@ const FarmerBannerSlider = () => {
               <SwiperSlide key={index}>
                 <div className="w-full flex flex-col">
                   <div
-                    className={`w-full relative overflow-hidden rounded-t-2xl group/slide flex-shrink-0 ${banner.clickable ? "cursor-pointer" : ""}`}
+                    className={`w-full relative overflow-hidden rounded-t-2xl group/slide shrink-0 ${banner.clickable ? "cursor-pointer" : ""}`}
                     onClick={() => banner.clickable && banner.link && navigate(banner.link)}
                     title={banner.clickable ? "View all products" : undefined}
                     role={banner.clickable ? "button" : undefined}
@@ -81,11 +72,11 @@ const FarmerBannerSlider = () => {
                       draggable={false}
                     />
                     {banner.clickable && (
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover/slide:opacity-100 transition-opacity duration-300 pointer-events-none rounded-t-2xl" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover/slide:opacity-100 transition-opacity duration-300 pointer-events-none rounded-t-2xl" />
                     )}
                   </div>
                   {/* 20px on mobile, 40px on md+ - slider height increased, image height unchanged */}
-                  <div className="w-full h-[20px] md:h-[40px] bg-white flex-shrink-0 rounded-b-2xl" />
+                  <div className="w-full h-[20px] md:h-[40px] bg-white shrink-0 rounded-b-2xl" />
                 </div>
               </SwiperSlide>
             ))}
@@ -112,7 +103,7 @@ const FarmerBannerSlider = () => {
           </button>
 
           {/* Pagination bar */}
-          <div className="absolute bottom-0 left-0 right-0 z-10 py-4 bg-gradient-to-t from-black/30 to-transparent pointer-events-none rounded-b-2xl" />
+          <div className="absolute bottom-0 left-0 right-0 z-10 py-4 bg-linear-to-t from-black/30 to-transparent pointer-events-none rounded-b-2xl" />
           <div className="farmer-banner-pagination absolute bottom-5 left-0 right-0 z-20 flex justify-center pointer-events-auto" />
           </div>
         </div>
