@@ -72,13 +72,13 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
   const lowestPriceVariant = variants.reduce((min, v) => (v.price < min.price ? v : min), variants[0] || null);
 
   return (
-    <div className="group bg-white border-0.5 border-grey-50 rounded-md shadow-md overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md relative w-full">
+    <div className="group bg-white border-0.5 border-grey-50 rounded-md shadow-md overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md relative w-full h-full flex flex-col min-h-0">
     <Link
       to={`/product/${product.id}`}
       onClick={handleProductClick}
-      
+      className="flex flex-col h-full"
     >
-      <div className="aspect-[39/37] overflow-hidden relative">
+      <div className="aspect-[39/37] overflow-hidden relative flex-shrink-0">
         <img
           src={product.images.main}
           alt={product.name}
@@ -121,11 +121,11 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
         </div> */}
       </div>
 
-      <div className="px-3 py-4">
+      <div className="px-3 py-4 flex-1 flex flex-col min-h-0">
         <h3 className="text-sm font-semibold text-[#2C3639] mb-1 line-clamp-1">
           {product.name}
         </h3>
-        <p className="text-gray-600 text-[10px] mb-2 line-clamp-2">
+        <p className="text-gray-600 text-[10px] mb-2 line-clamp-2 min-h-[2rem]">
           {product.description}
         </p>
 

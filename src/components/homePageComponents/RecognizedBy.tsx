@@ -17,14 +17,15 @@ interface CompanyLogo {
 }
 
 const companyLogos: CompanyLogo[] = [
-  { id: 1, name: "AFBIC-IITKGP", logo: "/assets/logos/AFBIC.png" },
-  { id: 2, name: "IITKGP", logo: "/assets/logos/IITKGP.png" },
-  { id: 3, name: "ISI Kolkata", logo: "/assets/logos/ISI-kolkata.png" },
-  { id: 4, name: "DPIIT", logo: "/assets/logos/DPIIT.png" },
-  { id: 5, name: "MSME", logo: "/assets/logos/MSME.png" },
-  { id: 6, name: "Start Up India", logo: "/assets/logos/Start Up India.png" },
-  { id: 7, name: "Nasscom 10k Startups", logo: "/assets/logos/Nasscom 10k Startups.png" },
-  { id: 8, name: "STPI", logo: "/assets/logos/STPI.png" },
+  { id: 1, name: "AFBIC", logo: "/assets/logos/7.png" },
+  { id: 2, name: "IIT KGP", logo: "/assets/logos/1.png" },
+  { id: 3, name: "ISI-Calcutta", logo: "/assets/logos/6.png" },
+  { id: 4, name: "DPIIT", logo: "/assets/logos/5.png" },
+  { id: 5, name: "MSME", logo: "/assets/logos/4.png" },
+  { id: 5, name: "STARTUP INDIA", logo: "/assets/logos/8.png" },
+  { id: 7, name: "NASSCOM  10K STARTUP", logo: "/assets/logos/2.png" },
+  { id: 8, name: "STPI GOVT OF INDIA", logo: "/assets/logos/3.png" },
+  
 ];
 
 const allLogos = [...companyLogos, ...companyLogos];
