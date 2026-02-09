@@ -211,7 +211,12 @@
 // import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-const GuaranteeCycle = () => {
+interface GuaranteeCycleProps {
+  /** Optional: path to the big image shown on the left half (default: Center Image.png) */
+  leftImage?: string;
+}
+
+const GuaranteeCycle = ({ leftImage = "/assets/images/oil_image.jpeg" }: GuaranteeCycleProps) => {
   const guarantees = [
     {
       title: "Authenticity",
@@ -253,7 +258,7 @@ const GuaranteeCycle = () => {
 
   return (
     <div className="w-full bg-[rgba(255,255,255,0.75)] p-4 pb-8 md:p-8 md:pb-16">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 md:mb-12 mt-4 md:mt-8">
           <motion.div
@@ -275,55 +280,102 @@ const GuaranteeCycle = () => {
           </motion.p>
         </div>
 
-        {/* Main Circle Display */}
-        <div className="relative h-[360px] md:h-[480px] flex items-center justify-center"> {/* Increased height by 1.2x */}
-          {/* Center Circle with Image - Increased size by 1.2x */}
-          <div className="absolute z-20">
-            <div className="w-28 h-28 md:w-44 md:h-44 bg-white rounded-full shadow-lg flex items-center justify-center border-4 border-green-100 overflow-hidden"> {/* 1.2x larger */}
-              <img
-                src="/assets/images/Center Image.png"
-                alt="Quality Guarantee"
-                className="w-full h-full object-cover"
+        {/* Two-column: Left = big image, Right = feature cycle */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-center min-h-[360px] md:min-h-[480px]">
+          {/* Left half - Medium image (hidden on mobile) */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="hidden lg:block relative w-full max-w-[280px] md:max-w-[320px] aspect-[3/4] mx-auto rounded-2xl overflow-hidden shadow-lg"
+          >
+            <img
+              src={leftImage}
+              alt="Our quality mission"
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
+
+          {/* Right half - Feature cycle */}
+          <div className="relative h-[360px] md:h-[480px] flex items-center justify-center">
+            {/* Orbit track circle - SVG for clean dashed line */}
+            <svg
+              className="absolute w-[252px] h-[252px] md:w-[360px] md:h-[360px] text-green-brand"
+              style={{ zIndex: 5 }}
+              viewBox="0 0 360 360"
+            >
+              <circle
+                cx="180"
+                cy="180"
+                r="178"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeDasharray="6 10"
+                strokeLinecap="round"
+                opacity="0.6"
               />
-            </div>
-          </div>
-
-          {/* Guarantees with Images */}
-          {guarantees.map((item, index) => {
-            const angle = (index / guarantees.length) * (2 * Math.PI);
-            const radius = window.innerWidth < 768 ? 126 : 180; // 1.2x larger (105->126, 150->180)
-            const x = Math.cos(angle - Math.PI / 2) * radius;
-            const y = Math.sin(angle - Math.PI / 2) * radius;
-
-            return (
-              <div
-                key={index}
-                className="absolute"
-                style={{
-                  transform: `translate(${x}px, ${y}px)`,
-                  zIndex: 10,
-                }}
-              >
-                <div className="flex flex-col items-center">
-                  <motion.div
-                    className="w-14 h-14 md:w-24 md:h-24 rounded-full flex items-center justify-center cursor-pointer overflow-hidden mb-2 md:mb-3"
-                    whileHover={{ scale: 1.1 }}
-                  >
-                    <img
-                      src={`${item.image}?w=300&h=300&auto=format&fit=crop&q=80`}
-                      alt={item.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </motion.div>
-                  <div className="w-24 md:w-32 text-center">
-                    <p className="font-semibold text-black text-xs md:text-sm whitespace-normal">
-                      {item.title}
-                    </p>
-                  </div>
-                </div>
+            </svg>
+            {/* Center Circle with Image - stays fixed */}
+            <div className="absolute z-20">
+              <div className="w-28 h-28 md:w-44 md:h-44 bg-white rounded-full shadow-lg flex items-center justify-center border-4 border-green-100 overflow-hidden">
+                <img
+                  src="/assets/images/Center Image.png"
+                  alt="Quality Guarantee"
+                  className="w-full h-full object-cover"
+                />
               </div>
-            );
-          })}
+            </div>
+
+            {/* Rotating wrapper - cycle moves clockwise */}
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ zIndex: 10 }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+            >
+              {guarantees.map((item, index) => {
+                const angle = (index / guarantees.length) * (2 * Math.PI);
+                const radius = typeof window !== "undefined" && window.innerWidth < 768 ? 126 : 180;
+                const x = Math.cos(angle - Math.PI / 2) * radius;
+                const y = Math.sin(angle - Math.PI / 2) * radius;
+
+                return (
+                  <div
+                    key={index}
+                    className="absolute"
+                    style={{
+                      transform: `translate(${x}px, ${y}px)`,
+                    }}
+                  >
+                    {/* Counter-rotate so icon and label stay upright */}
+                    <motion.div
+                      className="flex flex-col items-center"
+                      animate={{ rotate: -360 }}
+                      transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                    >
+                      <motion.div
+                        className="relative w-14 h-14 md:w-24 md:h-24 rounded-full flex items-center justify-center cursor-pointer overflow-hidden mb-2 md:mb-3"
+                        whileHover={{ scale: 1.1 }}
+                      >
+                        <div className="absolute inset-0 rounded-full bg-white" aria-hidden />
+                        <img
+                          src={`${item.image}?w=300&h=300&auto=format&fit=crop&q=80`}
+                          alt={item.title}
+                          className="relative w-full h-full object-cover"
+                        />
+                      </motion.div>
+                      <div className="w-24 md:w-32 text-center">
+                        <p className="font-semibold text-black text-xs md:text-sm whitespace-normal">
+                          {item.title}
+                        </p>
+                      </div>
+                    </motion.div>
+                  </div>
+                );
+              })}
+            </motion.div>
+          </div>
         </div>
       </div>
     </div>

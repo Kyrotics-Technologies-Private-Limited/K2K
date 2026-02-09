@@ -6,9 +6,7 @@ import TestimonialsSection from "../components/homePageComponents/TestimonialsSe
 import GuaranteeCycle from "../components/homePageComponents/GuaranteeCycle";
 import RecognizedBy from "../components/homePageComponents/RecognizedBy";
 import KishanParivar from "../components/homePageComponents/KishanParivar";
-import FarmerBanner from "../components/homePageComponents/FarmerBanner";
-import SecondFarmerBanner from "../components/homePageComponents/SecondFarmerBanner";
-
+import FarmerBannerSlider from "../components/homePageComponents/FarmerBannerSlider";
 
 const HomePage = () => {
   return (
@@ -17,9 +15,8 @@ const HomePage = () => {
       <RecognizedBy />
       <FeaturesSection />
       <ProductSection />
-      <FarmerBanner />
       <GuaranteeCycle />
-      <SecondFarmerBanner />
+      <FarmerBannerSlider />
       <KishanParivar />
       <TestimonialsSection />
     </div>
