@@ -1,6 +1,6 @@
 
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { ProductGrid } from "../components/products/ProductGrid";
 // import { sampleProducts } from "../mockData/SampleProduct";
 import {
@@ -14,44 +14,31 @@ import {
   Battery,
   // Moon,
   // Shield,
- 
+
 } from "lucide-react";
 import RecognizedBy from "../components/homePageComponents/RecognizedBy";
-import { productApi } from '../services/api/productApi'
-import { Product } from "../types";
+import { useAppDispatch, useAppSelector } from "../store/store";
+import { fetchProducts } from "../store/slices/productSlice";
 import { useSearchParams } from "react-router-dom";
 
 const AllProductPage = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const { products, loading, error } = useAppSelector((state) => state.products);
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get('category');
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const data = await productApi.getAllProducts();
-        setProducts(data);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching products:", err);
-        setError("Failed to load products. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  // Scroll to product grid if category is selected
-  if (categoryParam) {
-    const productGridSection = document.getElementById('product-grid-section');
-    if (productGridSection) {
-      productGridSection.scrollIntoView({ behavior: 'smooth' });
+    if (products.length === 0 && !loading) {
+      dispatch(fetchProducts());
     }
-  }
-}, [categoryParam]);
+    // Scroll to product grid if category is selected
+    if (categoryParam) {
+      const productGridSection = document.getElementById('product-grid-section');
+      if (productGridSection) {
+        productGridSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [categoryParam, dispatch, products.length, loading]);
 
   const healthIssues = [
     {
@@ -86,7 +73,7 @@ const AllProductPage = () => {
     },
   ];
 
-  
+
 
   return (
     <div className="bg-white">

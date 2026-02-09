@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   ChevronLeft,
   ShoppingCart,
@@ -30,6 +30,8 @@ import { useAuth } from "../../context/AuthContext";
 import PhoneAuth from "../authComponents/PhoneAuth";
 import { AuthProvider } from "../../context/AuthContext";
 import { membershipApi } from "../../services/api/membershipApi";
+import { reviewApi, Review } from "../../services/api/reviewApi";
+import { WriteReviewCard } from "./WriteReviewCard";
 import { MembershipStatus, MembershipSettings } from "../../types/membership";
 import { isActiveKPMember } from "../../lib/utils";
 
@@ -65,6 +67,11 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
     useState<MembershipStatus | null>(null);
   const [kpSettings, setKPSettings] = useState<MembershipSettings | null>(null);
 
+  // Reviews state
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const ratingsSectionRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     async function fetchMembership() {
       if (user) {
@@ -89,6 +96,24 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
     fetchMembership();
     fetchSettings();
   }, [user]);
+
+  const fetchReviews = async () => {
+    if (!product?.id) return;
+    try {
+      setReviewsLoading(true);
+      const data = await reviewApi.getProductReviews(product.id);
+      setReviews(data);
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+      setReviews([]);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviews();
+  }, [product?.id]);
 
   useEffect(() => {
     const fetchVariants = async () => {
@@ -187,6 +212,13 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
 
   const getRegularPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
     applyGst(regularPrice, gstPercentage);
+
+  // Actual rating from reviews (fallback to product.ratings when no reviews)
+  const actualRating =
+    reviews.length > 0
+      ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
+      : product.ratings ?? 0;
+  const reviewCount = reviews.length;
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -555,23 +587,37 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
               <h1 className="text-3xl font-bold text-gray-800">
                 {product.name.replace(/^div/i, "").trim()}
               </h1>
-              <div className="flex items-center mt-2 space-x-2">
-                <div className="flex items-center">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-5 h-5 ${
-                        i < Math.floor(product.ratings)
-                          ? "fill-yellow-400 stroke-yellow-400"
-                          : "stroke-gray-300"
-                      }`}
-                    />
-                  ))}
+              <button
+                type="button"
+                onClick={() => ratingsSectionRef.current?.scrollIntoView({ behavior: "smooth" })}
+                className="flex items-center mt-2 gap-2 flex-wrap text-left cursor-pointer rounded-md py-1 pr-2 -ml-1 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
+                aria-label="Go to ratings and reviews"
+              >
+                <div className="flex items-center gap-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => {
+                    const fill = Math.min(1, Math.max(0, actualRating - i));
+                    return (
+                      <div key={i} className="relative w-5 h-5">
+                        <Star className="w-5 h-5 stroke-gray-300 fill-transparent absolute inset-0" />
+                        {fill > 0 && (
+                          <div
+                            className="absolute inset-0 overflow-hidden"
+                            style={{ width: `${fill * 100}%` }}
+                          >
+                            <Star className="w-5 h-5 fill-yellow-400 stroke-yellow-400" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-                <span className="text-sm text-gray-600">
-                  ({product.reviews} reviews)
+                <span className="text-sm font-medium text-gray-700">
+                  {actualRating > 0 ? actualRating.toFixed(1) : "0"}/5
+                  <span className="text-gray-500 font-normal ml-1">
+                    ({reviewCount} {reviewCount === 1 ? "review" : "reviews"})
+                  </span>
                 </span>
-              </div>
+              </button>
             </div>
 
             {/* Product Badges */}
@@ -869,6 +915,91 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
               <h2 className="text-xl font-semibold mb-2">Description</h2>
               <p className="text-gray-600">{product.description}</p>
             </div>
+          </div>
+        </div>
+
+        {/* Ratings & Reviews */}
+        <div
+          ref={ratingsSectionRef}
+          id="ratings-reviews"
+          className="mt-12 px-4 sm:px-8 pb-12 border-t border-gray-200 pt-10"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Ratings & Reviews</h2>
+            <div className="flex items-center gap-2 text-gray-600">
+              <div className="flex">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`w-5 h-5 ${
+                      i < Math.floor(product.ratings)
+                        ? "fill-amber-400 stroke-amber-400"
+                        : "stroke-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-sm font-medium">
+                {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
+              </span>
+            </div>
+          </div>
+
+          <WriteReviewCard
+            productId={product.id}
+            isLoggedIn={!!user}
+            onSuccess={fetchReviews}
+            onLoginClick={() => setShowLoginModal(true)}
+          />
+
+          {/* Reviews list */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Customer reviews</h3>
+            {reviewsLoading ? (
+              <div className="flex justify-center py-12">
+                <div className="animate-spin rounded-full h-10 w-10 border-2 border-green-700 border-t-transparent" />
+              </div>
+            ) : reviews.length === 0 ? (
+              <div className="text-center py-12 bg-gray-50 rounded-2xl border border-gray-100">
+                <p className="text-gray-500">No reviews yet.</p>
+                <p className="text-sm text-gray-400 mt-1">Be the first to review this product!</p>
+              </div>
+            ) : (
+              <ul className="space-y-6">
+                {reviews.map((review) => (
+                  <li
+                    key={review.id}
+                    className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow-sm"
+                  >
+                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                      <div className="flex">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 ${
+                              i < review.rating
+                                ? "fill-amber-400 stroke-amber-400"
+                                : "stroke-gray-200"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-gray-500">
+                        {new Date(review.createdAt).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                      <span className="text-xs text-green-700 font-medium bg-green-50 px-2 py-0.5 rounded">
+                        Verified
+                      </span>
+                    </div>
+                    <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 

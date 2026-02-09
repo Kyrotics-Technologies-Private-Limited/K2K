@@ -1,13 +1,20 @@
-import{ useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import { fetchOrders } from "../store/slices/orderSlice";
 import { orderApi } from "../services/api/orderApi";
+import { reviewApi } from "../services/api/reviewApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PackageOpen, ShoppingCart, AlertTriangle } from "lucide-react";
 import { toast } from "react-toastify";
+import {
+  getUnreviewedDeliveredProducts,
+  wasReviewPromptDismissedRecently,
+} from "../lib/deliveredOrderReview";
+import type { ProductToReview } from "../lib/deliveredOrderReview";
+import { DeliveredOrderReviewModal } from "../components/products/DeliveredOrderReviewModal";
 
 const OrdersPage = () => {
   const navigate = useNavigate();
@@ -17,10 +24,30 @@ const OrdersPage = () => {
   );
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [productsToReview, setProductsToReview] = useState<ProductToReview[]>([]);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (loading || !orders?.length) return;
+    reviewApi
+      .getMyReviews()
+      .then((myReviews) => {
+        const reviewedIds = myReviews.map((r) => r.productId);
+        const unreviewed = getUnreviewedDeliveredProducts(orders, reviewedIds);
+        if (
+          unreviewed.length > 0 &&
+          !wasReviewPromptDismissedRecently()
+        ) {
+          setProductsToReview(unreviewed);
+          setReviewModalOpen(true);
+        }
+      })
+      .catch(() => {});
+  }, [loading, orders]);
 
   const handleCancelOrder = async (orderId: string) => {
     // Find the order to check its status
@@ -231,6 +258,19 @@ const OrdersPage = () => {
           </Card>
         ))}
       </div>
+
+      <DeliveredOrderReviewModal
+        open={reviewModalOpen}
+        onOpenChange={setReviewModalOpen}
+        productsToReview={productsToReview}
+        onReviewSubmitted={(productId) => {
+          setProductsToReview((prev) => {
+            const next = prev.filter((p) => p.productId !== productId);
+            if (next.length === 0) setReviewModalOpen(false);
+            return next;
+          });
+        }}
+      />
 
       {/* Cancel Order Confirmation Popup */}
       {showCancelConfirm && (

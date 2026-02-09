@@ -70,32 +70,40 @@ async function fetchItemDetails(item: CartItem): Promise<CartItemWithDetails> {
 export const initializeCart = createAsyncThunk(
   "cart/initializeCart",
   async () => {
-    try {
-      // First try to load from localStorage
-      const savedCartId = localStorage.getItem("cartId");
-      if (savedCartId) {
-        // If we have a cartId, fetch that cart and its items
-        const cart = await cartApi.getCartById(savedCartId);
-        const items = await cartApi.getCartItems(savedCartId);
-        return { cart, items };
-      }
+    const savedCartId = localStorage.getItem("cartId");
 
-      // If no saved cart, try to get user's cart from backend
-      const cart = await cartApi.getUserCart();
-      const items = await cartApi.getCartItems(cart.id);
-
-      // Save to localStorage
-      localStorage.setItem("cartId", cart.id);
-      localStorage.setItem("cart", JSON.stringify(cart));
-      localStorage.setItem("cartItems", JSON.stringify(items));
-
-      return { cart, items };
-    } catch (error) {
-      console.error("Error initializing cart:", error);
-      // Clear localStorage if there was an error
+    const clearSavedCart = () => {
       localStorage.removeItem("cartId");
       localStorage.removeItem("cart");
       localStorage.removeItem("cartItems");
+    };
+
+    // Try saved cart first (if we have one)
+    if (savedCartId) {
+      try {
+        const cart = await cartApi.getCartById(savedCartId);
+        const items = await cartApi.getCartItems(savedCartId);
+        localStorage.setItem("cartId", cart.id);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        localStorage.setItem("cartItems", JSON.stringify(items));
+        return { cart, items };
+      } catch {
+        // Saved cart invalid or missing (404, 500, etc.) — clear and get/create fresh cart below
+        clearSavedCart();
+      }
+    }
+
+    // No saved cart or failed to load it — get or create user cart
+    try {
+      const cart = await cartApi.getUserCart();
+      const items = await cartApi.getCartItems(cart.id).catch(() => []);
+      localStorage.setItem("cartId", cart.id);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      localStorage.setItem("cartItems", JSON.stringify(items));
+      return { cart, items };
+    } catch (error) {
+      console.error("Error initializing cart:", error);
+      clearSavedCart();
       return { cart: null, items: [] };
     }
   }

@@ -93,6 +93,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
       }, variants[0])
     : null;
 
+  const imageSrc = product?.images?.main ?? product?.images?.gallery?.[0] ?? "";
+
+  if (!product) return null;
+
   return (
     <Link
       to={`/product/${product.id}`}
@@ -100,12 +104,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
       className="group bg-white border-0.5 border-grey-50 rounded-md shadow-md overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md relative w-full"
     >
       <div className="aspect-[39/37] overflow-hidden relative">
-        <img
-          src={product.images.main}
-          alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          loading="lazy"
-        />
+        {imageSrc ? (
+          <img
+            src={imageSrc}
+            alt={product.name ?? "Product"}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
+            No image
+          </div>
+        )}
         <div className="absolute top-1.5 left-1.5 flex gap-0.5">
           <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-white/90 text-[#4A5D23]">
             {product.category}
