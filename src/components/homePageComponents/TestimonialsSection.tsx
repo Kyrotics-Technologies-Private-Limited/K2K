@@ -168,7 +168,7 @@ const testimonials = [
 const TestimonialsSection = () => {
   return (
     <section className="py-8 bg-[#fffbe8]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-green-brand">
           Customer Stories
         </h2>

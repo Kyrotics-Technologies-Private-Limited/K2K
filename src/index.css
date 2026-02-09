@@ -114,6 +114,19 @@
     0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
+/* Featured products carousel: equal-width, equal-height slides */
+.product-swiper .swiper-wrapper {
+  align-items: stretch;
+}
+.product-swiper .swiper-slide {
+  height: auto;
+  display: flex;
+}
+.product-swiper .swiper-slide > div {
+  width: 100%;
+  display: flex;
+}
+
 @theme inline {
  --radius-sm: calc(var(--radius) - 4px);
  --radius-md: calc(var(--radius) - 2px);

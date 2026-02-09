@@ -55,7 +55,7 @@ const ProductSection = () => {
   }
 
   return (
-    <section className="pt-4 sm:pt-8 md:pt-12 pb-2 sm:pb-4 md:pb-5 bg-[rgba(255,255,255,0.75)] overflow-hidden w-full max-w-7xl m-auto">
+    <section className="pt-4 sm:pt-8 md:pt-12 pb-2 sm:pb-4 md:pb-5 bg-[rgba(255,255,255,0.75)] overflow-hidden w-full">
       <div className="w-full">
         <div className="text-center mb-4 sm:mb-6 md:mb-10 px-4 sm:px-6 lg:px-8">
           <h2 className="featureProducts text-2xl md:text-3xl lg:text-4xl font-semibold text-green-brand">
@@ -90,14 +90,14 @@ const ProductSection = () => {
                 640: { slidesPerView: 2, spaceBetween: 20 },
                 1024: { slidesPerView: 4, spaceBetween: 24 },
               }}
-              className="!overflow-visible w-full"
+              className="product-swiper !overflow-visible w-full"
             >
               {products.map((product) => (
                 <SwiperSlide
                   key={product.id}
-                  className="!h-auto"
+                  className="!h-auto !flex-shrink-0"
                 >
-                  <div className="w-full p-1">
+                  <div className="w-full h-full min-w-0 p-1">
                     <HomeProductCard product={product} />
                   </div>
                 </SwiperSlide>

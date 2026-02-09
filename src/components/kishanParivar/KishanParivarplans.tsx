@@ -35,7 +35,7 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
         const transformedPlans = data.map((plan, index) => {
           // Determine if this plan should be marked as popular (e.g., middle option)
           const isPopular = index === 1; // Mark second plan as popular, or customize logic here
-          
+
           return {
             id: plan.id,
             name: plan.type,
@@ -43,18 +43,18 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
             price: `₹${plan.price}`,
             originalPrice: `₹${plan.price + (plan.duration * 50)}`, // Dynamic original price calculation
             discount: `${plan.discountPercentage}%`,
-            delivery: 'Fast',
+            Prepared: 'Freshly ',
             popular: isPopular,
             features: [
-              `${plan.discountPercentage}% discount on all products`,
-              'Fast delivery (2-3 days)',
-              'Priority customer support',
-              'Free shipping on orders above ₹500',
+              // `5% - 10% discount on all products`,
+              // 'Fast delivery (2-3 days)',
+              // 'Priority customer support',
+              // 'Free shipping on orders above ₹500',
             ],
             description: plan.description, // Include description for additional info
           };
         });
-        
+
         setDisplayPlans(transformedPlans);
       })
       .catch(() => {
@@ -84,7 +84,7 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
   return (
     <div
       ref={targetRef}
-      
+
       className="relative min-h-screen flex items-center justify-center py-8 px-4 overflow-hidden"
       style={{
         backgroundImage:
@@ -94,7 +94,7 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
         backgroundAttachment: "fixed",
       }}
     >
-      
+
       {/* Premium gradient overlay */}
       <div
         className="absolute inset-0"
@@ -140,7 +140,7 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
         </div>
 
         {/* Plans grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {isLoading && (
             <div className="col-span-3 text-center text-white text-lg">Loading plans...</div>
           )}
@@ -152,9 +152,8 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
             displayPlans.map((plan) => (
               <div
                 key={plan.id}
-                className={`relative rounded-2xl p-6 transition-all duration-300 ${
-                  plan.popular ? "border-2 lg:scale-105" : "border"
-                }`}
+                className={`relative rounded-2xl p-5 transition-all duration-300 ${plan.popular ? "border-2 lg:scale-105" : "border"
+                  }`}
                 style={{
                   background: "rgba(255, 255, 255, 0.95)",
                   backdropFilter: "blur(10px)",
@@ -181,63 +180,63 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
               >
                 {/* Popular badge */}
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
-                    <div className="bg-green-brand text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
-                      🌟 Most Popular
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20">
+                    <div className="bg-green-brand text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg uppercase tracking-wider">
+                      Most Popular
                     </div>
                   </div>
                 )}
 
                 {/* Card content */}
-                <div className="relative z-10">
-                  <div className="text-center mb-5">
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">
+                <div className="relative z-10 flex flex-col h-full">
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-bold text-gray-800 mb-1">
                       {plan.name}
                     </h3>
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <span className="text-sm text-gray-500 line-through">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <span className="text-xs text-gray-500 line-through">
                         {plan.originalPrice}
                       </span>
-                      <div className="text-3xl font-bold text-green-brand">
+                      <div className="text-2xl font-bold text-green-brand">
                         {plan.price}
                       </div>
                     </div>
-                    <p className="text-gray-600 text-sm">for {plan.duration}</p>
+                    <p className="text-gray-600 text-xs">for {plan.duration}</p>
                   </div>
                   {/* Key benefits cards */}
-                  <div className="grid grid-cols-2 gap-3 mb-5">
+                  <div className="grid grid-cols-2 gap-2 mb-4">
                     <div
-                      className="text-center rounded-lg p-3 border"
+                      className="text-center rounded-lg p-2 border"
                       style={{
                         background: "rgba(34, 197, 94, 0.1)",
                         borderColor: "rgba(34, 197, 94, 0.3)",
                       }}
                     >
-                      <div className="text-lg font-bold text-green-brand mb-1">
+                      <div className="text-base font-bold text-green-brand mb-0.5">
                         {plan.discount}
                       </div>
-                      <div className="text-xs text-gray-600">Discount</div>
+                      <div className="text-[10px] uppercase tracking-wide text-gray-600">Discount</div>
                     </div>
                     <div
-                      className="text-center rounded-lg p-3 border"
+                      className="text-center rounded-lg p-2 border"
                       style={{
                         background: "rgba(34, 197, 94, 0.1)",
                         borderColor: "rgba(34, 197, 94, 0.3)",
                       }}
                     >
-                      <div className="text-sm font-bold text-green-brand mb-1">
-                        {plan.delivery}
+                      <div className="text-sm font-bold text-green-brand mb-0.5">
+                        {plan.Prepared}
                       </div>
-                      <div className="text-xs text-gray-600">Delivery</div>
+                      <div className="text-[10px] uppercase tracking-wide text-gray-600">Prepared</div>
                     </div>
                   </div>
                   {/* Features list */}
-                  <div className="space-y-2 mb-5">
+                  <div className="space-y-1.5 mb-5 flex-grow">
                     {plan.features.map((feature: string, featureIndex: number) => (
                       <div key={featureIndex} className="flex items-start">
-                        <div className="flex-shrink-0 w-5 h-5 bg-green-brand rounded-full flex items-center justify-center mr-3 mt-0.5">
+                        <div className="flex-shrink-0 w-4 h-4 bg-green-brand rounded-full flex items-center justify-center mr-2 mt-0.5">
                           <svg
-                            className="w-3 h-3 text-white"
+                            className="w-2.5 h-2.5 text-white"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -248,14 +247,14 @@ const KishanParivarForm: React.FC<KishanParivarFormProps> = ({ targetRef }) => {
                             />
                           </svg>
                         </div>
-                        <span className="text-gray-700 text-sm leading-relaxed">
+                        <span className="text-gray-700 text-sm leading-tight">
                           {feature}
                         </span>
                       </div>
                     ))}
                   </div>
                   <button
-                    className="button w-full py-3 px-6 rounded-xl font-semibold text-white bg-green-brand transition-all duration-300"
+                    className="button w-full py-2.5 px-4 rounded-xl font-semibold text-sm text-white bg-green-brand hover:bg-green-700 active:scale-95 transition-all duration-300 shadow-md hover:shadow-lg"
                     disabled={subscribingPlanId === plan.id || isLoading}
                     onClick={() => handlePayNowClick(plan.id as PlanType)}
                   >

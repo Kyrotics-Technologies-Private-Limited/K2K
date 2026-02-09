@@ -258,7 +258,7 @@ const GuaranteeCycle = ({ leftImage = "/assets/images/oil_image.jpeg" }: Guarant
 
   return (
     <div className="w-full bg-[rgba(255,255,255,0.75)] p-4 pb-8 md:p-8 md:pb-16">
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8 md:mb-12 mt-4 md:mt-8">
           <motion.div
