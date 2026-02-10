@@ -1,12 +1,12 @@
 // src/services/api.ts
-import axios, {  AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { auth } from '../firebase/firebase'; // Adjust the import path as necessary
 
 // Create axios instance
 const api = axios.create({
   // Use a relative URL for the API base URL
   // baseURL: import.meta.env.REACT_APP_API_URL || 'http://192.168.1.44:5566/api',
-  baseURL: `${import.meta.env.VITE_BACKEND_URL}/api` || '/api' ,
+  baseURL: `${import.meta.env.VITE_BACKEND_URL}/api` || '/api',
   // baseURL: '/api',
   headers: {
     'Content-Type': 'application/json'
@@ -40,7 +40,7 @@ api.interceptors.response.use(
   },
   async (error: AxiosError) => {
     const originalRequest = error.config;
-    
+
     // Handle token refreshing if needed
     if (error.response?.status === 401 && originalRequest) {
       try {
@@ -48,7 +48,7 @@ api.interceptors.response.use(
         const user = auth.currentUser;
         if (user) {
           await user.getIdToken(true);
-          
+
           // Retry the original request with new token
           if (originalRequest.headers) {
             originalRequest.headers.Authorization = `Bearer ${await user.getIdToken()}`;
@@ -59,7 +59,7 @@ api.interceptors.response.use(
         console.error('Error refreshing token:', refreshError);
       }
     }
-    
+
     return Promise.reject(error);
   }
 );

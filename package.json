@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "serve dist -s -l $PORT",
+    "gcp-build": "npm run build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -47,6 +49,7 @@
     "react-phone-input-2": "^2.15.1",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.5.0",
+    "serve": "^14.2.4",
     "react-toastify": "^11.0.5",
     "styled-components": "^6.1.17",
     "swiper": "^11.2.6",
