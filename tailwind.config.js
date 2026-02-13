@@ -8,6 +8,7 @@ export default {
         'sans': ['"DM Sans"', 'sans-serif'],
         'quando': ['"Quando"', 'serif'], // Replaced "Kelly Slab" with "Quando"
         'titillium': ['"Titillium Web"', 'sans-serif'],
+        'lobster-two': ['"Lobster Two"', 'cursive'],
       }, 
       animation: {
         'merriweather': ['"Merriweather"', 'serif'],

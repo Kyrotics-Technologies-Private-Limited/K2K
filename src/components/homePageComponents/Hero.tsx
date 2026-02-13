@@ -1,41 +1,55 @@
+import { useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination } from 'swiper/modules';
+import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
-import 'swiper/css/pagination';
 
 const slides = [
   {
-    image: "/assets/images/BANNER IMAGE 1.png",
-    link: "/all-products?category=ghee"
-  },
-  {
     image: "/assets/images/BANNER IMAGE 2.png",
-    link: "/all-products?category=oils" 
+    link: "/all-products?category=atta" 
   }, 
   {
     image: "/assets/images/BANNER IMAGE 3.png",
-    link: "/all-products?category=honey"
+    link: "/all-products?category=ghee"
   },
   {
     image: "/assets/images/BANNER IMAGE 4.png",
+    link: "/all-products? category=oils"
+  },
+  {
+    image: "/assets/images/BANNER IMAGE 1.png",
     link: "/all-products"
-  }
+  },
 ];
 
 const Hero = () => {
+  const [hasPlayedInitialAnimation, setHasPlayedInitialAnimation] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setHasPlayedInitialAnimation(true), 600);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="hero w-screen max-w-full relative">
+    <div className="hero w-full max-w-full relative overflow-hidden">
+      <style>{`
+        .hero .hero-zoom-initial {
+          animation: heroZoomIn 0.4s ease-out forwards;
+        }
+        @keyframes heroZoomIn {
+          from {
+            transform: scale(0.92);
+          }
+          to {
+            transform: scale(1);
+          }
+        }
+      `}</style>
       <Swiper
-        modules={[Autoplay, Pagination]}
+        modules={[Autoplay]}
         autoplay={{
           delay: 5000,
           disableOnInteraction: false,
-        }}
-        pagination={{
-          clickable: true,
-          el: '.custom-pagination',
-          bulletClass: 'swiper-pagination-bullet !w-2.5 !h-2.5 !mx-1.5 !bg-gray-400/80 !opacity-100',
-          bulletActiveClass: '!bg-green-600/50 !w-3 !h-3',
         }}
         loop
         className="h-full w-full"
@@ -46,16 +60,13 @@ const Hero = () => {
               <img
                 src={slide.image}
                 alt={`Banner ${index + 1}`}
-                className="w-full h-full object-contain sm:h-auto sm:w-full md:h-auto md:w-full lg:h-auto lg:w-full"
+                className={`w-full h-full object-contain sm:h-auto sm:w-full md:h-auto md:w-full lg:h-auto lg:w-full ${index === 0 && !hasPlayedInitialAnimation ? 'hero-zoom-initial' : ''}`}
                 loading="eager"
               />
             </a>
           </SwiperSlide>
         ))}
       </Swiper>
-
-      {/* Custom Pagination Container */}
-      <div className="custom-pagination absolute bottom-8 left-0 right-0 z-10 flex justify-center" />
     </div>
   );
 };

@@ -75,7 +75,7 @@ const Footer: FC = () => {
                 alt="Kishan2Kitchen Logo"
                 className="bg-white h-16 w-16 sm:h-20 sm:w-20 object-cover rounded-md"
               />
-              <span className="logoFont text-xl sm:text-2xl font-bold text-white">
+              <span className="font-lobster-two italic text-xl sm:text-2xl font-bold text-white">
                 Kishan2Kitchen
               </span>
             </div>

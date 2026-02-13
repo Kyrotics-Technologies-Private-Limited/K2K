@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { CheckCircle } from "lucide-react";
 import { RecaptchaVerifier } from "firebase/auth";
 import * as authService from "../../services/api/authApi";
 // shadcn/ui components
@@ -24,7 +25,11 @@ import {
   // resetAuth
 } from "../../store/slices/authSlice";
 
-const PhoneAuth: React.FC = () => {
+interface PhoneAuthProps {
+  onAuthenticated?: () => void;
+}
+
+const PhoneAuth: React.FC<PhoneAuthProps> = ({ onAuthenticated }) => {
   // Redux state and dispatch
   const dispatch = useAppDispatch();
   const { user, isAuthenticated, loading, confirmationResult, error, phone } =
@@ -39,6 +44,8 @@ const PhoneAuth: React.FC = () => {
   // Refs
   const recaptchaWrapperRef = useRef<HTMLDivElement>(null);
   const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
+  const otpContainerRef = useRef<HTMLDivElement>(null);
+  const phoneFormRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     // Initialize recaptcha when component mounts
@@ -68,6 +75,37 @@ const PhoneAuth: React.FC = () => {
       }
     }
   }, [user]);
+
+  // Auto-close modal 5 seconds after successful authentication
+  useEffect(() => {
+    if (!isAuthenticated || !user || user.needsProfileCompletion || !onAuthenticated) return;
+    const timer = setTimeout(() => {
+      onAuthenticated();
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [isAuthenticated, user, onAuthenticated]);
+
+  // Focus phone input when login modal opens (phone step visible) so user can type immediately
+  useEffect(() => {
+    if (confirmationResult) return;
+    const timer = setTimeout(() => {
+      const input = phoneFormRef.current?.querySelector<HTMLInputElement>("input[type=tel]");
+      input?.focus();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [confirmationResult]);
+
+  // Focus OTP input when OTP step is shown so user can type immediately
+  useEffect(() => {
+    if (!confirmationResult || !otpContainerRef.current) return;
+    const timer = setTimeout(() => {
+      const input = otpContainerRef.current?.querySelector<HTMLInputElement>("[data-input-otp], input");
+      if (input) {
+        input.focus();
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [confirmationResult]);
 
   const validateEmail = (email: string): string => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -194,14 +232,19 @@ const PhoneAuth: React.FC = () => {
 
   if (isAuthenticated && user && !user.needsProfileCompletion) {
     return (
-      <div className="text-center p-6">
-        <h2 className="text-xl font-semibold mb-4">
-          Authentication Successful
+      <div className="text-center py-8 px-6">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-100 text-green-600 mb-5">
+          <CheckCircle className="w-8 h-8" strokeWidth={2} />
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900 mb-1">
+          You're all set!
         </h2>
-        <p className="mb-4">Welcome{user.name ? `, ${user.name}` : ""}!</p>
-        {/* <Button onClick={handleSignOut} variant="outline">
-          Sign Out
-        </Button> */}
+        <p className="text-gray-600 mb-1">
+          Welcome{user.name ? `, ${user.name}` : ""}. You're now signed in.
+        </p>
+        <p className="text-sm text-gray-500">
+          You can browse products and place orders. This window will close shortly.
+        </p>
       </div>
     );
   }
@@ -220,7 +263,14 @@ const PhoneAuth: React.FC = () => {
 
       {/* Phone input or OTP input */}
       {!confirmationResult ? (
-        <div className="space-y-4">
+        <form
+          ref={phoneFormRef}
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSendOtp();
+          }}
+        >
           <div className="flex">
             <div className="flex items-center justify-center bg-gray-100 rounded-l-md px-3 border border-gray-300 border-r-0">
               <span className="text-gray-600">🇮🇳</span>
@@ -240,8 +290,8 @@ const PhoneAuth: React.FC = () => {
           </div>
 
           <Button
-            onClick={handleSendOtp}
-            className="w-full bg-teal-700 hover:bg-teal-800"
+            type="submit"
+            className="w-full bg-teal-700 hover:bg-teal-800 cursor-pointer"
             disabled={loading}
           >
             {loading ? "Sending..." : "Login"}
@@ -259,10 +309,22 @@ const PhoneAuth: React.FC = () => {
               Privacy policy
             </a>
           </p>
-        </div>
+        </form>
       ) : (
-        <div className="space-y-4">
-          <div className="flex justify-center mb-4">
+        <form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleVerifyOtp();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleVerifyOtp();
+            }
+          }}
+        >
+          <div ref={otpContainerRef} className="flex justify-center mb-4">
             <InputOTP
               maxLength={6}
               value={otp}
@@ -281,8 +343,8 @@ const PhoneAuth: React.FC = () => {
           </div>
 
           <Button
-            onClick={handleVerifyOtp}
-            className="w-full bg-teal-700 hover:bg-teal-800"
+            type="submit"
+            className="w-full bg-teal-700 hover:bg-teal-800 cursor-pointer"
             disabled={loading}
           >
             {loading ? "Verifying..." : "Verify OTP"}
@@ -292,15 +354,16 @@ const PhoneAuth: React.FC = () => {
 
           <div className="text-center">
             <Button
+              type="button"
               variant="link"
               onClick={handleChangePhone}
-              className="text-sm text-teal-700"
+              className="text-sm text-teal-700 cursor-pointer"
               disabled={loading}
             >
               Change Phone Number
             </Button>
           </div>
-        </div>
+        </form>
       )}
 
       <div ref={recaptchaWrapperRef} className="mt-4"></div>
@@ -352,7 +415,7 @@ const PhoneAuth: React.FC = () => {
 
             <Button
               onClick={handleSaveUserInfo}
-              className="w-full bg-teal-700 hover:bg-teal-800"
+              className="w-full bg-teal-700 hover:bg-teal-800 cursor-pointer"
               disabled={loading}
             >
               {loading ? "Saving..." : "Save"}

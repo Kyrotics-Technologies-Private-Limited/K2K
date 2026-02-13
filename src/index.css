@@ -71,21 +71,6 @@
   pointer-events: none !important;
 }
 
-/* Hero pagination custom styles */
-.hero-pagination .swiper-pagination-bullet {
-  width: 10px !important;
-  height: 10px !important;
-  background: white !important;
-  opacity: 0.5 !important;
-  margin: 0 6px !important;
-  transition: all 0.3s ease !important;
-}
-
-.hero-pagination .swiper-pagination-bullet-active {
-  opacity: 1 !important;
-  transform: scale(1.2) !important;
-}
-
 /* Farmer banner: 3D depth without rotation (stays rectangle, no trapezium) */
 .slider-3d-wrapper {
   perspective: 1200px;
@@ -124,6 +109,19 @@
 }
 .product-swiper .swiper-slide > div {
   width: 100%;
+  display: flex;
+}
+
+/* Customer stories: prevent top of cards from being cut on tablet */
+.testimonial-swiper {
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+}
+.testimonial-swiper .swiper-wrapper {
+  align-items: stretch;
+}
+.testimonial-swiper .swiper-slide {
+  height: auto;
   display: flex;
 }
 
@@ -237,8 +235,9 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
- }
-  body {
+  }
+  html, body {
     @apply bg-background text-foreground;
- }
+    overflow-x: hidden;
+  }
 }
