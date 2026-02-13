@@ -257,10 +257,10 @@ const GuaranteeCycle = ({ leftImage = "/assets/images/oil_image.jpeg" }: Guarant
   ];
 
   return (
-    <div className="w-full bg-[rgba(255,255,255,0.75)] p-4 pb-8 md:p-8 md:pb-16">
+    <div className="max-w-7xl mx-auto bg-[rgba(255,255,255,0.75)] p-4 pb-8 md:p-8 md:pb-16">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-8 md:mb-12 mt-4 md:mt-8">
+        <div className="text-center mb-8 md:mb-2 mt-4 md:mt-8">
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -287,7 +287,7 @@ const GuaranteeCycle = ({ leftImage = "/assets/images/oil_image.jpeg" }: Guarant
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="hidden lg:block relative w-full max-w-[280px] md:max-w-[320px] aspect-[3/4] mx-auto rounded-2xl overflow-hidden shadow-lg"
+            className="hidden lg:block relative w-full max-w-[280px] md:max-w-[400px] aspect-square rounded-2xl overflow-hidden shadow-lg mx-auto"
           >
             <img
               src={leftImage}
