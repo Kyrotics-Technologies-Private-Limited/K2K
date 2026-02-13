@@ -8,13 +8,13 @@ import {
 } from "lucide-react";
 import { FC } from "react";
 import { Link } from "react-router-dom";
-
+ 
 interface SocialLink {
   icon: React.ComponentType<{ className?: string }>;
   name: string;
   url: string;
 }
-
+ 
 const Footer: FC = () => {
   const socialLinks: SocialLink[] = [
     {
@@ -43,7 +43,7 @@ const Footer: FC = () => {
       url: "https://www.youtube.com/channel/UCIxVSJfOKPV95EmOL3g3jSw",
     },
   ];
-
+ 
   const quickLinks = [
     { name: "Shop", path: "/all-products" },
     { name: "Our Story", path: "/our-story" },
@@ -63,7 +63,7 @@ const Footer: FC = () => {
     { name: "Shipping Info", path: "/shippinginfo" },
     { name: "Refund Policy", path: "/refundpolicy" },
   ];
-
+ 
   return (
     <footer
       className="relative bg-cover bg-center bg-no-repeat"
@@ -118,7 +118,7 @@ const Footer: FC = () => {
               })}
             </div>
           </div>
-
+ 
           {/* Quick Links */}
           <div className="col-span-1">
             <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6 pb-2 border-b border-green-700/50">
@@ -137,7 +137,7 @@ const Footer: FC = () => {
               ))}
             </ul>
           </div>
-
+ 
           {/* Categories */}
           <div className="col-span-1">
             <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6 pb-2 border-b border-green-700/50">
@@ -158,7 +158,7 @@ const Footer: FC = () => {
               )}
             </ul>
           </div>
-
+ 
           {/* Newsletter - Full width on mobile, 2 columns on tablet */}
           <div className="col-span-2 md:col-span-1">
             <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6 pb-2 border-b border-green-700/50">
@@ -186,7 +186,7 @@ const Footer: FC = () => {
             </p>
           </div>
         </div>
-
+ 
         <div className="border-t border-green-700/50 mt-8 sm:mt-12 pt-6 sm:pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-green-200/80 text-xs sm:text-sm text-center md:text-left">
@@ -209,5 +209,5 @@ const Footer: FC = () => {
     </footer>
   );
 };
-
+ 
 export default Footer;

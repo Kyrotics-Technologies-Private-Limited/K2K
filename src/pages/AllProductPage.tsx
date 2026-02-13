@@ -80,17 +80,17 @@ const AllProductPage = () => {
       {/* Health Issues Section */}
       <div className="pt-8">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-3 relative">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-3 relative">
             Health Concerns?
           </h2>
           <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
             Discover natural solutions for your everyday health challenges
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-4 md:gap-6 lg:gap-8 lg:grid lg:grid-cols-5 lg:justify-normal">
             {healthIssues.map((issue, index) => (
               <div
                 key={index}
-                className="group relative overflow-hidden rounded-tr-3xl rounded-bl-3xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
+                className="group relative overflow-hidden rounded-tr-2xl rounded-bl-2xl md:rounded-tr-3xl md:rounded-bl-3xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer w-[calc((100%-1rem)/3)] sm:w-[calc((100%-2rem)/3)] md:w-[calc((100%-3rem)/3)] lg:w-auto"
               >
                 {/* Background Image with Overlay */}
                 <div
@@ -100,22 +100,22 @@ const AllProductPage = () => {
                   <div className="absolute inset-0 bg-green-800 opacity-70"></div>
                 </div>
 
-                {/* Content */}
-                <div className="relative p-6 h-[220px] flex flex-col items-center justify-center text-center z-10 bg-green-800">
-                  <div className="bg-white/90 rounded-full p-4 mb-4 transition-transform duration-300 group-hover:scale-110">
+                {/* Content - mobile/sm: compact; md/lg: original sizes */}
+                <div className="relative p-1.5 sm:p-3 md:p-6 h-[130px] sm:h-[160px] md:h-[220px] flex flex-col items-center justify-center text-center z-10 bg-green-800 pt-4 sm:pt-5 md:pt-0">
+                  <div className="bg-white/90 rounded-full p-2 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-4 transition-transform duration-300 group-hover:scale-110">
                     {React.cloneElement(issue.icon, {
                       className:
-                        "w-8 h-8 text-green-800 transition-colors duration-300 group-hover:text-green-900",
+                        "w-5 h-5 sm:w-8 sm:h-8 md:w-8 md:h-8 text-green-800 transition-colors duration-300 group-hover:text-green-900",
                     })}
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2 transition-transform duration-300">
+                  <h3 className="text-[9px] sm:text-sm md:text-xl font-semibold text-white mb-0.5 sm:mb-1 md:mb-2 transition-transform duration-300 leading-tight">
                     {issue.title}
                   </h3>
-                  <p className="text-white/80 text-sm transition-transform duration-300">
+                  <p className="text-white/80 text-[8px] sm:text-xs md:text-sm transition-transform duration-300 leading-tight line-clamp-2">
                     {issue.description}
                   </p>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white transform origin-left"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 md:h-1 bg-white transform origin-left"></div>
               </div>
             ))}
           </div>
@@ -256,15 +256,15 @@ const AllProductPage = () => {
         )}
       </div>
 
-      {/* Bottom Banner Section */}
+      {/* Bottom Banner Section - fixed aspect ratio so dimensions stay intact on all viewports */}
       <div className="max-w-7xl mx-auto px-4">
         <div
-          className="relative rounded-xl shadow-lg p-8 my-4 bg-cover bg-center h-[300px]"
+          className="relative w-full rounded-xl shadow-lg my-4 bg-cover bg-center bg-no-repeat aspect-[3/1] min-h-[200px]"
           style={{
             backgroundImage: 'url("/assets/honeyimg/honey.jpeg")',
           }}
         >
-          <div className="absolute inset-0  rounded-xl"></div>
+          <div className="absolute inset-0 rounded-xl" aria-hidden="true" />
         </div>
       </div>
       <div className=" py-4">

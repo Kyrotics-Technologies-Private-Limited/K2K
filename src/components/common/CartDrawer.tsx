@@ -369,7 +369,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                 onClick={() => {
                   setShowLoginModal(true);
                 }}
-                className="bg-green-800 text-white px-6 py-2 rounded-lg hover:bg-[#3A4D13] transition-colors"
+                className="bg-green-800 text-white px-6 py-2 rounded-lg hover:bg-[#3A4D13] transition-colors cursor-pointer"
               >
                 Login
               </button>

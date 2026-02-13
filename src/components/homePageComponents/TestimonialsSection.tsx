@@ -167,7 +167,7 @@ const testimonials = [
 
 const TestimonialsSection = () => {
   return (
-    <section className="py-8 bg-[#fffbe8]">
+    <section className="py-8 md:pt-12 bg-[#fffbe8] overflow-visible">
       <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-green-brand">
           Customer Stories
@@ -176,7 +176,7 @@ const TestimonialsSection = () => {
           Hear from those who've experienced our products
         </p>
 
-        <div className="relative">
+        <div className="relative overflow-visible">
           <Swiper
             modules={[Autoplay, Pagination]}
             autoplay={{ delay: 3000 }}
@@ -192,18 +192,19 @@ const TestimonialsSection = () => {
             breakpoints={{
               768: { slidesPerView: 2 },
               1024: { slidesPerView: 3 },
+              1280: { slidesPerView: 4 },
             }}
-            className="px-2 pb-12 pt-6"
+            className="testimonial-swiper px-2 pb-12 pt-6 md:pt-10"
           >
             {testimonials.map(({ name, image, content, rating, product }) => (
-              <SwiperSlide key={name}>
+              <SwiperSlide key={name} className="!h-auto">
                 <div
-                  className="bg-[#fffbe8] border border-black p-4 h-full flex flex-col"
+                  className="bg-[#fffbe8] border border-black p-4 h-[280px] flex flex-col"
                   style={{
                     borderRadius: "16px 16px 50px 16px",
                   }}
                 >
-                  <div className="flex mb-4 justify-center">
+                  <div className="flex mb-4 justify-center shrink-0">
                     <img
                       src={image}
                       alt={name}
@@ -223,10 +224,10 @@ const TestimonialsSection = () => {
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm md:text-base text-gray-800/70 flex-grow mb-4">
+                  <p className="text-sm md:text-base text-gray-800/70 grow min-h-0 overflow-y-auto mb-4">
                     "{content}"
                   </p>
-                  <div className="mt-auto pt-3 border-t border-gray-200">
+                  <div className="shrink-0 pt-3 border-t border-gray-200">
                     <span className="inline-block px-3 py-1 text-sm font-medium bg-[#fff6ca] text-gray-700 rounded-full">
                       {product}
                     </span>
