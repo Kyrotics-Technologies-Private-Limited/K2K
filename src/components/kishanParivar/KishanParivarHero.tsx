@@ -1,6 +1,6 @@
 
 import React from "react";
-import { CreditCard } from "lucide-react";
+
 
 interface HeroKishanParivarProps {
   scrollToTarget: () => void;
@@ -15,35 +15,19 @@ const KishanParivarHero: React.FC<HeroKishanParivarProps> = ({ scrollToTarget })
           {/* Compact Heading */}
           <div className="text-center mb-6">
             <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-green-brand leading-tight">
-              Kishan Parivar Premium
+              Kishan Parivar Membership
             </h1>
-            <p className="mt-2 text-gray-600">Exclusive benefits for farmers</p>
+            {/* <p className="mt-2 text-gray-600">Exclusive benefits for farmers</p> */}
           </div>
 
           {/* Premium Card - Compact Version */}
-          <div className="relative mb-6">
-            <div className="bg-gradient-to-br from-green-600 to-green-800 rounded-xl p-6 w-full aspect-[16/9] flex flex-col justify-between shadow-xl">
-              <div className="flex justify-between">
-                <div>
-                  <h3 className="text-xl font-bold text-white">Kishan Parivar</h3>
-                  <p className="text-green-200 text-sm">Premium Member</p>
-                </div>
-                <CreditCard className="text-white" />
-              </div>
-              <div>
-                <p className="text-white text-xl tracking-widest font-mono mb-4">•••• •••• •••• 1234</p>
-                <div className="flex justify-between text-white text-sm">
-                  <div>
-                    <p className="text-green-200 text-xs">CARD HOLDER</p>
-                    <p>Kishan Kumar</p>
-                  </div>
-                  <div>
-                    <p className="text-green-200 text-xs">VALID THRU</p>
-                    <p>03/30</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Premium Image */}
+          <div className="relative mb-6 w-full flex justify-center">
+            <img
+              src="/assets/membershiphomeimg/FINAL.png"
+              alt="Kishan Parivar Membership"
+              className="w-full h-auto object-contain rounded-xl shadow-lg mix-blend-multiply"
+            />
           </div>
 
           {/* Single CTA Button */}

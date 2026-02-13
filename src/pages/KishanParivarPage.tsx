@@ -4,7 +4,8 @@ import { AuthProvider } from '../context/AuthContext';
 import KishanParivarForm from '../components/kishanParivar/KishanParivarplans';
 import KishanParivarHero from '../components/kishanParivar/KishanParivarHero';
 // import FeaturesKishanParivar from '../components/kishanParivar/FeaturesKishanParivar';
-import MembershipStatusSection from '@/components/kishanParivar/MembershipStatusSecction';
+import MembershipStatusSection from '@/components/kishanParivar/MembershipStatusSection';
+import KishanParivarInfo from '../components/kishanParivar/KishanParivarInfo';
 import RecognizedBy from '../components/homePageComponents/RecognizedBy';
 
 
@@ -38,6 +39,7 @@ const KishanParivarPage = () => {
       <div className="min-h-screen">
         <KishanParivarHero scrollToTarget={scrollToTarget}/>
         {/* <FeaturesKishanParivar scrollToTarget={scrollToTarget} /> */}
+        <KishanParivarInfo />
         <KishanParivarForm targetRef={targetRef} />
         <MembershipStatusSection/>
         {/* <FeaturesKishanParivar scrollToTarget={scrollToTarget} /> */}

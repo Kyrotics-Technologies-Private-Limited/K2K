@@ -8,13 +8,13 @@ import {
 } from "lucide-react";
 import { FC } from "react";
 import { Link } from "react-router-dom";
-
+ 
 interface SocialLink {
   icon: React.ComponentType<{ className?: string }>;
   name: string;
   url: string;
 }
-
+ 
 const Footer: FC = () => {
   const socialLinks: SocialLink[] = [
     {
@@ -43,18 +43,19 @@ const Footer: FC = () => {
       url: "https://www.youtube.com/channel/UCIxVSJfOKPV95EmOL3g3jSw",
     },
   ];
-
+ 
   const quickLinks = [
     { name: "Shop", path: "/all-products" },
     { name: "Our Story", path: "/our-story" },
     { name: "Blog", path: "/Blog" },
     { name: "Traceability", path: "/traceability" },
+    { name: "Try Our Sample", path: "/try-our-sample" },
   ];
   const categories = [
-    { name: "Honey", path: "/all-products?category=honey" },
-    { name: "Essential Oils", path: "/all-products?category=oils" },
+    { name: "Atta", path: "/all-products?category=atta" },
+    { name: "Dal", path: "/all-products?category=dal" },
     { name: "Ghee", path: "/all-products?category=ghee" },
-    { name: "Natural Products", path: "/all-products" },
+    { name: "Oils", path: "/all-products?category=oils" },
   ];
   const policyLinks = [
     { name: "Privacy Policy", path: "/privacypolicy" },
@@ -62,30 +63,43 @@ const Footer: FC = () => {
     { name: "Shipping Info", path: "/shippinginfo" },
     { name: "Refund Policy", path: "/refundpolicy" },
   ];
-
+ 
   return (
-    <footer className="relative bg-green-brand">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <footer
+      className="relative bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundColor: "#1e5631",
+        backgroundImage: `url("/assets/images/K2K footer banner.png")`,
+      }}
+    >
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: "rgba(30, 86, 45, 0.80)" }}
+        aria-hidden="true"
+      />
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           {/* Brand Section - Full width on mobile, 2 columns on tablet */}
-          <div className="col-span-2 md:col-span-1">
+          <div className="col-span-2 md:col-span-1 text-left">
             <div className="flex flex-col sm:flex-row md:flex-col items-start sm:items-center md:items-start gap-4 mb-4 sm:mb-6">
               <img
                 src="/assets/images/K2K Logo.png"
                 alt="Kishan2Kitchen Logo"
                 className="bg-white h-16 w-16 sm:h-20 sm:w-20 object-cover rounded-md"
               />
-              <span className="font-lobster-two italic text-xl sm:text-2xl font-bold text-white">
+              <span className="logoFont text-xl sm:text-2xl font-bold text-white">
                 Kishan2Kitchen
               </span>
             </div>
-            <p className="text-green-100 mb-4 text-xs sm:text-sm leading-relaxed">
-              Univillage Agro Pvt. Ltd., Uttar Narayan Pur, PO: BK Chungri, PS:
-              Margram, District: Birbhum, West Bengal - 731202, India
-            </p>
-            <p className="text-green-100 mb-4 text-sm sm:text-base leading-relaxed">
-              Bringing nature's finest organic products to your doorstep.
-            </p>
+            <div className="space-y-3 mb-4 text-green-100 text-xs sm:text-sm leading-relaxed max-w-[280px] sm:max-w-[320px]">
+              <p className="text-left">
+                Univillage Agro Pvt. Ltd., Uttar Narayan Pur, PO: BK Chungri, PS:
+                Margram, District: Birbhum, West Bengal - 731202, India
+              </p>
+              <p className="text-left">
+                Bringing nature's finest organic products to your doorstep.
+              </p>
+            </div>
             <div className="flex flex-wrap gap-3 sm:gap-4">
               {socialLinks.map((social) => {
                 const Icon = social.icon;
@@ -104,7 +118,7 @@ const Footer: FC = () => {
               })}
             </div>
           </div>
-
+ 
           {/* Quick Links */}
           <div className="col-span-1">
             <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6 pb-2 border-b border-green-700/50">
@@ -123,7 +137,7 @@ const Footer: FC = () => {
               ))}
             </ul>
           </div>
-
+ 
           {/* Categories */}
           <div className="col-span-1">
             <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6 pb-2 border-b border-green-700/50">
@@ -144,7 +158,7 @@ const Footer: FC = () => {
               )}
             </ul>
           </div>
-
+ 
           {/* Newsletter - Full width on mobile, 2 columns on tablet */}
           <div className="col-span-2 md:col-span-1">
             <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6 pb-2 border-b border-green-700/50">
@@ -172,7 +186,7 @@ const Footer: FC = () => {
             </p>
           </div>
         </div>
-
+ 
         <div className="border-t border-green-700/50 mt-8 sm:mt-12 pt-6 sm:pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-green-200/80 text-xs sm:text-sm text-center md:text-left">
@@ -195,5 +209,5 @@ const Footer: FC = () => {
     </footer>
   );
 };
-
+ 
 export default Footer;
