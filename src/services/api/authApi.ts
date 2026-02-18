@@ -11,11 +11,14 @@ import {
 import { auth } from "../firebase/firebase";
 
 /**
- * Initialize reCAPTCHA verifier
+ * Initialize reCAPTCHA verifier.
+ * Clears the container first to avoid "reCAPTCHA has already been rendered" when re-initializing.
+ * Use a fresh verifier for each OTP request (RecaptchaVerifier is single-use for phone auth).
  * @param container DOM element to render the reCAPTCHA
  * @returns RecaptchaVerifier instance
  */
 export const initRecaptcha = (container: HTMLElement): RecaptchaVerifier => {
+  container.innerHTML = "";
   const verifier = new RecaptchaVerifier(auth, container, {
     size: "invisible",
     callback: () => {},

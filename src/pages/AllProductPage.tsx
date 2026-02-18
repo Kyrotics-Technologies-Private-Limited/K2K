@@ -20,6 +20,22 @@ import RecognizedBy from "../components/homePageComponents/RecognizedBy";
 import { useAppDispatch, useAppSelector } from "../store/store";
 import { fetchProducts } from "../store/slices/productSlice";
 import { useSearchParams } from "react-router-dom";
+import { useBannerUrls } from "../hooks/useBannerUrls";
+
+function AllProductsBottomBanner() {
+  const { getUrl } = useBannerUrls();
+  const url = getUrl("all_products_banner") ?? "/assets/images/All_Products_Banner.jpeg";
+  return (
+    <div className="max-w-7xl mx-auto px-4">
+      <div
+        className="relative w-full rounded-xl shadow-lg my-4 bg-cover bg-left bg-no-repeat aspect-3/1 min-h-[200px] md:bg-center"
+        style={{ backgroundImage: `url("${url}")` }}
+      >
+        <div className="absolute inset-0 rounded-xl" aria-hidden="true" />
+      </div>
+    </div>
+  );
+}
 
 const AllProductPage = () => {
   const dispatch = useAppDispatch();
@@ -28,17 +44,17 @@ const AllProductPage = () => {
   const categoryParam = searchParams.get('category');
 
   useEffect(() => {
-    if (products.length === 0 && !loading) {
-      dispatch(fetchProducts());
-    }
-    // Scroll to product grid if category is selected
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
+  useEffect(() => {
     if (categoryParam) {
       const productGridSection = document.getElementById('product-grid-section');
       if (productGridSection) {
         productGridSection.scrollIntoView({ behavior: 'smooth' });
       }
     }
-  }, [categoryParam, dispatch, products.length, loading]);
+  }, [categoryParam]);
 
   const healthIssues = [
     {
@@ -238,6 +254,8 @@ const AllProductPage = () => {
           </div>
         </div>
       </div> */}
+      {/* Bottom Banner Section - fixed aspect ratio so dimensions stay intact on all viewports */}
+      <AllProductsBottomBanner />
       <div id="product-grid-section" className="max-w-7xl mx-auto px-4">
         {loading ? (
           <ProductGrid products={products} />
@@ -254,18 +272,6 @@ const AllProductPage = () => {
         ) : (
           <ProductGrid products={products} />
         )}
-      </div>
-
-      {/* Bottom Banner Section - fixed aspect ratio so dimensions stay intact on all viewports */}
-      <div className="max-w-7xl mx-auto px-4">
-        <div
-          className="relative w-full rounded-xl shadow-lg my-4 bg-cover bg-center bg-no-repeat aspect-[3/1] min-h-[200px]"
-          style={{
-            backgroundImage: 'url("/assets/honeyimg/honey.jpeg")',
-          }}
-        >
-          <div className="absolute inset-0 rounded-xl" aria-hidden="true" />
-        </div>
       </div>
       <div className=" py-4">
         <RecognizedBy />

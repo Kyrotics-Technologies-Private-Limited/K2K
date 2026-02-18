@@ -225,17 +225,17 @@ export const OrderReview = () => {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between mt-8">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3 sm:gap-0 mt-6 sm:mt-8">
         <button
           onClick={handleBack}
-          className="button px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+          className="button w-full sm:w-auto px-4 py-2.5 sm:px-6 sm:py-2 text-sm sm:text-base border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
         >
           Back to Selection
         </button>
         <button
           onClick={handleContinue}
           disabled={isCheckingStock}
-          className="w-2xl bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto px-4 py-2.5 sm:py-3 sm:px-6 text-sm sm:text-base bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {isCheckingStock ? "Checking Stock..." : "Continue to Payment"}
         </button>

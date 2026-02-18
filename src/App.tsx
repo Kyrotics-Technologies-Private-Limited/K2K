@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Public components
 import AdvertisementBar from "./components/common/AdvertisementBar";
@@ -8,6 +8,7 @@ import { CartDrawer } from "./components/common/CartDrawer";
 import { CheckoutPage } from "./pages/Checkout";
 import { OrderSuccess } from "./pages/OrderSuccess";
 import Footer from "./components/common/Footer";
+import MobileBottomBar from "./components/common/MobileBottomBar";
 import KishanParivarPage from "./pages/KishanParivarPage";
 import SignUp from "./pages/authPages/SignUp";
 import Login from "./pages/authPages/Login";
@@ -47,18 +48,43 @@ import MembershipSuccess from "./pages/MembershipSuccess";
 import MembershipPayment from "./pages/MembershipPayment";
 
 
+const AD_BAR_STICKY_THRESHOLD = 40; // px scrolled past which navbar becomes fixed (matches ad bar height)
+
 const PublicLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isNavbarSticky, setIsNavbarSticky] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setIsNavbarSticky(window.scrollY >= AD_BAR_STICKY_THRESHOLD);
+    };
+    onScroll(); // set initial state
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <>
+      {/* Ad bar and navbar in flow; after scroll past ad bar, navbar is fixed at top */}
       <AdvertisementBar />
-      <Navbar onCartClick={() => setIsCartOpen(true)} />
-      <main>
+      {isNavbarSticky ? (
+        <>
+          <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+            <Navbar onCartClick={() => setIsCartOpen(true)} />
+          </div>
+          <div className="h-12 sm:h-16" aria-hidden="true" />
+        </>
+      ) : (
+        <div className="z-50 bg-white">
+          <Navbar onCartClick={() => setIsCartOpen(true)} />
+        </div>
+      )}
+      <main className="pb-14 md:pb-0">
         <Outlet />
       </main>
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       <Footer />
+      <MobileBottomBar />
       <ToastContainer
         position="top-right"
         autoClose={5000}

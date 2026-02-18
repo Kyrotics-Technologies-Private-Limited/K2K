@@ -18,9 +18,14 @@ const initialState: ProductState = {
 
 export const fetchProducts = createAsyncThunk(
     'products/fetchProducts',
-    async () => {
-        const products = await productApi.getAllProducts();
-        return products;
+    async (_, { rejectWithValue }) => {
+        try {
+            const products = await productApi.getAllProducts();
+            return products;
+        } catch (err: any) {
+            const message = err?.response?.data?.error ?? err?.message ?? 'Failed to fetch products';
+            return rejectWithValue(message);
+        }
     }
 );
 
@@ -36,11 +41,11 @@ const productSlice = createSlice({
             })
             .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
                 state.loading = false;
-                state.products = action.payload;
-                // Extract unique categories, filter empty/null, and sort alphabetically
+                const list = Array.isArray(action.payload) ? action.payload : [];
+                state.products = list;
                 const uniqueCategories = Array.from(
                     new Set(
-                        action.payload
+                        list
                             .map((product) => product.category?.toLowerCase())
                             .filter((category): category is string => !!category && category.trim().length > 0)
                     )
@@ -49,7 +54,7 @@ const productSlice = createSlice({
             })
             .addCase(fetchProducts.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message || 'Failed to fetch products';
+                state.error = (action.payload as string) || action.error?.message || 'Failed to fetch products';
             });
     },
 });

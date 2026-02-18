@@ -62,13 +62,13 @@ const ProductSection = () => {
             Featured Products
           </h2>
           <p className="text-sm md:text-base text-gray-800/70 mx-auto mt-2">
-            Discover our carefully curated selection of organic products, sourced directly from nature.
+            Discover our carefully curated selection of products, sourced directly from nature.
           </p>
         </div>
 
         <div className="relative w-full">
           <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 z-10 flex justify-between pointer-events-none px-1 sm:px-4">
-            <button className="swiper-button-prev !w-0 !h-0 !static !mt-0 pointer-events-auto" />
+            <button className="swiper-button-prev w-0! !h-0 !static !mt-0 pointer-events-auto" />
             <button className="swiper-button-next !w-0 !h-0 !static !mt-0 pointer-events-auto" />
           </div>
 

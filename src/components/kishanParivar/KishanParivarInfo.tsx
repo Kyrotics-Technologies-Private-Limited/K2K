@@ -76,7 +76,7 @@ const KishanParivarInfo = () => {
             Have You Missed <br className="hidden md:block"/> Becoming a Farmer?
           </h2>
           <p className="text-xl md:text-2xl text-gray-600 font-medium max-w-2xl mx-auto">
-            Eat better. Live healthier. <span className="text-green-700 font-bold">Save smarter.</span>
+            Still eat better. Live healthier. <span className="text-green-700 font-bold">Save smarter.</span>
           </p>
         </motion.div>
       </div>
