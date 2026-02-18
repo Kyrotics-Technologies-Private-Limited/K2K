@@ -10,6 +10,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import PhoneAuth from "../authComponents/PhoneAuth";
+import { useBannerUrls } from "../../hooks/useBannerUrls";
 import { signOut } from "../../store/slices/authSlice";
 import { fetchProducts } from "../../store/slices/productSlice";
 
@@ -27,6 +28,8 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
   const [showProductDropdown, setShowProductDropdown] = useState(false);
   const location = useLocation();
   const dispatch = useAppDispatch();
+  const { getUrl } = useBannerUrls();
+  const logoUrl = getUrl("footer_logo") ?? "/assets/images/K2K Logo.png";
 
   // Get auth state from Redux
   const { user, isAuthenticated } = useAppSelector(
@@ -85,7 +88,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? "Close menu" : "Open menu"}
             >
-              {isOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}
+              {isOpen ? <X className="h-6 w-6 sm:h-6 sm:w-6" /> : <Menu className="h-6 w-6 sm:h-6 sm:w-6" />}
             </button>
           </div>
 
@@ -95,11 +98,11 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             className="flex items-center justify-self-center lg:justify-self-auto"
           >
             <img
-              src="/assets/images/K2K Logo.png"
+              src={logoUrl}
               alt="Kishan2Kitchen Logo"
               className="md:h-14 sm:h-12 h-10 md:w-14 sm:w-12 w-10 object-cover rounded-md"
             />
-            <span className="font-lobster-two italic ml-2 lg:text-3xl md:text-2xl sm:text-xl font-semibold text-green-800">
+            <span className="font-lobster-two italic ml-2 text-xl sm:text-2xl md:text-3xl lg:text-3xl font-semibold text-green-800">
               Kishan2Kitchen
             </span>
           </Link>
@@ -221,24 +224,27 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
               </button>
             )}
 
-            {isAuthenticated ? (
-              <button
-                onClick={toggleUserMenu}
-                className="lg:hidden w-6 h-6 sm:w-7 sm:h-7 mr-1.5 sm:mr-2 rounded-full bg-green-600 text-white flex items-center justify-center cursor-pointer text-sm sm:text-base"
-              >
-                {displayName.charAt(0).toUpperCase()}
-              </button>
-            ) : (
-              <button
-                onClick={() => setShowLoginModal(true)}
-                className="text-gray-700 hover:text-green-600 transition lg:hidden cursor-pointer p-1"
-              >
-                <UserIcon className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
-            )}
+            {/* Account: hidden on mobile (bottom bar has it), visible on tablet only (md to lg) */}
+            <div className="hidden md:flex lg:hidden items-center">
+              {isAuthenticated ? (
+                <button
+                  onClick={toggleUserMenu}
+                  className="w-6 h-6 sm:w-7 sm:h-7 mr-1.5 sm:mr-2 rounded-full bg-green-600 text-white flex items-center justify-center cursor-pointer text-sm sm:text-base"
+                >
+                  {displayName.charAt(0).toUpperCase()}
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowLoginModal(true)}
+                  className="text-gray-700 hover:text-green-600 transition cursor-pointer p-1"
+                >
+                  <UserIcon className="w-6 h-6" />
+                </button>
+              )}
+            </div>
 
             <button onClick={onCartClick} className="button relative p-1.5 lg:p-2">
-              <ShoppingCart className="text-gray-700 w-5 h-5 sm:w-6 sm:h-6 lg:w-6 lg:h-6" />
+              <ShoppingCart className="text-gray-700 w-6 h-6 lg:w-6 lg:h-6" />
               {itemCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 lg:-top-1 lg:-right-1 bg-green-600 text-white rounded-full h-4 w-4 min-w-4 lg:h-5 lg:w-5 lg:min-w-5 flex items-center justify-center text-[10px] lg:text-xs">
                   {itemCount > 99 ? "99+" : itemCount}

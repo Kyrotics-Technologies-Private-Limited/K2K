@@ -4,11 +4,14 @@ import { ProductGrid } from '../components/products/ProductGrid';
 import { productApi } from '../services/api/productApi';
 import { Product } from '../types';
 import RecognizedBy from '../components/homePageComponents/RecognizedBy';
+import { useBannerUrls } from '../hooks/useBannerUrls';
 
 const TryOurSamplePage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { getUrl } = useBannerUrls();
+  const bannerSrc = getUrl("try_our_sample") ?? "/assets/tryOurSample/Try_our_sample16_5.png";
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -47,7 +50,7 @@ const TryOurSamplePage: React.FC = () => {
       <div className="relative">
         <div className="w-full h-64 sm:h-80 md:h-96 lg:h-[500px] overflow-hidden">
           <img 
-            src="/assets/tryOurSample/Try_our_sample16_5.png" 
+            src={bannerSrc} 
             alt="Try Our Sample Banner" 
             className="w-full h-full object-cover object-center"
           />

@@ -109,7 +109,7 @@ const testimonials = [
     image:
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200",
     content:
-      "The organic protein powder blends perfectly into my morning smoothies. It's the cleanest plant-based protein I've found.",
+      "The protein powder blends perfectly into my morning smoothies. It's the cleanest plant-based protein I've found.",
     rating: 5,
     product: "Vanilla Protein Powder"
   },
@@ -159,7 +159,7 @@ const testimonials = [
     image:
       "https://images.unsplash.com/photo-1542178243-bc20204b769f?auto=format&fit=crop&q=80&w=200",
     content:
-      "The organic coconut oil has become my kitchen staple. Its rich flavor elevates both raw and cooked dishes beautifully.",
+      "The coconut oil has become my kitchen staple. Its rich flavor elevates both raw and cooked dishes beautifully.",
     rating: 5,
     product: "Cold-Pressed Coconut Oil"
   }

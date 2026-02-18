@@ -88,7 +88,7 @@ export const sampleBlogs: Blog[] = [
 
         <figure class="my-8">
           <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=1200" alt="Farmers in field" class="rounded-lg shadow-lg"/>
-          <figcaption class="text-center text-sm mt-2">Our partner farmers working in organic fields</figcaption>
+          <figcaption class="text-center text-sm mt-2">Our partner farmers working in fields</figcaption>
         </figure>
 
         <h2>Our Farmer Partnership Program</h2>
@@ -96,7 +96,7 @@ export const sampleBlogs: Blog[] = [
         <ul>
           <li><strong>Direct Relationships:</strong> We work directly with farmers, eliminating middlemen and ensuring better returns</li>
           <li><strong>Fair Price Guarantee:</strong> Farmers receive premium prices for quality produce</li>
-          <li><strong>Technical Support:</strong> Regular training sessions on organic farming practices</li>
+          <li><strong>Technical Support:</strong> Regular training sessions on farming practices</li>
           <li><strong>Quality Control:</strong> On-site assistance for maintaining high standards</li>
         </ul>
 
@@ -112,7 +112,7 @@ export const sampleBlogs: Blog[] = [
             <ul>
               <li>Soil testing</li>
               <li>Water quality monitoring</li>
-              <li>Organic certification</li>
+              <li>Certification</li>
               <li>Regular field inspections</li>
             </ul>
           </div>
@@ -149,7 +149,7 @@ export const sampleBlogs: Blog[] = [
             </div>
             <div class="text-center">
               <p class="text-2xl font-bold text-green-600">100%</p>
-              <p class="text-sm">Organic</p>
+              // <p class="text-sm">Organic</p>
             </div>
             <div class="text-center">
               <p class="text-2xl font-bold text-green-600">50+</p>
@@ -299,7 +299,7 @@ export const sampleBlogs: Blog[] = [
 
       <div class="my-8 p-6 bg-green-50 rounded-lg">
         <h3 class="text-xl font-semibold mb-4">Lakshmi's Journey to Success</h3>
-        <p>From a farm laborer earning daily wages to running her own organic farming collective, Lakshmi's story exemplifies the transformative power of our program. Today, she leads a group of 25 women farmers, implementing sustainable farming practices and securing premium prices for their produce.</p>
+        <p>From a farm laborer earning daily wages to running her own farming collective, Lakshmi's story exemplifies the transformative power of our program. Today, she leads a group of 25 women farmers, implementing sustainable farming practices and securing premium prices for their produce.</p>
       </div>
 
       <div class="my-8 p-6 bg-green-50 rounded-lg">
@@ -357,7 +357,7 @@ export const sampleBlogs: Blog[] = [
       <h2>Our Sustainable Practices</h2>
       <p>We implement various sustainable methods:</p>
       <ul>
-        <li>Organic farming techniques</li>
+        <li>Farming techniques</li>
         <li>Water conservation methods</li>
         <li>Natural pest control</li>
         <li>Crop rotation</li>
@@ -378,7 +378,7 @@ export const sampleBlogs: Blog[] = [
         <li>100% renewable energy usage</li>
         <li>Zero-waste packaging</li>
         <li>Enhanced biodiversity programs</li>
-        <li>Expanded organic farming network</li>
+        <li>Expanded farming network</li>
       </ul>
     `,    coverImage: 'https://images.unsplash.com/photo-1589923158776-cb4485d99fd6?q=80&w=1200&auto=format&fit=crop',
     category: 'farming',
@@ -388,6 +388,6 @@ export const sampleBlogs: Blog[] = [
     },
     publishedAt: '2025-05-20',
     readTime: '7 min read',
-    tags: ['sustainability', 'environment', 'farming', 'organic']
+    tags: ['sustainability', 'environment', 'farming']
   }
 ];

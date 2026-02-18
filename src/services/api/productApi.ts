@@ -29,7 +29,7 @@ export const productApi = {
 
   // src/services/api/productApi.ts
 // src/services/api/productApi.ts
-import api from "../api/api";
+import api from "./api";
 import { Product } from "../../types/index"; // adjust this path based on your project structure
 
 // const BASE_URL = "http://localhost:5566/api/products";
@@ -43,8 +43,13 @@ export const productApi = {
 
   // GET all products
   getAllProducts: async (): Promise<Product[]> => {
-    const response = await api.get(`/products`);
-    return response.data;
+    const response = await api.get<Product[] | { products?: Product[] }>(`/products`);
+    const data = response.data;
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object' && Array.isArray((data as { products?: Product[] }).products)) {
+      return (data as { products: Product[] }).products;
+    }
+    return [];
   },
 
   // GET single product by ID

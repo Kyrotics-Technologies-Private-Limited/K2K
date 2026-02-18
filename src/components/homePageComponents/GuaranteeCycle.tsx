@@ -267,7 +267,7 @@ const GuaranteeCycle = ({ leftImage = "/assets/images/oil_image.jpeg" }: Guarant
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-green-brand">
-              OUR MISSION AGAINST ADULTERATED FOOD
+              SAY NO TO ADULTERATED FOOD
             </h2>
           </motion.div>
           <motion.p

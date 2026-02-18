@@ -1,29 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
+import { useBannerUrls } from '../../hooks/useBannerUrls';
 
-const slides = [
-  {
-    image: "/assets/images/BANNER IMAGE 2.png",
-    link: "/all-products?category=atta" 
-  }, 
-  {
-    image: "/assets/images/BANNER IMAGE 3.png",
-    link: "/all-products?category=ghee"
-  },
-  {
-    image: "/assets/images/BANNER IMAGE 4.png",
-    link: "/all-products? category=oils"
-  },
-  {
-    image: "/assets/images/BANNER IMAGE 1.png",
-    link: "/all-products"
-  },
+const SLIDE_KEYS: { key: string; link: string; fallback: string }[] = [
+  { key: 'hero_atta', link: '/all-products?category=atta', fallback: '/assets/images/Atta_Banner.jpeg' },
+  { key: 'hero_ghee', link: '/all-products?category=ghee', fallback: '/assets/images/Ghee_Banner.jpeg' },
+  { key: 'hero_mustard_oil', link: '/all-products?category=oils', fallback: '/assets/images/Mustard_Oil_Banner.jpeg' },
+  { key: 'hero_sesar_oil', link: '/all-products?category=oils', fallback: '/assets/images/Sesar_Oil_Banner.jpeg' },
+  { key: 'hero_dal', link: '/all-products?category=dal', fallback: '/assets/images/Dal_Banner.jpeg' },
+  { key: 'hero_k2k_products', link: '/all-products', fallback: '/assets/images/K2K_Products_Banner.jpeg' },
 ];
 
 const Hero = () => {
   const [hasPlayedInitialAnimation, setHasPlayedInitialAnimation] = useState(false);
+  const { getUrl } = useBannerUrls();
+
+  const slides = useMemo(
+    () =>
+      SLIDE_KEYS.map(({ key, link, fallback }) => ({
+        image: getUrl(key) ?? fallback,
+        link,
+      })),
+    [getUrl]
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => setHasPlayedInitialAnimation(true), 600);

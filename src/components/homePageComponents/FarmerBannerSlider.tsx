@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation, EffectFade, Keyboard } from "swiper/modules";
@@ -5,24 +6,20 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "swiper/css/effect-fade";
+import { useBannerUrls } from "../../hooks/useBannerUrls";
 
-const banners = [
-  {
-    src: "/assets/images/we are in a mission.png",
-    alt: "We are on a mission",
-    link: "/all-products",
-    clickable: true,
-  },
-  {
-    src: "/assets/images/Adulteration free food banner (1).png",
-    alt: "Adulteration free food",
-    link: null,
-    clickable: false,
-  },
+const BANNER_ITEMS = [
+  { key: "farmer_slider_mission", alt: "We are on a mission", link: "/all-products", clickable: true, fallback: "/assets/images/we are in a mission.png" },
+  { key: "farmer_slider_adulteration", alt: "Adulteration free food", link: null, clickable: false, fallback: "/assets/images/Adulteration free food banner (1).png" },
 ];
 
 const FarmerBannerSlider = () => {
   const navigate = useNavigate();
+  const { getUrl } = useBannerUrls();
+  const banners = useMemo(
+    () => BANNER_ITEMS.map(({ key, fallback, ...rest }) => ({ src: getUrl(key) ?? fallback, ...rest })),
+    [getUrl]
+  );
 
   return (
     <section className="w-full py-4 md:py-8 px-4 bg-white">
@@ -59,7 +56,7 @@ const FarmerBannerSlider = () => {
               <SwiperSlide key={index}>
                 <div className="w-full flex flex-col">
                   <div
-                    className={`w-full relative overflow-hidden rounded-t-2xl group/slide shrink-0 ${banner.clickable ? "cursor-pointer" : ""}`}
+                    className={`w-full relative overflow-hidden rounded-2xl group/slide shrink-0 ${banner.clickable ? "cursor-pointer" : ""}`}
                     onClick={() => banner.clickable && banner.link && navigate(banner.link)}
                     title={banner.clickable ? "View all products" : undefined}
                     role={banner.clickable ? "button" : undefined}
@@ -72,11 +69,9 @@ const FarmerBannerSlider = () => {
                       draggable={false}
                     />
                     {banner.clickable && (
-                      <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover/slide:opacity-100 transition-opacity duration-300 pointer-events-none rounded-t-2xl" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover/slide:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl" />
                     )}
                   </div>
-                  {/* 20px on mobile, 40px on md+ - slider height increased, image height unchanged */}
-                  <div className="w-full h-[20px] md:h-[40px] bg-white shrink-0 rounded-b-2xl" />
                 </div>
               </SwiperSlide>
             ))}

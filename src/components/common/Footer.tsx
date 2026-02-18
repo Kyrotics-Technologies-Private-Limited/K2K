@@ -8,14 +8,18 @@ import {
 } from "lucide-react";
 import { FC } from "react";
 import { Link } from "react-router-dom";
- 
+import { useBannerUrls } from "../../hooks/useBannerUrls";
+
 interface SocialLink {
   icon: React.ComponentType<{ className?: string }>;
   name: string;
   url: string;
 }
- 
+
 const Footer: FC = () => {
+  const { getUrl } = useBannerUrls();
+  const footerBannerUrl = getUrl("footer_banner") ?? "/assets/images/K2K footer banner.png";
+  const logoUrl = getUrl("footer_logo") ?? "/assets/images/K2K Logo.png";
   const socialLinks: SocialLink[] = [
     {
       icon: Instagram,
@@ -69,7 +73,7 @@ const Footer: FC = () => {
       className="relative bg-cover bg-center bg-no-repeat"
       style={{
         backgroundColor: "#1e5631",
-        backgroundImage: `url("/assets/images/K2K footer banner.png")`,
+        backgroundImage: `url("${footerBannerUrl}")`,
       }}
     >
       <div
@@ -83,7 +87,7 @@ const Footer: FC = () => {
           <div className="col-span-2 md:col-span-1 text-left">
             <div className="flex flex-col sm:flex-row md:flex-col items-start sm:items-center md:items-start gap-4 mb-4 sm:mb-6">
               <img
-                src="/assets/images/K2K Logo.png"
+                src={logoUrl}
                 alt="Kishan2Kitchen Logo"
                 className="bg-white h-16 w-16 sm:h-20 sm:w-20 object-cover rounded-md"
               />
@@ -97,7 +101,7 @@ const Footer: FC = () => {
                 Margram, District: Birbhum, West Bengal - 731202, India
               </p>
               <p className="text-left">
-                Bringing nature's finest organic products to your doorstep.
+                Bringing nature's finest products to your doorstep.
               </p>
             </div>
             <div className="flex flex-wrap gap-3 sm:gap-4">
@@ -165,7 +169,7 @@ const Footer: FC = () => {
               Stay Updated
             </h3>
             <p className="text-green-100 mb-4 text-sm sm:text-base leading-relaxed">
-              Subscribe to our newsletter for the latest products and organic
+              Subscribe to our newsletter for the latest products and healthy
               living tips.
             </p>
             <div className="relative">

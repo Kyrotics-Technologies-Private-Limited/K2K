@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/input-otp";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { RootState, useAppDispatch, useAppSelector } from "../../store/store";
+import { useBannerUrls } from "../../hooks/useBannerUrls";
 // Import Redux actions
 import {
   sendOTP,
@@ -34,6 +35,8 @@ const PhoneAuth: React.FC<PhoneAuthProps> = ({ onAuthenticated }) => {
   const dispatch = useAppDispatch();
   const { user, isAuthenticated, loading, confirmationResult, error, phone } =
     useAppSelector((state: RootState) => state.auth);
+  const { getUrl } = useBannerUrls();
+  const logoUrl = getUrl("footer_logo") ?? "/assets/images/K2K Logo.png";
 
   // Local state for form inputs
   const [otp, setOtp] = useState("");
@@ -48,17 +51,14 @@ const PhoneAuth: React.FC<PhoneAuthProps> = ({ onAuthenticated }) => {
   const phoneFormRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    // Initialize recaptcha when component mounts
-    if (recaptchaWrapperRef.current) {
-      recaptchaVerifierRef.current = authService.initRecaptcha(
-        recaptchaWrapperRef.current
-      );
-    }
-
     return () => {
-      // Clean up recaptcha on unmount
       if (recaptchaVerifierRef.current) {
-        recaptchaVerifierRef.current.clear();
+        try {
+          recaptchaVerifierRef.current.clear();
+        } catch {
+          // ignore if already cleared
+        }
+        recaptchaVerifierRef.current = null;
       }
     };
   }, []);
@@ -135,17 +135,14 @@ const PhoneAuth: React.FC<PhoneAuthProps> = ({ onAuthenticated }) => {
       return;
     }
 
-    // Re-initialize recaptcha if needed
-    if (!recaptchaVerifierRef.current && recaptchaWrapperRef.current) {
-      recaptchaVerifierRef.current = authService.initRecaptcha(
-        recaptchaWrapperRef.current
-      );
-    }
-
-    if (!recaptchaVerifierRef.current) {
-      dispatch({ type: "auth/setError", payload: "reCAPTCHA not initialized" });
+    // Create a fresh reCAPTCHA verifier for each OTP request (verifier is single-use)
+    if (!recaptchaWrapperRef.current) {
+      dispatch({ type: "auth/setError", payload: "reCAPTCHA container not ready" });
       return;
     }
+    recaptchaVerifierRef.current = authService.initRecaptcha(
+      recaptchaWrapperRef.current
+    );
 
     // Add +91 prefix before sending to backend
     const fullPhoneNumber = `+91${phone}`;
@@ -254,7 +251,7 @@ const PhoneAuth: React.FC<PhoneAuthProps> = ({ onAuthenticated }) => {
       {/* Header with logo */}
       <div className="text-center mb-6">
         <img
-          src="/assets/images/K2K Logo.png"
+          src={logoUrl}
           alt="Company Logo"
           className="mx-auto mb-2 h-16 w-16 object-cover rounded-md"
         />
