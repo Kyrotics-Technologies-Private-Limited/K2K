@@ -137,27 +137,36 @@ export const OrderReview = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    {/* Regular price with GST (crossed out for members) */}
-                    <p className="text-sm text-gray-500 line-through">
-                      ₹{(
-                        getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
-                      ).toLocaleString("en-IN")}
-                    </p>
-                    {/* KP Member Price (with GST) */}
-                    {isKPMember && (
-                      <p className="text-sm text-green-600">
-                        KP Member: ₹{(
-                          getKPMemberPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
-                        ).toLocaleString("en-IN")}
-                      </p>
-                    )}
-                    {/* Regular price when not a member (with GST) */}
-                    {!isKPMember && (
-                      <p className="text-lg font-semibold">
-                        ₹{(
-                          getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
-                        ).toLocaleString("en-IN")}
-                      </p>
+                    {/* KP Member View */}
+                    {isKPMember ? (
+                      <>
+                        <p className="text-sm text-gray-500 line-through">
+                          ₹{(
+                            getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
+                          ).toLocaleString("en-IN")}
+                        </p>
+                        <p className="text-sm text-green-600">
+                          KP Member: ₹{(
+                            getKPMemberPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
+                          ).toLocaleString("en-IN")}
+                        </p>
+                      </>
+                    ) : (
+                      /* Non-Member View */
+                      <>
+                        {item.variant?.originalPrice && (
+                          <p className="text-sm text-gray-500 line-through">
+                            ₹{(
+                              getRegularPriceWithGST(item.variant.originalPrice, item.variant?.gstPercentage) * item.quantity
+                            ).toLocaleString("en-IN")}
+                          </p>
+                        )}
+                        <p className="text-lg font-semibold">
+                          ₹{(
+                            getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
+                          ).toLocaleString("en-IN")}
+                        </p>
+                      </>
                     )}
                   </div>
                 </>
@@ -177,7 +186,7 @@ export const OrderReview = () => {
             </span>
             <span>₹{orderSummary.subtotal.toFixed(2)}</span>
           </div>
-          
+
           {/* Show original subtotal for KP members */}
           {isKPMember && (
             <div className="flex justify-between text-gray-500">
@@ -185,7 +194,7 @@ export const OrderReview = () => {
               <span className="line-through">₹{(orderSummary.subtotal + orderSummary.kpDiscountAmount).toFixed(2)}</span>
             </div>
           )}
-          
+
           {/* <div className="flex justify-between">
             <span>GST (18%)</span>
             <span>₹{localOrderSummary.tax.toFixed(2)}</span>
@@ -213,7 +222,7 @@ export const OrderReview = () => {
               )}
             </div>
           </div>
-          
+
           {/* Show total savings from KP membership */}
           {isKPMember && (
             <div className="flex justify-between text-green-600 font-medium pt-2 border-t">
