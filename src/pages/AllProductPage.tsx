@@ -24,11 +24,11 @@ import { useBannerUrls } from "../hooks/useBannerUrls";
 
 function AllProductsBottomBanner() {
   const { getUrl } = useBannerUrls();
-  const url = getUrl("all_products_banner") ?? "/assets/images/All_Products_Banner.jpeg";
+  const url = getUrl("all_products_banner") ?? "/assets/images/user.png";
   return (
     <div className="max-w-7xl mx-auto px-4">
       <div
-        className="relative w-full rounded-xl shadow-lg my-4 bg-cover bg-left bg-no-repeat aspect-3/1 min-h-[200px] md:bg-center"
+        className="relative w-full rounded-xl shadow-lg my-4 bg-cover bg-left bg-no-repeat aspect-[3/1] min-h-[150px] md:bg-center"
         style={{ backgroundImage: `url("${url}")` }}
       >
         <div className="absolute inset-0 rounded-xl" aria-hidden="true" />

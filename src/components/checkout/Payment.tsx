@@ -30,24 +30,12 @@ export const Payment = () => {
     (state) => state.cart
   );
   const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
+  const totalQuantity = itemsToCheckout.reduce((acc, item) => acc + item.quantity, 0);
 
   // Check if user is a KP member
   const isKPMember = orderSummary.kpDiscountPercentage > 0 && orderSummary.kpDiscountAmount > 0;
 
-  // Pricing helpers aligned with ProductDetail: apply KP discount first, then GST
-  const applyGst = (amount: number, gstPercentage?: number) => {
-    const gst = gstPercentage ?? 0;
-    return Math.floor(amount + (amount * gst) / 100);
-  };
-  const getRegularPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
-    applyGst(regularPrice, gstPercentage);
-  const getKPMemberPriceWithGST = (regularPrice: number, gstPercentage?: number) =>
-    applyGst(
-      orderSummary.kpDiscountPercentage > 0
-        ? Math.floor(regularPrice - (regularPrice * orderSummary.kpDiscountPercentage) / 100)
-        : regularPrice,
-      gstPercentage
-    );
+
 
   const [error, setLocalError] = useState<string | null>(null);
 
@@ -127,7 +115,7 @@ export const Payment = () => {
         if (stockIssues.some((issue: any) => typeof issue !== 'string')) {
           stockIssues.forEach((issue: any) => {
             if (typeof issue !== 'string') {
-              
+
               window.toast ? window.toast.error(issue) : alert('Out of stock');
             }
           });
@@ -212,7 +200,7 @@ export const Payment = () => {
   };
 
   console.log("Error state:", error);
-  
+
   return (
     <div className="max-w-4xl mx-auto p-4">
       {/* Final Order Summary */}
@@ -221,13 +209,13 @@ export const Payment = () => {
         <div className="space-y-2">
           <div className="flex justify-between">
             <span>Total Items</span>
-            <span>{itemsToCheckout.length}</span>
+            <span>{totalQuantity}</span>
           </div>
           <div className="flex justify-between">
             <span>Subtotal <span className="text-xs">(including GST)</span></span>
             <span>₹{orderSummary.subtotal.toFixed(2)}</span>
           </div>
-          
+
           {/* Show original subtotal for KP members */}
           {isKPMember && (
             <div className="flex justify-between text-gray-500">
@@ -235,7 +223,7 @@ export const Payment = () => {
               <span className="line-through">₹{(orderSummary.subtotal + orderSummary.kpDiscountAmount).toFixed(2)}</span>
             </div>
           )}
-          
+
           <div className="flex justify-between">
             <span>Shipping</span>
             <span>
@@ -259,7 +247,7 @@ export const Payment = () => {
               )}
             </div>
           </div>
-          
+
           {/* Show total savings from KP membership */}
           {isKPMember && (
             <div className="flex justify-between text-green-600 font-medium pt-2 border-t">
@@ -272,15 +260,14 @@ export const Payment = () => {
 
       {/* Payment Methods */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-         <h2 className="text-lg font-semibold mb-4">Select Payment Method</h2>
-         <div className="space-y-4">
+        <h2 className="text-lg font-semibold mb-4">Select Payment Method</h2>
+        <div className="space-y-4">
           {/* Online Payment */}
           <div
-            className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-              paymentMethod === "online"
-                ? "border-green-500 bg-green-50"
-                : "border-gray-200 hover:border-green-300"
-            }`}
+            className={`border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "online"
+              ? "border-green-500 bg-green-50"
+              : "border-gray-200 hover:border-green-300"
+              }`}
             onClick={() => handlePaymentMethodChange("online")}
           >
             <div className="flex items-center">
@@ -304,11 +291,10 @@ export const Payment = () => {
 
           {/* Cash on Delivery */}
           <div
-            className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-              paymentMethod === "cod"
-                ? "border-green-500 bg-green-50"
-                : "border-gray-200 hover:border-green-300"
-            }`}
+            className={`border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "cod"
+              ? "border-green-500 bg-green-50"
+              : "border-gray-200 hover:border-green-300"
+              }`}
             onClick={() => handlePaymentMethodChange("cod")}
           >
             <div className="flex items-center">
@@ -330,13 +316,13 @@ export const Payment = () => {
             </div>
           </div>
         </div>
-      
+
         {error && (
           <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-md">
             {error}
           </div>
         )}
-        </div>
+      </div>
 
       {/* Navigation Buttons */}
       <div className="flex justify-between mt-8">
@@ -350,9 +336,8 @@ export const Payment = () => {
         <button
           onClick={handlePlaceOrder}
           disabled={isProcessing}
-          className={`px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center ${
-            isProcessing ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center ${isProcessing ? "opacity-50 cursor-not-allowed" : ""
+            }`}
         >
           {isProcessing ? (
             <>

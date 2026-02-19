@@ -60,7 +60,7 @@ export const SelectStep = () => {
   const { buyNowItem, cartItems, activeCartId } = useAppSelector(
     (state) => state.cart
   );
-  const {} = useAppSelector((state) => state.auth);
+  const { } = useAppSelector((state) => state.auth);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [itemLoading, setItemLoading] = useState<{ [key: string]: boolean }>(
@@ -329,8 +329,7 @@ export const SelectStep = () => {
 
       if (!item.variant.inStock || item.variant.units_in_stock <= 0) {
         setError(
-          `${item.product?.name || "Item"} (${
-            item.variant.weight
+          `${item.product?.name || "Item"} (${item.variant.weight
           }) is out of stock`
         );
         return;
@@ -338,8 +337,7 @@ export const SelectStep = () => {
 
       if (item.quantity > item.variant.units_in_stock) {
         setError(
-          `${item.product?.name || "Item"} (${item.variant.weight}) - Only ${
-            item.variant.units_in_stock
+          `${item.product?.name || "Item"} (${item.variant.weight}) - Only ${item.variant.units_in_stock
           } units available. Requested: ${item.quantity}`
         );
         return;
@@ -394,11 +392,10 @@ export const SelectStep = () => {
                   {addresses.map((address) => (
                     <div
                       key={address.id}
-                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                        selectedAddress?.id === address.id
-                          ? "border-green-500 bg-green-50"
-                          : "border-gray-200 hover:border-green-300"
-                      }`}
+                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${selectedAddress?.id === address.id
+                        ? "border-green-500 bg-green-50"
+                        : "border-gray-200 hover:border-green-300"
+                        }`}
                       onClick={() => handleSelectAddress(address)}
                     >
                       <div className="flex justify-between items-start gap-2">
@@ -494,11 +491,10 @@ export const SelectStep = () => {
                       value={formData.phone}
                       onChange={handleInputChange}
                       placeholder="Enter 10-digit phone number"
-                      className={`mt-1 block w-full rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 ${
-                        formData.phone && formData.phone.length !== 10
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                          : "border-gray-300"
-                      }`}
+                      className={`mt-1 block w-full rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 ${formData.phone && formData.phone.length !== 10
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                        : "border-gray-300"
+                        }`}
                     />
                     {formData.phone && formData.phone.length !== 10 && (
                       <p className="mt-1 text-sm text-red-600">
@@ -566,11 +562,10 @@ export const SelectStep = () => {
                       value={formData.pincode}
                       onChange={handleInputChange}
                       placeholder="Enter 6-digit pincode"
-                      className={`mt-1 block w-full rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 ${
-                        formData.pincode && formData.pincode.length !== 6
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                          : "border-gray-300"
-                      }`}
+                      className={`mt-1 block w-full rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 ${formData.pincode && formData.pincode.length !== 6
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                        : "border-gray-300"
+                        }`}
                     />
                     {formData.pincode && formData.pincode.length !== 6 && (
                       <p className="mt-1 text-sm text-red-600">
@@ -693,11 +688,11 @@ export const SelectStep = () => {
                                   itemLoading[item.id] ||
                                   (item.variant &&
                                     item.quantity >=
-                                      item.variant.units_in_stock)
+                                    item.variant.units_in_stock)
                                 }
                                 title={
                                   item.variant &&
-                                  item.quantity >= item.variant.units_in_stock
+                                    item.quantity >= item.variant.units_in_stock
                                     ? `Only ${item.variant.units_in_stock} available`
                                     : "Increase quantity"
                                 }
@@ -716,27 +711,36 @@ export const SelectStep = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        {/* Regular price with GST (crossed out for members) */}
-                        <p className="text-sm text-gray-500 line-through">
-                          ₹{(
-                            getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
-                          ).toLocaleString("en-IN")}
-                        </p>
-                        {/* KP Member Price (with GST) */}
-                        {isKPMember && (
-                          <p className="text-sm text-green-600">
-                            KP Member: ₹{(
-                              getKPMemberPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
-                            ).toLocaleString("en-IN")}
-                          </p>
-                        )}
-                        {/* Regular price when not a member (with GST) */}
-                        {!isKPMember && (
-                          <p className="text-lg font-semibold">
-                            ₹{(
-                              getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
-                            ).toLocaleString("en-IN")}
-                          </p>
+                        {/* KP Member View */}
+                        {isKPMember ? (
+                          <>
+                            <p className="text-sm text-gray-500 line-through">
+                              ₹{(
+                                getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
+                              ).toLocaleString("en-IN")}
+                            </p>
+                            <p className="text-sm text-green-600">
+                              KP Member: ₹{(
+                                getKPMemberPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
+                              ).toLocaleString("en-IN")}
+                            </p>
+                          </>
+                        ) : (
+                          /* Non-Member View */
+                          <>
+                            {item.variant?.originalPrice && (
+                              <p className="text-sm text-gray-500 line-through">
+                                ₹{(
+                                  getRegularPriceWithGST(item.variant.originalPrice, item.variant?.gstPercentage) * item.quantity
+                                ).toLocaleString("en-IN")}
+                              </p>
+                            )}
+                            <p className="text-lg font-semibold">
+                              ₹{(
+                                getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
+                              ).toLocaleString("en-IN")}
+                            </p>
+                          </>
                         )}
                       </div>
                     </>
@@ -756,7 +760,7 @@ export const SelectStep = () => {
                 </span>
                 <span>₹{orderSummary.subtotal.toFixed(2)}</span>
               </div>
-              
+
               {/* Show original subtotal for KP members */}
               {isKPMember && (
                 <div className="flex justify-between text-gray-500">
@@ -764,7 +768,7 @@ export const SelectStep = () => {
                   <span className="line-through">₹{(orderSummary.subtotal + orderSummary.kpDiscountAmount).toFixed(2)}</span>
                 </div>
               )}
-              
+
               <div className="flex justify-between">
                 <span>Shipping</span>
                 <span>
@@ -788,7 +792,7 @@ export const SelectStep = () => {
                   )}
                 </div>
               </div>
-              
+
               {/* Show total savings from KP membership */}
               {isKPMember && (
                 <div className="flex justify-between text-green-600 font-medium pt-2 border-t">
