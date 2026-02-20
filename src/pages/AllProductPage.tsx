@@ -263,7 +263,7 @@ const AllProductPage = () => {
           <div className="text-center py-12">
             <p className="text-red-600">{error}</p>
             <button
-              className="mt-4 px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800"
+              className="mt-4 px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 cursor-pointer"
               onClick={() => window.location.reload()}
             >
               Try Again

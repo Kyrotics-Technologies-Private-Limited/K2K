@@ -8,6 +8,7 @@ export interface Review {
   userId: string;
   createdAt: string;
   updatedAt: string;
+  photos?: string[];
 }
 
 export const reviewApi = {
@@ -20,6 +21,7 @@ export const reviewApi = {
     productId: string;
     rating: number;
     comment: string;
+    photos?: string[];
   }): Promise<Review> => {
     const response = await api.post<Review & { id: string }>("/reviews/create", data);
     return response.data as Review;

@@ -271,6 +271,17 @@ export const SelectStep = () => {
       return;
     }
 
+    if (formData.isDefault) {
+      const existingDefault = addresses.find((a) => a.isDefault);
+      if (existingDefault) {
+        // If adding new address OR editing a different address than the current default
+        if (!editAddress || existingDefault.id !== editAddress.id) {
+          setError("You already have a default address. Please uncheck 'Set as default address'.");
+          return;
+        }
+      }
+    }
+
     try {
       setLoading(true);
       setError(null); // Clear any previous errors
@@ -400,7 +411,14 @@ export const SelectStep = () => {
                     >
                       <div className="flex justify-between items-start gap-2">
                         <div>
-                          <h3 className="font-medium">{address.name}</h3>
+                          <div className="flex items-center gap-6">
+                            <h3 className="font-medium">{address.name}</h3>
+                            {address.isDefault && (
+                              <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full border border-green-200">
+                                Default
+                              </span>
+                            )}
+                          </div>
                           <p className="text-sm text-gray-600">
                             {address.phone}
                           </p>
@@ -441,11 +459,7 @@ export const SelectStep = () => {
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
-                        {address.isDefault && (
-                          <span className="text-sm text-green-600 font-medium">
-                            Default
-                          </span>
-                        )}
+
                       </div>
                       <div className="mt-2 text-sm text-gray-600">
                         <p>{address.appartment}</p>

@@ -76,7 +76,7 @@ const MembershipPayment: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="bg-white p-8 rounded-xl shadow-lg text-center">
           <h2 className="text-xl font-bold mb-4">No plan selected</h2>
-          <button className="button bg-green-600 text-white px-4 py-2 rounded" onClick={() => navigate(-1)}>
+          <button className="cursor-pointer button bg-green-600 text-white px-4 py-2 rounded" onClick={() => navigate(-1)}>
             Go Back
           </button>
         </div>
@@ -94,10 +94,10 @@ const MembershipPayment: React.FC = () => {
       setError("Please select a payment method to continue");
       return;
     }
-    
+
     setIsProcessing(true);
     setError(null);
-    
+
     try {
       const planId = getPlanId(plan);
       const response = await membershipApi.subscribe(planId);
@@ -159,11 +159,10 @@ const MembershipPayment: React.FC = () => {
           <div className="space-y-4">
             {/* Credit Card */}
             <div
-              className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                paymentMethod === "credit"
+              className={`border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "credit"
                   ? "border-green-500 bg-green-50"
                   : "border-gray-200 hover:border-green-300"
-              }`}
+                }`}
               onClick={() => handlePaymentMethodChange("credit")}
             >
               <div className="flex items-center">
@@ -176,7 +175,7 @@ const MembershipPayment: React.FC = () => {
                 />
                 <div className="ml-3 flex items-center">
                   <svg className="w-8 h-8 text-blue-600 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+                    <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" />
                   </svg>
                   <div>
                     <label className="font-medium text-gray-900">Credit Card</label>
@@ -188,11 +187,10 @@ const MembershipPayment: React.FC = () => {
 
             {/* Debit Card */}
             <div
-              className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                paymentMethod === "debit"
+              className={`border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "debit"
                   ? "border-green-500 bg-green-50"
                   : "border-gray-200 hover:border-green-300"
-              }`}
+                }`}
               onClick={() => handlePaymentMethodChange("debit")}
             >
               <div className="flex items-center">
@@ -205,7 +203,7 @@ const MembershipPayment: React.FC = () => {
                 />
                 <div className="ml-3 flex items-center">
                   <svg className="w-8 h-8 text-purple-600 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+                    <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" />
                   </svg>
                   <div>
                     <label className="font-medium text-gray-900">Debit Card</label>
@@ -217,11 +215,10 @@ const MembershipPayment: React.FC = () => {
 
             {/* UPI */}
             <div
-              className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                paymentMethod === "upi"
+              className={`border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "upi"
                   ? "border-green-500 bg-green-50"
                   : "border-gray-200 hover:border-green-300"
-              }`}
+                }`}
               onClick={() => handlePaymentMethodChange("upi")}
             >
               <div className="flex items-center">
@@ -234,7 +231,7 @@ const MembershipPayment: React.FC = () => {
                 />
                 <div className="ml-3 flex items-center">
                   <svg className="w-8 h-8 text-orange-600 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                   </svg>
                   <div>
                     <label className="font-medium text-gray-900">UPI</label>
@@ -246,11 +243,10 @@ const MembershipPayment: React.FC = () => {
 
             {/* Other Cards */}
             <div
-              className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                paymentMethod === "card"
+              className={`border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "card"
                   ? "border-green-500 bg-green-50"
                   : "border-gray-200 hover:border-green-300"
-              }`}
+                }`}
               onClick={() => handlePaymentMethodChange("card")}
             >
               <div className="flex items-center">
@@ -263,7 +259,7 @@ const MembershipPayment: React.FC = () => {
                 />
                 <div className="ml-3 flex items-center">
                   <svg className="w-8 h-8 text-gray-600 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+                    <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" />
                   </svg>
                   <div>
                     <label className="font-medium text-gray-900">Other Cards</label>
@@ -285,7 +281,7 @@ const MembershipPayment: React.FC = () => {
         <div className="flex justify-between mt-8">
           <button
             onClick={() => navigate(-1)}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+            className="cursor-pointer px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
             disabled={isProcessing}
           >
             Back to Plans
@@ -293,9 +289,8 @@ const MembershipPayment: React.FC = () => {
           <button
             onClick={handleProceedToPay}
             disabled={isProcessing}
-            className={`px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center ${
-              isProcessing ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`cursor-pointer px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center ${isProcessing ? "opacity-50 cursor-not-allowed" : ""
+              }`}
           >
             {isProcessing ? (
               <>

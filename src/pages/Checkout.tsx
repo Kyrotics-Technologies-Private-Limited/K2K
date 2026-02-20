@@ -40,12 +40,12 @@ export const CheckoutPage = () => {
         // Get membership status
         let kpDiscountPercentage = 0;
         let isKPMember = false;
-        
+
         if (isAuthenticated) {
           try {
             const membershipStatus: MembershipStatus = await membershipApi.getStatus();
             isKPMember = isActiveKPMember(membershipStatus);
-            
+
             // Get discount percentage - only if membership is active
             if (isKPMember && membershipStatus?.discountPercentage && membershipStatus.discountPercentage > 0) {
               kpDiscountPercentage = membershipStatus.discountPercentage;
@@ -70,7 +70,7 @@ export const CheckoutPage = () => {
 
         // If buyNowItem exists, calculate summary for it, else for cart
         const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
-        
+
         // Helpers inline
         const applyGst = (amount: number, gstPercentage?: number) => {
           const gst = gstPercentage ?? 0;
@@ -142,7 +142,7 @@ export const CheckoutPage = () => {
             <div className="mt-6">
               <button
                 onClick={() => navigate("/all-products")}
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
               >
                 Continue Shopping
               </button>
@@ -160,56 +160,50 @@ export const CheckoutPage = () => {
         <div className="flex justify-between items-center">
           <div className="flex-1">
             <div
-              className={`h-1 w-full ${
-                currentStep >= 1 ? "bg-green-600" : "bg-gray-200"
-              }`}
+              className={`h-1 w-full ${currentStep >= 1 ? "bg-green-600" : "bg-gray-200"
+                }`}
             />
           </div>
           <div className="flex-1">
             <div
-              className={`h-1 w-full ${
-                currentStep >= 2 ? "bg-green-600" : "bg-gray-200"
-              }`}
+              className={`h-1 w-full ${currentStep >= 2 ? "bg-green-600" : "bg-gray-200"
+                }`}
             />
           </div>
           <div className="flex-1">
             <div
-              className={`h-1 w-full ${
-                currentStep >= 3 ? "bg-green-600" : "bg-gray-200"
-              }`}
+              className={`h-1 w-full ${currentStep >= 3 ? "bg-green-600" : "bg-gray-200"
+                }`}
             />
           </div>
         </div>
         <div className="flex justify-between mt-2">
           <div className="text-center flex-1">
             <span
-              className={`text-sm ${
-                currentStep === 1
+              className={`text-sm ${currentStep === 1
                   ? "text-green-600 font-medium"
                   : "text-gray-500"
-              }`}
+                }`}
             >
               Select Address & Items
             </span>
           </div>
           <div className="text-center flex-1">
             <span
-              className={`text-sm ${
-                currentStep === 2
+              className={`text-sm ${currentStep === 2
                   ? "text-green-600 font-medium"
                   : "text-gray-500"
-              }`}
+                }`}
             >
               Review Order
             </span>
           </div>
           <div className="text-center flex-1">
             <span
-              className={`text-sm ${
-                currentStep === 3
+              className={`text-sm ${currentStep === 3
                   ? "text-green-600 font-medium"
                   : "text-gray-500"
-              }`}
+                }`}
             >
               Payment
             </span>

@@ -1,4 +1,4 @@
-import { useState,  useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
 import { orderApi } from "../services/api/orderApi";
@@ -60,7 +60,7 @@ export const OrderSuccess = () => {
                     ₹{total?.toFixed(2)}
                   </dd>
                 </div>
-                
+
                 {/* KP Member Discount Information */}
                 {order?.kp_discount_amount && order.kp_discount_amount > 0 && (
                   <>
@@ -74,7 +74,7 @@ export const OrderSuccess = () => {
                     </div>
                   </>
                 )}
-                
+
                 <div className="flex justify-between">
                   <dt className="text-sm text-gray-600">Payment Method</dt>
                   <dd className="text-sm font-medium text-gray-900">
@@ -120,13 +120,13 @@ export const OrderSuccess = () => {
           <div className="mt-8 flex gap-4">
             <button
               onClick={() => navigate("/orders")}
-              className="button flex-1 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+              className="cursor-pointer button flex-1 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
             >
               View Orders
             </button>
             <button
               onClick={() => navigate("/all-products")}
-              className="button flex-1 bg-white text-green-600 px-4 py-2 rounded-md border border-green-600 hover:bg-green-50 transition-colors"
+              className="cursor-pointer button flex-1 bg-white text-green-600 px-4 py-2 rounded-md border border-green-600 hover:bg-green-50 transition-colors"
             >
               Continue Shopping
             </button>

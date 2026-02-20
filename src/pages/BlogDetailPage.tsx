@@ -44,7 +44,7 @@ const BlogDetailPage: React.FC = () => {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <button
           onClick={() => navigate('/Blog')}
-          className="button flex items-center gap-2 mb-4 text-gray-600 hover:text-green-600 transition-colors"
+          className="cursor-pointer button flex items-center gap-2 mb-4 text-gray-600 hover:text-green-600 transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
           Back to Blog
@@ -60,7 +60,7 @@ const BlogDetailPage: React.FC = () => {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <button
         onClick={() => navigate('/Blog')}
-        className="flex items-center gap-2 mb-4 text-gray-600 hover:text-green-600 transition-colors"
+        className="cursor-pointer flex items-center gap-2 mb-4 text-gray-600 hover:text-green-600 transition-colors"
       >
         <ArrowLeft className="h-5 w-5" />
         Back to Blog
@@ -76,7 +76,7 @@ const BlogDetailPage: React.FC = () => {
         <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm mb-4">
           {blog.category}
         </span>
-        
+
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
           {blog.title}
         </h1>
@@ -101,7 +101,7 @@ const BlogDetailPage: React.FC = () => {
 
         <hr className="my-8 border-gray-200" />
 
-        <div 
+        <div
           className="blog-content prose prose-lg prose-green max-w-none mx-auto prose-h2:text-2xl prose-h2:font-bold prose-h2:text-gray-800 prose-p:text-gray-600 prose-p:leading-relaxed prose-li:text-gray-600 prose-strong:text-gray-800 prose-img:rounded-lg"
           dangerouslySetInnerHTML={{ __html: blog.content }}
         />

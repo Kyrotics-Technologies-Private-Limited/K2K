@@ -72,6 +72,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
   // Reviews state
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [showWriteReview, setShowWriteReview] = useState(false);
   const ratingsSectionRef = useRef<HTMLDivElement>(null);
   const variantsCarouselRef = useRef<HTMLDivElement>(null);
   const [carouselAtStart, setCarouselAtStart] = useState(true);
@@ -506,7 +507,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`shrink-0 w-14 h-14 lg:w-16 lg:h-16 overflow-hidden rounded ${selectedImage === index ? "ring-2 ring-green-800" : ""
+                    className={`cursor-pointer shrink-0 w-14 h-14 lg:w-16 lg:h-16 overflow-hidden rounded ${selectedImage === index ? "ring-2 ring-green-800" : ""
                       }`}
                   >
                     <img
@@ -533,7 +534,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                         prev === 0 ? product.images.gallery.length - 1 : prev - 1
                       )
                     }
-                    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
+                    className="cursor-pointer absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
@@ -543,7 +544,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                         prev === product.images.gallery.length - 1 ? 0 : prev + 1
                       )
                     }
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
+                    className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
@@ -556,7 +557,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                     <div className="flex border border-gray-300 rounded-xl max-sm:self-start md:scale-95 lg:scale-100 md:origin-left">
                       <button
                         onClick={() => handleUpdateQuantity("decrement")}
-                        className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
+                        className="button cursor-pointer w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
                         disabled={loading || quantity <= 1}
                       >
                         -
@@ -566,7 +567,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                       </span>
                       <button
                         onClick={() => handleUpdateQuantity("increment")}
-                        className="button w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
+                        className="button cursor-pointer w-10 h-10 rounded-xl border border-gray-300 flex items-center justify-center bg-gray-100"
                         disabled={
                           loading ||
                           quantity >=
@@ -591,7 +592,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                       <div className="flex flex-row w-full sm:flex-1 gap-3 min-w-0">
                         <button
                           onClick={handleAddToCartClick}
-                          className="button flex-1 min-w-0 md:min-w-28 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300 whitespace-nowrap"
+                          className="button cursor-pointer flex-1 min-w-0 md:min-w-28 bg-white border-2 border-green-800 text-green-800 py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0d6b1e] hover:text-white transition-all duration-300 whitespace-nowrap"
                           disabled={
                             !variants[selectedVariant]?.inStock || addingToCart
                           }
@@ -610,7 +611,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                         </button>
                         <button
                           onClick={handleBuyNowClick}
-                          className="button flex-1 min-w-0 md:min-w-28 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors whitespace-nowrap"
+                          className="button cursor-pointer flex-1 min-w-0 md:min-w-28 bg-green-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-green-800 transition-colors whitespace-nowrap"
                           disabled={!variants[selectedVariant].inStock || loading}
                         >
                           {loading ? (
@@ -725,7 +726,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                           <button
                             key={variant.id}
                             onClick={() => setSelectedVariant(index)}
-                            className={`button flex flex-col items-start p-3 rounded-lg border-2 transition-all duration-200 shrink-0 snap-start w-[calc(50%-6px)] min-w-[calc(50%-6px)] ${selectedVariant === index
+                            className={`button cursor-pointer flex flex-col items-start p-3 rounded-lg border-2 transition-all duration-200 shrink-0 snap-start w-[calc(50%-6px)] min-w-[calc(50%-6px)] ${selectedVariant === index
                               ? "border-green-600 ring-2 ring-green-200 shadow-sm"
                               : "border-gray-200 hover:border-gray-300"
                               } ${!variant.inStock || variant.units_in_stock <= 0
@@ -822,7 +823,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                           <button
                             type="button"
                             onClick={() => scrollVariantsCarousel("left")}
-                            className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-transparent border border-transparent flex items-center justify-center text-gray-700 hover:bg-white/40 hover:border-gray-200/50 z-10"
+                            className="cursor-pointer absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-transparent border border-transparent flex items-center justify-center text-gray-700 hover:bg-white/40 hover:border-gray-200/50 z-10"
                             aria-label="Previous variants"
                           >
                             <ChevronLeft className="w-5 h-5" />
@@ -832,7 +833,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                           <button
                             type="button"
                             onClick={() => scrollVariantsCarousel("right")}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-transparent border border-transparent flex items-center justify-center text-gray-700 hover:bg-white/40 hover:border-gray-200/50 z-10"
+                            className="cursor-pointer absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-transparent border border-transparent flex items-center justify-center text-gray-700 hover:bg-white/40 hover:border-gray-200/50 z-10"
                             aria-label="Next variants"
                           >
                             <ChevronRight className="w-5 h-5" />
@@ -859,7 +860,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                         <button
                           key={variant.id}
                           onClick={() => setSelectedVariant(index)}
-                          className={`button flex flex-col items-start p-3 rounded-lg w-full border-2 transition-all duration-200 ${selectedVariant === index
+                          className={`button cursor-pointer flex flex-col items-start p-3 rounded-lg w-full border-2 transition-all duration-200 ${selectedVariant === index
                             ? "border-green-600 ring-2 ring-green-200 shadow-sm"
                             : "border-gray-200 hover:border-gray-300"
                             } ${!variant.inStock || variant.units_in_stock <= 0
@@ -1031,7 +1032,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                     <div className="relative">
                       <button
                         onClick={() => setShowPricePopup(true)}
-                        className="button flex items-center gap-2 text-sm sm:text-md text-green-800 hover:text-black border border-gray-300 rounded-lg px-3 py-2"
+                        className="button cursor-pointer flex items-center gap-2 text-sm sm:text-md text-green-800 hover:text-black border border-gray-300 rounded-lg px-3 py-2"
                       >
                         Know our price
                         <Info size={16} />
@@ -1040,7 +1041,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
                         <div className="absolute top-full left-0 right-0 lg:right-auto mt-2 bg-white rounded-lg shadow-lg p-4 w-full max-w-[16rem] lg:w-64 z-50 border border-gray-200">
                           <button
                             onClick={() => setShowPricePopup(false)}
-                            className="button absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                            className="button cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-700"
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -1213,7 +1214,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
           <div className="mt-8">
             <button
               onClick={() => setIsBenefitsOpen(!isBenefitsOpen)}
-              className="w-full flex items-center justify-between"
+              className="cursor-pointer w-full flex items-center justify-between"
             >
               <div className="text-left">
                 <h2 className="text-2xl lg:text-3xl uppercase font-bold font-cormorant text-gray-800">Benefits</h2>
@@ -1271,80 +1272,189 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
           id="ratings-reviews"
           className="mt-8 lg:mt-12 px-4 sm:px-6 lg:px-8 pb-8 lg:pb-12 border-t border-gray-200 pt-8 lg:pt-10"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900">Ratings & Reviews</h2>
-            <div className="flex items-center gap-2 text-gray-600">
-              <div className="flex">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-5 h-5 ${i < Math.floor(product.ratings)
-                      ? "fill-amber-400 stroke-amber-400"
-                      : "stroke-gray-300"
-                      }`}
-                  />
-                ))}
-              </div>
-              <span className="text-sm font-medium">
-                {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
-              </span>
-            </div>
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            {/* Left Column: Ratings Summary & Histogram */}
+            <div className="lg:col-span-4 space-y-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Customer reviews</h2>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="flex text-yellow-400">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-6 h-6 ${i < Math.round(actualRating)
+                          ? "fill-yellow-400 stroke-yellow-400"
+                          : "fill-transparent stroke-gray-300"
+                          }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-lg font-medium text-gray-900">
+                    {actualRating > 0 ? actualRating.toFixed(1) : "0"} out of 5
+                  </span>
+                </div>
+                <p className="text-gray-500 mb-6">{reviewCount} global ratings</p>
 
-          <WriteReviewCard
-            productId={product.id}
-            isLoggedIn={!!user}
-            onSuccess={fetchReviews}
-            onLoginClick={() => setShowLoginModal(true)}
-          />
-
-          {/* Reviews list */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Customer reviews</h3>
-            {reviewsLoading ? (
-              <div className="flex justify-center py-12">
-                <div className="animate-spin rounded-full h-10 w-10 border-2 border-green-700 border-t-transparent" />
-              </div>
-            ) : reviews.length === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded-2xl border border-gray-100">
-                <p className="text-gray-500">No reviews yet.</p>
-                <p className="text-sm text-gray-400 mt-1">Be the first to review this product!</p>
-              </div>
-            ) : (
-              <ul className="space-y-6">
-                {reviews.map((review) => (
-                  <li
-                    key={review.id}
-                    className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow-sm"
-                  >
-                    <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <div className="flex">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-4 h-4 ${i < review.rating
-                              ? "fill-amber-400 stroke-amber-400"
-                              : "stroke-gray-200"
-                              }`}
+                {/* Histogram */}
+                <div className="space-y-3">
+                  {[5, 4, 3, 2, 1].map((star) => {
+                    const count = reviews.filter((r) => Math.round(r.rating) === star).length;
+                    const percentage = reviewCount > 0 ? (count / reviewCount) * 100 : 0;
+                    return (
+                      <div key={star} className="flex items-center gap-3 text-sm">
+                        <span className="w-12 font-medium text-gray-600 hover:text-green-700 hover:underline cursor-pointer">
+                          {star} star
+                        </span>
+                        <div className="flex-1 h-5 bg-gray-100 rounded-sm overflow-hidden border border-gray-200">
+                          <div
+                            className="h-full bg-yellow-400 border-r border-yellow-500"
+                            style={{ width: `${percentage}%` }}
                           />
-                        ))}
+                        </div>
+                        <span className="w-10 text-right text-gray-600">
+                          {Math.round(percentage)}%
+                        </span>
                       </div>
-                      <span className="text-sm text-gray-500">
-                        {new Date(review.createdAt).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </span>
-                      <span className="text-xs text-green-700 font-medium bg-green-50 px-2 py-0.5 rounded">
-                        Verified
-                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Review this product</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Share your thoughts with other customers
+                </p>
+                <button
+                  onClick={() => setShowWriteReview(true)}
+                  className="cursor-pointer w-full bg-white border border-gray-300 text-gray-800 font-medium py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+                >
+                  Write a product review
+                </button>
+              </div>
+            </div>
+
+            {/* Right Column: Reviews List */}
+            <div className="lg:col-span-8">
+              {showWriteReview && (
+                <div className="mb-8 animate-fade-in">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-bold text-gray-900">Write your review</h3>
+                    <button
+                      onClick={() => setShowWriteReview(false)}
+                      className="cursor-pointer text-gray-500 hover:text-gray-700"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <WriteReviewCard
+                    productId={product.id}
+                    isLoggedIn={!!user}
+                    onSuccess={() => {
+                      fetchReviews();
+                      setShowWriteReview(false);
+                    }}
+                    onLoginClick={() => setShowLoginModal(true)}
+                  />
+                </div>
+              )}
+
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Top reviews from India</h3>
+
+              {reviewsLoading ? (
+                <div className="flex justify-center py-12">
+                  <div className="animate-spin rounded-full h-10 w-10 border-2 border-green-700 border-t-transparent" />
+                </div>
+              ) : reviews.length === 0 ? (
+                <div className="text-center py-12 bg-gray-50 rounded-2xl border border-gray-100">
+                  <p className="text-gray-500">No reviews yet.</p>
+                  <p className="text-sm text-gray-400 mt-1">Be the first to review this product!</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {reviews.slice(0, 4).map((review) => (
+                    <div key={review.id} className="border-b border-gray-100 pb-6 last:border-0">
+                      {/* User Info */}
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                          </svg>
+                        </div>
+                        <span className="text-sm font-medium text-gray-900">
+                          K2K Customer
+                        </span>
+                      </div>
+
+                      {/* Rating & Title */}
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="flex text-yellow-400">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-4 h-4 ${i < review.rating
+                                ? "fill-yellow-400 stroke-yellow-400"
+                                : "fill-transparent stroke-gray-300"
+                                }`}
+                            />
+                          ))}
+                        </div>
+
+                      </div>
+
+                      {/* Date & Verified */}
+                      <div className="text-sm text-gray-500 mb-3 space-x-2">
+                        <span>Reviewed in India on {(() => {
+                          try {
+                            return new Date(review.createdAt).toLocaleDateString("en-IN", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            });
+                          } catch (e) {
+                            return "Recent";
+                          }
+                        })()}</span>
+                        <span className="text-gray-300">|</span>
+                        <span className="text-amber-700 font-medium">Verified Purchase</span>
+                      </div>
+
+                      {/* Comment */}
+                      {review.comment && (
+                        <p className="text-gray-800 leading-relaxed mb-4">
+                          {review.comment}
+                        </p>
+                      )}
+
+                      {/* Photos */}
+                      {review.photos && review.photos.length > 0 && (
+                        <div className="flex gap-2 mb-4">
+                          {review.photos.map((photo, index) => (
+                            <img
+                              key={index}
+                              src={photo}
+                              alt={`Review photo ${index + 1}`}
+                              className="w-24 h-24 object-cover rounded-lg border border-gray-200"
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <p className="text-gray-700 leading-relaxed">{review.comment}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
+                  ))}
+
+                  {reviews.length > 4 && (
+                    <div className="pt-4 border-t border-gray-100">
+                      <Link
+                        to={`/product/${product.id}/reviews`}
+                        className="text-green-800 font-semibold hover:underline flex items-center gap-1 group"
+                      >
+                        See all reviews <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1371,7 +1481,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({
           <div className="relative bg-green-50 rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-gray-100 animate-fade-in">
             <button
               onClick={() => setShowLoginModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-red-500"
+              className=" cursor-pointer absolute top-4 right-4 text-gray-400 hover:text-red-500"
               aria-label="Close"
             >
               <X className="w-5 h-5" />

@@ -7,6 +7,7 @@ import { CartItem } from "../../types/cart";
 // import { useAppDispatch, useAppSelector } from "../../store/store";
 // import { addToCart, createCart } from "../../store/slices/cartSlice";
 import VariantApi from "../../services/api/variantApi";
+import { reviewApi } from "../../services/api/reviewApi";
 // import { toast } from "react-toastify";
 
 interface ProductCardProps {
@@ -16,15 +17,16 @@ interface ProductCardProps {
   onAddToCart?: () => void; // New prop to handle cart drawer opening
 }
 
-export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
+export const HomeProductCard: React.FC<ProductCardProps> = ({ product, }) => {
   const navigate = useNavigate();
   // const dispatch = useAppDispatch();
   // let { activeCartId } = useAppSelector(state => state.cart);
-  
-//   const [isAddingToCart, setIsAddingToCart] = useState(false);
+
+  //   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [variants, setVariants] = useState<Variant[]>([]);
+  const [averageRating, setAverageRating] = useState<number>(0);
   // const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
@@ -33,9 +35,9 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
         setLoading(true);
         const data = await VariantApi.getVariantsByProductId(product.id);
         setVariants(data);
-        
+
         // Variants loaded successfully
-        
+
         setError(null);
       } catch (err) {
         setError("Failed to load product variants. Please try again later.");
@@ -46,6 +48,23 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
 
     fetchProductVariants();
   }, [product.id]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const reviews = await reviewApi.getProductReviews(product.id);
+        if (reviews.length > 0) {
+          const avg = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length;
+          setAverageRating(avg);
+        } else {
+          setAverageRating(product.ratings ?? 0);
+        }
+      } catch (err) {
+        setAverageRating(product.ratings ?? 0);
+      }
+    };
+    fetchReviews();
+  }, [product.id, product.ratings]);
 
   const handleProductClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -79,42 +98,42 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
 
   return (
     <div className="group bg-white border-0.5 border-grey-50 rounded-md shadow-md overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md relative w-full h-full flex flex-col min-h-0">
-    <Link
-      to={`/product/${product.id}`}
-      onClick={handleProductClick}
-      className="flex flex-col h-full"
-    >
-      <div className="aspect-[39/37] overflow-hidden relative flex-shrink-0">
-        {imageSrc ? (
-          <img
-            src={imageSrc}
-            alt={product.name ?? "Product"}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
-            No image
-          </div>
-        )}
-        {/* Show lowest price variant info */}
-        {lowestPriceVariant && (
-          <div className="text-xs text-gray-600 mb-1">
-            {lowestPriceVariant.weight}
-          </div>
-        )}
-        <div className="absolute top-1.5 left-1.5 flex gap-0.5">
-          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-white/90 text-[#4A5D23]">
-            {product.category}
-          </span>
-          {product.ratings >= 4.5 && (
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[#F8D7A8] text-[#A05E2B]">
-              Best Seller
-            </span>
+      <Link
+        to={`/product/${product.id}`}
+        onClick={handleProductClick}
+        className="flex flex-col h-full"
+      >
+        <div className="aspect-[39/37] overflow-hidden relative flex-shrink-0">
+          {imageSrc ? (
+            <img
+              src={imageSrc}
+              alt={product.name ?? "Product"}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
+              No image
+            </div>
           )}
-        </div>
+          {/* Show lowest price variant info */}
+          {lowestPriceVariant && (
+            <div className="text-xs text-gray-600 mb-1">
+              {lowestPriceVariant.weight}
+            </div>
+          )}
+          <div className="absolute top-1.5 left-1.5 flex gap-0.5">
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-white/90 text-[#4A5D23]">
+              {product.category}
+            </span>
+            {(product.isBestseller || averageRating >= 4.5) && (
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[#F8D7A8] text-[#A05E2B] font-semibold">
+                🏆 Best Seller
+              </span>
+            )}
+          </div>
 
-        {/* <div className="absolute bottom-1.5 right-1.5 bg-white shadow rounded-md p-0.5 flex items-center gap-0.5 z-10">
+          {/* <div className="absolute bottom-1.5 right-1.5 bg-white shadow rounded-md p-0.5 flex items-center gap-0.5 z-10">
           <button
             onClick={handleQuantityDecrement}
             className="w-5 h-5 flex items-center justify-center hover:bg-gray-100"
@@ -131,45 +150,47 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
             <Plus className="w-2.5 h-2.5 text-[#4A5D23]" />
           </button>
         </div> */}
-      </div>
-
-      <div className="px-3 py-4 flex-1 flex flex-col min-h-0">
-        <h3 className="text-sm font-semibold text-[#2C3639] mb-1 line-clamp-1">
-          {product.name}
-        </h3>
-        <p className="text-gray-600 text-[10px] mb-2 line-clamp-2 min-h-[2rem]">
-          {product.description}
-        </p>
-
-        <div className="flex items-start justify-between mb-2">
-        <div className="flex flex-col">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-base font-bold text-black">
-                ₹{lowestPriceVariant ? lowestPriceVariant.price.toLocaleString("en-IN") : "-"}
-              </span>
-              {lowestPriceVariant?.originalPrice && (
-                <span className="text-xs line-through text-gray-500">
-                  ₹{lowestPriceVariant.originalPrice.toLocaleString("en-IN")}
-                </span>
-              )}
-              {lowestPriceVariant?.discount && (
-                <span className="text-xs text-green-800">{lowestPriceVariant.discount}% off</span>
-              )}
-            </div>
-            {product.stockStatus === "out_of_stock" && (
-              <span className="text-[10px] text-red-500 font-medium">
-                Out of Stock
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center gap-0.5">
-            <Star className="w-3 h-3 fill-yellow-400 stroke-yellow-400" />
-            <span className="text-[10px] font-medium">{product.ratings}</span>
-          </div>
         </div>
 
-        {/* <div className="flex gap-1">
+        <div className="px-3 py-4 flex-1 flex flex-col min-h-0">
+          <h3 className="text-sm font-semibold text-[#2C3639] mb-1 line-clamp-1">
+            {product.name}
+          </h3>
+          <p className="text-gray-600 text-[10px] mb-2 line-clamp-2 min-h-[2rem]">
+            {product.description}
+          </p>
+
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex flex-col">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-base font-bold text-black">
+                  ₹{lowestPriceVariant ? lowestPriceVariant.price.toLocaleString("en-IN") : "-"}
+                </span>
+                {lowestPriceVariant?.originalPrice && (
+                  <span className="text-xs line-through text-gray-500">
+                    ₹{lowestPriceVariant.originalPrice.toLocaleString("en-IN")}
+                  </span>
+                )}
+                {lowestPriceVariant?.discount && (
+                  <span className="text-xs text-green-800">{lowestPriceVariant.discount}% off</span>
+                )}
+              </div>
+              {product.stockStatus === "out_of_stock" && (
+                <span className="text-[10px] text-red-500 font-medium">
+                  Out of Stock
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-0.5">
+              <Star className="w-3 h-3 fill-yellow-400 stroke-yellow-400" />
+              <span className="text-[10px] font-medium">
+                {averageRating > 0 ? averageRating.toFixed(1) : (product.ratings ?? 0)}
+              </span>
+            </div>
+          </div>
+
+          {/* <div className="flex gap-1">
           {product.stockStatus === "out_of_stock" ? (
             <button
               disabled
@@ -203,8 +224,8 @@ export const HomeProductCard: React.FC<ProductCardProps> = ({ product,  }) => {
             </>
           )}
         </div> */}
-      </div>
-    </Link>
+        </div>
+      </Link>
     </div>
   );
 };
