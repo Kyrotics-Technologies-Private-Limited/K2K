@@ -181,15 +181,18 @@ const PhoneAuth: React.FC<PhoneAuthProps> = ({ onAuthenticated }) => {
   const handleSaveUserInfo = () => {
     dispatch(clearError());
 
-    const emailError = validateEmail(email);
-    if (emailError) {
-      dispatch({ type: "auth/setError", payload: emailError });
-      return;
-    }
-
     if (!name.trim()) {
       dispatch({ type: "auth/setError", payload: "Please enter your name" });
       return;
+    }
+
+    // Validate email only if provided (it's optional)
+    if (email.trim()) {
+      const emailError = validateEmail(email);
+      if (emailError) {
+        dispatch({ type: "auth/setError", payload: emailError });
+        return;
+      }
     }
 
     const formattedPhone = phone.startsWith("+") ? phone : `+${phone}`;
@@ -400,7 +403,9 @@ const PhoneAuth: React.FC<PhoneAuthProps> = ({ onAuthenticated }) => {
             </div>
 
             <div>
-              <label className="text-sm text-gray-700 mb-1 block">Email</label>
+              <label className="text-sm text-gray-700 mb-1 block">
+                Email
+              </label>
               <Input
                 type="email"
                 value={email}

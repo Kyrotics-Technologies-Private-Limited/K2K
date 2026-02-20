@@ -58,11 +58,10 @@ const BlogPage: React.FC = () => {
             <button
               key={category.value}
               onClick={() => setSelectedCategory(category.value)}
-              className={`button px-4 py-2 rounded-full text-sm transition-colors ${
-                selectedCategory === category.value
+              className={`cursor-pointer button px-4 py-2 rounded-full text-sm transition-colors ${selectedCategory === category.value
                   ? "bg-green-100 text-green-800"
                   : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-              }`}
+                }`}
             >
               {category.label}
             </button>
@@ -87,7 +86,7 @@ const BlogPage: React.FC = () => {
               <Link
                 key={blog.id}
                 to={`/Blog/${blog.id}`}
-                className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 block"
+                className="cursor-pointer group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 block"
               >
                 <div className="overflow-hidden">
                   <img

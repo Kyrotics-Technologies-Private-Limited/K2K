@@ -18,7 +18,7 @@ import TermsOfService from "./pages/policyPages/TermsOfService";
 import ShippingPolicy from "./pages/policyPages/ShippingPolicy";
 import RefundPolicy from "./pages/policyPages/RefundPolicy";
 import Traceability from "./pages/Traceability";
-import OrdersPage  from "./pages/OrdersPage";
+import OrdersPage from "./pages/OrdersPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import ForgotPasswordPage from "./pages/authPages/ForgotPassword";
 import ResetPasswordPage from "./pages/authPages/ResetPassword";
@@ -46,6 +46,7 @@ import ScrollToTop from './components/common/ScrollToTop';
 import TryOurSamplePage from "./pages/TryOurSamplePage";
 import MembershipSuccess from "./pages/MembershipSuccess";
 import MembershipPayment from "./pages/MembershipPayment";
+import ProductReviewsPage from "./pages/ProductReviewsPage";
 
 
 const AD_BAR_STICKY_THRESHOLD = 40; // px scrolled past which navbar becomes fixed (matches ad bar height)
@@ -96,7 +97,7 @@ const PublicLayout = () => {
         draggable
         pauseOnHover
         theme="light"
-        style={{ marginTop: '3rem' }}  
+        style={{ marginTop: '3rem' }}
         className="!top-[3rem]" // This ensures toast appears below navbar
         transition={Bounce} />
     </>
@@ -116,11 +117,12 @@ function App() {
               <Route path="/all-products" element={<AllProductPage />} />
               <Route path="/try-our-sample" element={<TryOurSamplePage />} />
               <Route path="/product/:id" element={<ProductPage />} />
+              <Route path="/product/:id/reviews" element={<ProductReviewsPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/order-success" element={<OrderSuccess />} />
-              <Route path="/kishanParivarPage" element={<KishanParivarPage />}/>
-              <Route path="/membership-payment" element={<MembershipPayment />}/>
-              <Route path="/membership-success" element={<MembershipSuccess />}/>
+              <Route path="/kishanParivarPage" element={<KishanParivarPage />} />
+              <Route path="/membership-payment" element={<MembershipPayment />} />
+              <Route path="/membership-success" element={<MembershipSuccess />} />
               <Route path="/register" element={<SignUp />} />
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -134,16 +136,16 @@ function App() {
               <Route path="/shippinginfo" element={<ShippingPolicy />} />
               <Route path="/refundpolicy" element={<RefundPolicy />} />
               <Route path="/profile" element={<UserProfilePage />} />          <Route path="/Blog" element={<BlogPage />} />
-          <Route path="/Blog/:blogId" element={<BlogDetailPage />} />
+              <Route path="/Blog/:blogId" element={<BlogDetailPage />} />
             </Route>
             {/* Admin Routes */}
             <Route path="/admin" element={<Layout />}>
-             
+
               {/* <Route path="products/:id" element={<ProductDetailsPage />} />
               <Route path="productlist" element={<ProductListPage />} />
                <Route path="products/:productId/variants" element={<VariantDetailsPage/>} />
                <Route path="products/:productId/variants/:variantId/edit" element={<VariantEditPage/>} /> */}
-              
+
               {/* Add other admin routes as needed */}
             </Route>
           </Routes>

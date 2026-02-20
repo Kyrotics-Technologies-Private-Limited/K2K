@@ -8,24 +8,26 @@ import { CartItem } from "../../types/cart";
 // import { addToCart, setBuyNowItem, clearBuyNowItem } from "../../store/slices/cartSlice";
 // import { resetCheckout } from "../../store/slices/checkoutSlice";
 import VariantApi from "../../services/api/variantApi";
+import { reviewApi } from "../../services/api/reviewApi";
 // import { toast } from "react-toastify";
 
 interface ProductCardProps {
   product: Product;
   cartItem?: CartItem | null;
   variant?: Variant;
-  onAddToCart?: () => void; 
+  onAddToCart?: () => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
   const navigate = useNavigate();
   // const dispatch = useAppDispatch();
   // let { activeCartId } = useAppSelector(state => state.cart);
-  
+
   // const [, setIsAddingToCart] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [variants, setVariants] = useState<Variant[]>([]);
+  const [averageRating, setAverageRating] = useState<number>(0);
   // const [quantity, setQuantity] = useState(1);
   // const [setSelectedVariant] = useState<Variant | null>(null);
 
@@ -35,11 +37,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
         setLoading(true);
         const data = await VariantApi.getVariantsByProductId(product.id);
         setVariants(data);
-        
+
         // if (data && data.length > 0) {
         //   setSelectedVariant(data[0]);
         // }
-        
+
         setError(null);
       } catch (err) {
         setError("Failed to load product variants. Please try again later.");
@@ -50,6 +52,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
 
     fetchProductVariants();
   }, [product.id]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const reviews = await reviewApi.getProductReviews(product.id);
+        if (reviews.length > 0) {
+          const avg = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length;
+          setAverageRating(avg);
+        } else {
+          setAverageRating(product.ratings ?? 0);
+        }
+      } catch (err) {
+        setAverageRating(product.ratings ?? 0);
+      }
+    };
+    fetchReviews();
+  }, [product.id, product.ratings]);
 
   // GST helpers: no membership here; show regular price including GST
   const applyGst = (amount: number, gstPercentage?: number) => {
@@ -66,7 +85,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
     navigate(`/product/${product.id}`);
   };
 
- 
+
 
   if (loading) {
     return (
@@ -87,10 +106,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
   // Find the variant with the lowest GST-inclusive regular price
   const lowestPriceVariant = variants.length > 0
     ? variants.reduce((min, v) => {
-        const vPrice = getRegularPriceWithGST(v.price, v.gstPercentage);
-        const mPrice = min ? getRegularPriceWithGST(min.price, min.gstPercentage) : Number.POSITIVE_INFINITY;
-        return vPrice < mPrice ? v : min;
-      }, variants[0])
+      const vPrice = getRegularPriceWithGST(v.price, v.gstPercentage);
+      const mPrice = min ? getRegularPriceWithGST(min.price, min.gstPercentage) : Number.POSITIVE_INFINITY;
+      return vPrice < mPrice ? v : min;
+    }, variants[0])
     : null;
 
   const imageSrc = product?.images?.main ?? product?.images?.gallery?.[0] ?? "";
@@ -120,9 +139,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
           <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-white/90 text-[#4A5D23]">
             {product.category}
           </span>
-          {product.ratings >= 4.5 && (
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[#F8D7A8] text-[#A05E2B]">
-              Best Seller
+          {(product.isBestseller || averageRating >= 4.5) && (
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[#F8D7A8] text-[#A05E2B] font-semibold">
+              🏆 Best Seller
             </span>
           )}
         </div>
@@ -171,7 +190,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, }) => {
           </div>
           <div className="flex items-center gap-0.5">
             <Star className="w-3 h-3 fill-yellow-400 stroke-yellow-400" />
-            <span className="text-[10px] font-medium">{product.ratings}</span>
+            <span className="text-[10px] font-medium">
+              {averageRating > 0 ? averageRating.toFixed(1) : (product.ratings ?? 0)}
+            </span>
           </div>
         </div>
         {/* No Add/Buy buttons here */}

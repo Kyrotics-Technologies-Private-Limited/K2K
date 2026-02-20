@@ -10,7 +10,7 @@ const MembershipSuccess: React.FC = () => {
       className="min-h-screen flex flex-col items-center justify-center bg-white border border-green-200"
     >
       <div className="bg-white rounded-2xl shadow-2xl px-8 py-12 max-w-lg w-full flex flex-col items-center border border-green-200">
-        <CheckCircle className="w-16 h-16 text-green-600 mb-4"/>
+        <CheckCircle className="w-16 h-16 text-green-600 mb-4" />
         <h1 className="text-3xl font-bold mb-2 text-green-700 text-center">
           Membership Activated!
         </h1>
@@ -19,7 +19,7 @@ const MembershipSuccess: React.FC = () => {
           You now have exclusive member benefits, special discounts, and priority service.
         </p>
         <button
-          className="button bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-full transition-all duration-150"
+          className="cursor-pointer button bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-full transition-all duration-150"
           onClick={() => navigate("/")}
         >
           Start Shopping

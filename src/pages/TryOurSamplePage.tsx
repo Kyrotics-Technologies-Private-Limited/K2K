@@ -49,13 +49,13 @@ const TryOurSamplePage: React.FC = () => {
       {/* Hero Section */}
       <div className="relative">
         <div className="w-full h-64 sm:h-80 md:h-96 lg:h-[500px] overflow-hidden">
-          <img 
-            src={bannerSrc} 
-            alt="Try Our Sample Banner" 
+          <img
+            src={bannerSrc}
+            alt="Try Our Sample Banner"
             className="w-full h-full object-cover object-center"
           />
         </div>
-        
+
         {/* Try Our Sample Button */}
         <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
           <button
@@ -65,7 +65,7 @@ const TryOurSamplePage: React.FC = () => {
                 element.scrollIntoView({ behavior: 'smooth' });
               }
             }}
-            className="bg-green-600 text-white py-3 px-8 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-200"
+            className="cursor-pointer bg-green-600 text-white py-3 px-8 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-200"
           >
             Try Our Sample
           </button>
@@ -82,7 +82,7 @@ const TryOurSamplePage: React.FC = () => {
             Explore our range of authentic, farm-fresh products. Click on any product to learn more and place your sample order.
           </p>
         </div>
-        
+
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-pulse text-gray-500">Loading products...</div>
@@ -91,7 +91,7 @@ const TryOurSamplePage: React.FC = () => {
           <div className="text-center py-12">
             <p className="text-red-600">{error}</p>
             <button
-              className="mt-4 px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800"
+              className="mt-4 px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 cursor-pointer"
               onClick={() => window.location.reload()}
             >
               Try Again
@@ -112,7 +112,7 @@ const TryOurSamplePage: React.FC = () => {
           <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
             Why Try Our Samples?
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="text-center p-6 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-green-50 cursor-pointer">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 transition-all duration-300 hover:bg-green-200 hover:scale-110">
@@ -196,7 +196,7 @@ const TryOurSamplePage: React.FC = () => {
           </div>
         </div> */}
       </div>
-      
+
       <RecognizedBy />
     </div>
   );

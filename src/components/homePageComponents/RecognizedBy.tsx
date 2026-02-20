@@ -8,8 +8,8 @@ interface CompanyLogo {
 }
  
 const companyLogos: CompanyLogo[] = [
-  { id: 1, name: "AFBIC-IITKGP", logo: "/assets/logos/AFBIC.png" },
-  { id: 2, name: "IITKGP", logo: "/assets/logos/IITKGP.png" },
+  { id: 1, name: "AFBIC-IIT-KGP", logo: "/assets/logos/AFBIC.png" },
+  { id: 2, name: "IIT-KGP", logo: "/assets/logos/IITKGP.png" },
   { id: 3, name: "ISI Kolkata", logo: "/assets/logos/ISI-kolkata.png" },
   { id: 4, name: "DPIIT", logo: "/assets/logos/DPIIT.png" },
   { id: 5, name: "MSME", logo: "/assets/logos/MSME.png" },

@@ -20,6 +20,7 @@ export interface Product {
   stockStatus: "in_stock" | "low_stock" | "out_of_stock";
   ratings: number;
   reviews: number;
+  isBestseller?: boolean;
   badges: {
     text: string;
     image: string;

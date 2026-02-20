@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { Star } from "lucide-react";
+import { Star, Upload, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { reviewApi } from "../../services/api/reviewApi";
+import { storage } from "../../services/firebase/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export interface WriteReviewCardProps {
   productId: string;
@@ -21,6 +23,48 @@ export const WriteReviewCard: React.FC<WriteReviewCardProps> = ({
   const [hoverRating, setHoverRating] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      if (filesArray.length + selectedImages.length > 3) {
+        setError("You can upload a maximum of 3 images.");
+        return;
+      }
+      setSelectedImages((prev) => [...prev, ...filesArray]);
+      setError(null);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const uploadImages = async (): Promise<string[]> => {
+    if (selectedImages.length === 0) return [];
+
+    setUploadingImages(true);
+    const urls: string[] = [];
+
+    try {
+      for (const file of selectedImages) {
+        const timestamp = Date.now();
+        const storageRef = ref(storage, `reviews/${productId}/${timestamp}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        urls.push(url);
+      }
+    } catch (err) {
+      console.error("Error uploading images:", err);
+      throw new Error("Failed to upload images. Please try again.");
+    } finally {
+      setUploadingImages(false);
+    }
+
+    return urls;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,21 +77,23 @@ export const WriteReviewCard: React.FC<WriteReviewCardProps> = ({
       return;
     }
     const trimmed = comment.trim();
-    if (!trimmed) {
-      setError("Please write your review.");
-      return;
-    }
+    // Removed mandatory comment check
+
     setError(null);
     setSubmitting(true);
     try {
+      const photoUrls = await uploadImages();
+
       await reviewApi.createReview({
         productId,
         rating,
         comment: trimmed,
+        photos: photoUrls,
       });
       toast.success("Thank you! Your review has been posted.");
       setRating(0);
       setComment("");
+      setSelectedImages([]);
       setHoverRating(0);
       onSuccess?.();
     } catch (err: any) {
@@ -101,11 +147,10 @@ export const WriteReviewCard: React.FC<WriteReviewCardProps> = ({
                 aria-label={`${star} star${star > 1 ? "s" : ""}`}
               >
                 <Star
-                  className={`w-8 h-8 transition-colors ${
-                    star <= (hoverRating || rating)
-                      ? "fill-amber-400 stroke-amber-400"
-                      : "stroke-gray-300 fill-transparent"
-                  }`}
+                  className={`w-8 h-8 transition-colors ${star <= (hoverRating || rating)
+                    ? "fill-amber-400 stroke-amber-400"
+                    : "stroke-gray-300 fill-transparent"
+                    }`}
                 />
               </button>
             ))}
@@ -124,7 +169,7 @@ export const WriteReviewCard: React.FC<WriteReviewCardProps> = ({
             htmlFor="review-comment"
             className="block text-sm font-medium text-gray-700 mb-2"
           >
-            Your review <span className="text-red-500">*</span>
+            Your review <span className="text-gray-400 font-normal">(Optional)</span>
           </label>
           <textarea
             id="review-comment"
@@ -139,6 +184,44 @@ export const WriteReviewCard: React.FC<WriteReviewCardProps> = ({
             {comment.length}/1000
           </p>
         </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Add Photos <span className="text-gray-400 font-normal">(Optional)</span>
+          </label>
+          <div className="flex flex-wrap gap-4">
+            {selectedImages.map((file, index) => (
+              <div key={index} className="relative w-24 h-24 border rounded-lg overflow-hidden">
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt="preview"
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600 focus:outline-none"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+            {selectedImages.length < 3 && (
+              <label className="w-24 h-24 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-green-500 hover:bg-gray-50 transition-colors">
+                <Upload className="w-6 h-6 text-gray-400" />
+                <span className="text-xs text-gray-500 mt-1">Upload</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                  multiple
+                />
+              </label>
+            )}
+          </div>
+          <p className="text-xs text-gray-500 mt-2">Max 3 images.</p>
+        </div>
         {error && (
           <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
             {error}
@@ -146,7 +229,7 @@ export const WriteReviewCard: React.FC<WriteReviewCardProps> = ({
         )}
         <button
           type="submit"
-          disabled={submitting || rating < 1 || !comment.trim()}
+          disabled={submitting || rating < 1 || uploadingImages}
           className="px-6 py-3 bg-green-800 text-white font-medium rounded-xl hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[140px]"
         >
           {submitting ? (

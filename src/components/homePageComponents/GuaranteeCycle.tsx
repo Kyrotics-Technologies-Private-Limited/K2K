@@ -216,7 +216,7 @@ interface GuaranteeCycleProps {
   leftImage?: string;
 }
 
-const GuaranteeCycle = ({ leftImage = "/assets/images/oil_image.jpeg" }: GuaranteeCycleProps) => {
+const GuaranteeCycle = ({ leftImage = "/assets/images/oilimg.png" }: GuaranteeCycleProps) => {
   const guarantees = [
     {
       title: "Authenticity",
@@ -281,18 +281,21 @@ const GuaranteeCycle = ({ leftImage = "/assets/images/oil_image.jpeg" }: Guarant
         </div>
 
         {/* Two-column: Left = big image, Right = feature cycle */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-center min-h-[360px] md:min-h-[480px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 mt-10 items-center min-h-[360px] md:min-h-[480px]">
           {/* Left half - Medium image (hidden on mobile) */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="hidden lg:block relative w-full max-w-[280px] md:max-w-[400px] aspect-square rounded-2xl overflow-hidden shadow-lg mx-auto"
+            className="hidden lg:flex items-center justify-center relative h-[360px] md:h-[480px]"
           >
             <img
               src={leftImage}
               alt="Our quality mission"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover rounded-2xl"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = '/assets/images/oil_image.jpeg';
+              }}
             />
           </motion.div>
 

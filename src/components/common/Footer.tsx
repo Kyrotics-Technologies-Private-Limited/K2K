@@ -59,7 +59,7 @@ const Footer: FC = () => {
     { name: "Atta", path: "/all-products?category=atta" },
     { name: "Dal", path: "/all-products?category=dal" },
     { name: "Ghee", path: "/all-products?category=ghee" },
-    { name: "Oils", path: "/all-products?category=oils" },
+    { name: "Oil", path: "/all-products?category=oil" },
   ];
   const policyLinks = [
     { name: "Privacy Policy", path: "/privacypolicy" },
