@@ -140,9 +140,19 @@ const PhoneAuth: React.FC<PhoneAuthProps> = ({ onAuthenticated }) => {
       dispatch({ type: "auth/setError", payload: "reCAPTCHA container not ready" });
       return;
     }
-    recaptchaVerifierRef.current = authService.initRecaptcha(
-      recaptchaWrapperRef.current
-    );
+
+    try {
+      // Wait for reCAPTCHA to finish rendering before sending OTP (required by Firebase)
+      recaptchaVerifierRef.current = await authService.initRecaptcha(
+        recaptchaWrapperRef.current
+      );
+    } catch (err: any) {
+      dispatch({
+        type: "auth/setError",
+        payload: err?.message?.includes("reCAPTCHA") ? "reCAPTCHA failed. Please refresh and try again." : "Setup failed. Please refresh and try again.",
+      });
+      return;
+    }
 
     // Add +91 prefix before sending to backend
     const fullPhoneNumber = `+91${phone}`;

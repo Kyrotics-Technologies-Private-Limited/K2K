@@ -14,7 +14,7 @@ const NatureTraceBannerContent: React.FC = () => {
   const bannerUrl = getUrl("traceability_banner") ?? "/assets/bannerimg/tracability_banner.png";
   const logoUrl = getUrl("footer_logo") ?? "/assets/images/K2K Logo.png";
 
-  const handleRedirect =async () => {
+  const handleRedirect = async () => {
     if (!user) {
       setShowLoginModal(true);
       return;
@@ -24,14 +24,16 @@ const NatureTraceBannerContent: React.FC = () => {
       console.error("User not authenticated");
       return;
     }
-    const idToken = await auth.currentUser.getIdToken();
-
-    window.open(
-      // `https://k2ktraceability.netlify.app/customer?token=${idToken}`,
-      `http://localhost:3000/customer?token=${idToken}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
+    try {
+      const idToken = await auth.currentUser.getIdToken();
+      window.open(
+        `https://k2ktraceability.netlify.app/customer?token=${idToken}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    } catch (error) {
+      console.error("Error getting ID token:", error);
+    }
   };
 
   return (
@@ -110,15 +112,10 @@ const NatureTraceBannerContent: React.FC = () => {
             <h2 className="text-2xl font-semibold text-green-700 text-center mb-4">
               Login with Kishan2Kitchen
             </h2>
-            <PhoneAuth />
-            <button
-              onClick={() => {
+            <PhoneAuth
+              onAuthenticated={() => {
                 setShowLoginModal(false);
-                window.open(
-                  "https://yourcompanywebsite.com",
-                  "_blank",
-                  "noopener,noreferrer"
-                );
+                handleRedirect();
               }}
             />
           </div>

@@ -6,6 +6,7 @@ import {
   signInWithPhoneNumber,
   ConfirmationResult,
   signOut,
+  updatePassword,
 } from "firebase/auth";
 
 import { auth } from "../firebase/firebase";
@@ -14,18 +15,19 @@ import { auth } from "../firebase/firebase";
  * Initialize reCAPTCHA verifier.
  * Clears the container first to avoid "reCAPTCHA has already been rendered" when re-initializing.
  * Use a fresh verifier for each OTP request (RecaptchaVerifier is single-use for phone auth).
+ * Waits for render() to complete so the verifier is ready before signInWithPhoneNumber is called.
  * @param container DOM element to render the reCAPTCHA
- * @returns RecaptchaVerifier instance
+ * @returns Promise resolving to RecaptchaVerifier instance
  */
-export const initRecaptcha = (container: HTMLElement): RecaptchaVerifier => {
+export const initRecaptcha = async (container: HTMLElement): Promise<RecaptchaVerifier> => {
   container.innerHTML = "";
   const verifier = new RecaptchaVerifier(auth, container, {
     size: "invisible",
-    callback: () => {},
-    "expired-callback": () => {},
+    callback: () => { },
+    "expired-callback": () => { },
   });
 
-  verifier.render();
+  await verifier.render();
   return verifier;
 };
 
@@ -75,7 +77,7 @@ export const verifyOTP = async (
 export const getCurrentUser = async (): Promise<User> => {
   try {
     const token = await auth.currentUser?.getIdToken();
-  //  console.log("Token:", token);
+    //  console.log("Token:", token);
     if (!token) {
       throw new Error("Not authenticated");
     }
@@ -102,6 +104,7 @@ export const saveUserInfo = async (userData: {
   name: string;
   email: string;
   phone: string;
+  profilePicture?: string | null;
 }): Promise<User> => {
   try {
     const token = await auth.currentUser?.getIdToken();
@@ -216,6 +219,23 @@ export const getAuthToken = async (): Promise<string | null> => {
  * Check if user is authenticated
  * @returns Boolean indicating if user is authenticated
  */
+/**
+ * Update current user's password
+ * @param newPassword New password string
+ * @returns Promise that resolves when password is updated
+ */
+export const updateUserPassword = async (newPassword: string): Promise<void> => {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Not authenticated");
+
+    await updatePassword(user, newPassword);
+  } catch (error) {
+    console.error("Error updating password:", error);
+    throw error;
+  }
+};
+
 export const isAuthenticated = (): boolean => {
   return !!auth.currentUser;
 };

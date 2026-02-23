@@ -3,15 +3,9 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RecaptchaVerifier, ConfirmationResult } from 'firebase/auth';
 import * as authService from '../../services/api/authApi';
 
-// Define types
-interface User {
-  uid: string;
-  name: string | null;
-  email: string | null;
-  phone: string;
-  needsProfileCompletion?: boolean;
-}
+import { User } from '../../types/user';
 
+// Define types
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
@@ -39,7 +33,7 @@ export const sendOTP = createAsyncThunk(
       return { confirmationResult, phone };
     } catch (error: any) {
       let errorMessage = 'Error sending OTP';
-      
+
       if (error.code === 'auth/invalid-phone-number') {
         errorMessage = 'Invalid phone number format.';
       } else if (error.code === 'auth/too-many-requests') {
@@ -47,7 +41,7 @@ export const sendOTP = createAsyncThunk(
       } else if (error.message?.includes('reCAPTCHA')) {
         errorMessage = 'reCAPTCHA check failed. Please refresh the page.';
       }
-      
+
       return rejectWithValue(errorMessage);
     }
   }
@@ -56,15 +50,15 @@ export const sendOTP = createAsyncThunk(
 export const verifyOTP = createAsyncThunk(
   'auth/verifyOTP',
   async (
-    { confirmationResult, otp }: { confirmationResult: ConfirmationResult, otp: string }, 
+    { confirmationResult, otp }: { confirmationResult: ConfirmationResult, otp: string },
     { rejectWithValue }
   ) => {
     try {
       const userCredential = await authService.verifyOTP(confirmationResult, otp);
-      
+
       // Check if user info exists in database
       const userCheck = await authService.checkUserExists();
-      
+
       if (userCheck.exists && userCheck.user) {
         return {
           uid: userCredential.user.uid,
@@ -84,7 +78,7 @@ export const verifyOTP = createAsyncThunk(
       }
     } catch (error: any) {
       let errorMessage = 'Verification failed';
-      
+
       if (error.code === 'auth/invalid-verification-code') {
         errorMessage = 'Invalid OTP code';
       } else if (error.code === 'auth/code-expired') {
@@ -92,7 +86,7 @@ export const verifyOTP = createAsyncThunk(
       } else if (error.code === 'auth/too-many-requests') {
         errorMessage = 'Too many attempts. Try again later.';
       }
-      
+
       return rejectWithValue(errorMessage);
     }
   }
@@ -101,11 +95,11 @@ export const verifyOTP = createAsyncThunk(
 export const saveUserInfo = createAsyncThunk(
   'auth/saveUserInfo',
   async (
-    { name, phone, email }: { name: string, phone: string, email: string }, 
+    userData: { name: string, phone: string, email: string, profilePicture?: string | null },
     { rejectWithValue }
   ) => {
     try {
-      const response = await authService.saveUserInfo({ name, phone, email });
+      const response = await authService.saveUserInfo(userData);
       return response;
     } catch (error: any) {
       return rejectWithValue('Failed to save user information. Please try again.');
@@ -120,7 +114,7 @@ export const getCurrentUser = createAsyncThunk(
       if (!authService.isAuthenticated()) {
         return null;
       }
-      
+
       const userData = await authService.getCurrentUser();
       return userData;
     } catch (error: any) {
@@ -137,6 +131,21 @@ export const signOut = createAsyncThunk(
       return null;
     } catch (error: any) {
       return rejectWithValue('Failed to sign out.');
+    }
+  }
+);
+
+export const updatePassword = createAsyncThunk(
+  'auth/updatePassword',
+  async (newPassword: string, { rejectWithValue }) => {
+    try {
+      await authService.updateUserPassword(newPassword);
+      return true;
+    } catch (error: any) {
+      if (error.code === 'auth/requires-recent-login') {
+        return rejectWithValue('Please log out and log in again to change your password for security reasons.');
+      }
+      return rejectWithValue(error.message || 'Failed to update password.');
     }
   }
 );
@@ -182,7 +191,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      
+
       // verifyOTP
       .addCase(verifyOTP.pending, (state) => {
         state.loading = true;
@@ -196,13 +205,13 @@ const authSlice = createSlice({
       .addCase(verifyOTP.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-        
+
         // Clear confirmationResult if OTP expired
         if (action.payload === 'OTP expired. Request a new one.') {
           state.confirmationResult = null;
         }
       })
-      
+
       // saveUserInfo
       .addCase(saveUserInfo.pending, (state) => {
         state.loading = true;
@@ -210,20 +219,15 @@ const authSlice = createSlice({
       })
       .addCase(saveUserInfo.fulfilled, (state, action) => {
         state.loading = false;
-        if (state.user && action.payload) {
-          state.user = {
-            ...state.user,
-            name: action.payload.name,
-            email: action.payload.email,
-            needsProfileCompletion: false
-          };
+        if (action.payload) {
+          state.user = action.payload;
         }
       })
       .addCase(saveUserInfo.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
-      
+
       // getCurrentUser
       .addCase(getCurrentUser.pending, (state) => {
         state.loading = true;
@@ -238,7 +242,7 @@ const authSlice = createSlice({
       .addCase(getCurrentUser.rejected, (state) => {
         state.loading = false;
       })
-      
+
       // signOut
       .addCase(signOut.pending, (state) => {
         state.loading = true;
@@ -253,11 +257,11 @@ const authSlice = createSlice({
   },
 });
 
-export const { 
-  clearError, 
-  resetAuth, 
-  setPhone, 
-  clearConfirmationResult, 
+export const {
+  clearError,
+  resetAuth,
+  setPhone,
+  clearConfirmationResult,
   setError,
   setUser  // Export the new action
 } = authSlice.actions;

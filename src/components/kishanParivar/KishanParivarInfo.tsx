@@ -67,13 +67,13 @@ const KishanParivarInfo = () => {
       {/* Header Section */}
       <div className="text-center mb-20 px-4">
         <motion.div
-           initial={{ opacity: 0, y: -20 }}
-           whileInView={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.6 }}
-           viewport={{ once: true }}
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
         >
           <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
-            Have You Missed <br className="hidden md:block"/> Becoming a Farmer?
+            Have You Missed <br className="hidden md:block" /> Becoming a Farmer?
           </h2>
           <p className="text-xl md:text-2xl text-gray-600 font-medium max-w-2xl mx-auto">
             Still eat better. Live healthier. <span className="text-green-700 font-bold">Save smarter.</span>
@@ -84,72 +84,74 @@ const KishanParivarInfo = () => {
       {/* Benefits Loop */}
       <div className="max-w-7xl mx-auto px-6 lg:px-12 space-y-24">
         {benefits.map((benefit, index) => (
-          <motion.div 
+          <motion.div
             key={index}
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
-            className={`flex flex-col md:flex-row gap-12 lg:gap-24 items-center ${
-              index % 2 === 1 ? 'md:flex-row-reverse' : ''
-            }`}
+            className={`flex flex-col md:flex-row gap-12 lg:gap-24 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''
+              }`}
           >
             {/* Image Side */}
             <div className="w-full md:w-1/2 flex justify-center perspective-1000">
-                 <motion.div 
-                   className="relative w-full max-w-[400px] aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl"
-                 >
-                   <img 
-                     src={benefit.image} 
-                     alt={benefit.imageAlt} 
-                     className="w-full h-full object-cover"
-                   />
-                 </motion.div>
+              <motion.div
+                className="relative w-full max-w-[400px] aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl"
+              >
+                <img
+                  src={benefit.image}
+                  alt={benefit.imageAlt}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
             </div>
 
             {/* Text Side */}
             <div className="w-full md:w-1/2">
 
-              
+
               <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-snug">
                 {benefit.title}
               </h3>
-              
-                <p className="text-lg text-gray-700 leading-relaxed text-justify">
-                  {benefit.description}
-                </p>
+
+              <p className="text-lg text-gray-700 leading-relaxed text-justify">
+                {benefit.description}
+              </p>
             </div>
           </motion.div>
         ))}
       </div>
 
       {/* Trust Section Footer */}
-      {/* Trust Section Footer */}
       <div className="mt-20 max-w-5xl mx-auto px-6">
         <div className="bg-white rounded-2xl p-8 shadow-[0_5px_20px_-5px_rgba(0,0,0,0.05)] text-center border border-gray-100">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Why Families Trust <span className="text-green-700">Kishan Parivar</span>
           </h2>
-          
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 mb-8">
-             {trustPoints.map((point, idx) => (
-               <div 
-                 key={idx}
-                 className="flex items-center gap-2"
-               >
-                 <span className="text-lg">✅</span>
-                 <span className="text-gray-800 font-medium text-sm">{point}</span>
-               </div>
-             ))}
+
+          <div className="inline-flex flex-col sm:flex-row flex-wrap justify-center gap-x-10 gap-y-5 mb-10 w-full max-w-xl mx-auto">
+            {trustPoints.map((point, idx) => (
+              <div
+                key={idx}
+                className="flex items-center gap-4 w-full sm:w-auto min-w-[240px] sm:min-w-0"
+              >
+                <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-green-600 flex items-center justify-center shadow-md shadow-green-200">
+                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span className="text-gray-800 font-bold text-sm md:text-base text-left">{point}</span>
+              </div>
+            ))}
           </div>
 
           <div className="mt-8">
-             <h3 className="text-xl md:text-2xl font-bold text-green-800 mb-2">
-               Join the Kishan Parivar Today
-             </h3>
-             <p className="text-base text-gray-600 font-medium">
-               Upgrade your lifestyle. Protect your health. Save every day.
-             </p>
+            <h3 className="text-xl md:text-2xl font-bold text-green-800 mb-2">
+              Join the Kishan Parivar Today
+            </h3>
+            <p className="text-base text-gray-600 font-medium">
+              Upgrade your lifestyle. Protect your health. Save every day.
+            </p>
           </div>
         </div>
       </div>

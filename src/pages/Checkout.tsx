@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../store/store";
+import { useAppDispatch, useAppSelector, RootState } from "../store/store";
 import { SelectStep } from "../components/checkout/SelectStep";
 import { OrderReview } from "../components/checkout/OrderReview";
 import { Payment } from "../components/checkout/Payment";
@@ -13,9 +13,9 @@ import { isActiveKPMember } from "../lib/utils";
 export const CheckoutPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { currentStep } = useAppSelector((state) => state.checkout);
-  const { buyNowItem, cartItems } = useAppSelector((state) => state.cart);
-  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+  const { currentStep } = useAppSelector((state: RootState) => state.checkout);
+  const { buyNowItem, cartItems } = useAppSelector((state: RootState) => state.cart);
+  const { user, isAuthenticated } = useAppSelector((state: RootState) => state.auth);
 
   // Scroll to top when step changes
   useEffect(() => {
@@ -81,7 +81,7 @@ export const CheckoutPage = () => {
             ? Math.floor(price - (price * kpDiscountPercentage) / 100)
             : price;
 
-        // Calculate GST-inclusive subtotal
+        // Calculate GST-inclusive subtotal (this is what the user PAYS)
         const subtotal = itemsToCheckout.reduce((total, item) => {
           const unit = item.variant?.price || 0;
           const gst = item.variant?.gstPercentage;
@@ -90,18 +90,26 @@ export const CheckoutPage = () => {
           return total + unitAfterGst * item.quantity;
         }, 0);
 
-        // Original subtotal (GST-inclusive, without KP discount)
-        const originalSubtotal = itemsToCheckout.reduce((total, item) => {
+        // Subtotal without KP discount (using current price + GST)
+        const subtotalWithoutKp = itemsToCheckout.reduce((total, item) => {
           const unit = item.variant?.price || 0;
           const gst = item.variant?.gstPercentage;
           const unitAfterGst = applyGst(unit, gst);
           return total + unitAfterGst * item.quantity;
         }, 0);
 
-        // KP discount amount as difference between original GST-inclusive and member GST-inclusive
-        const kpDiscountAmount = Math.max(originalSubtotal - subtotal, 0);
+        // Original subtotal (MSRP - using originalPrice if available)
+        const originalSubtotal = itemsToCheckout.reduce((total, item) => {
+          const unit = item.variant?.originalPrice || item.variant?.price || 0;
+          const gst = item.variant?.gstPercentage;
+          const unitAfterGst = applyGst(unit, gst);
+          return total + unitAfterGst * item.quantity;
+        }, 0);
 
-        // Shipping rule based on GST-inclusive subtotal
+        // KP discount amount as difference between regular GST-inclusive and member GST-inclusive
+        const kpDiscountAmount = isKPMember ? Math.max(subtotalWithoutKp - subtotal, 0) : 0;
+
+        // Shipping rule based on final GST-inclusive subtotal (user payment)
         const shipping = subtotal > 500 ? 0 : 40; // Free shipping above ₹500
 
         // Final totals
@@ -181,8 +189,8 @@ export const CheckoutPage = () => {
           <div className="text-center flex-1">
             <span
               className={`text-sm ${currentStep === 1
-                  ? "text-green-600 font-medium"
-                  : "text-gray-500"
+                ? "text-green-600 font-medium"
+                : "text-gray-500"
                 }`}
             >
               Select Address & Items
@@ -191,8 +199,8 @@ export const CheckoutPage = () => {
           <div className="text-center flex-1">
             <span
               className={`text-sm ${currentStep === 2
-                  ? "text-green-600 font-medium"
-                  : "text-gray-500"
+                ? "text-green-600 font-medium"
+                : "text-gray-500"
                 }`}
             >
               Review Order
@@ -201,8 +209,8 @@ export const CheckoutPage = () => {
           <div className="text-center flex-1">
             <span
               className={`text-sm ${currentStep === 3
-                  ? "text-green-600 font-medium"
-                  : "text-gray-500"
+                ? "text-green-600 font-medium"
+                : "text-gray-500"
                 }`}
             >
               Payment

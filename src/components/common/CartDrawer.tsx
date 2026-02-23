@@ -56,10 +56,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           const status = await membershipApi.getStatus();
           // console.log("Membership status:", status);
           setMembershipStatus(status);
-          
+
           // Get discount from user's membership status
           let discount = status.discountPercentage || 0;
-          
+
           // If no discount in user status, try to get it from membership plans
           if (discount === 0) {
             try {
@@ -73,7 +73,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               console.error("Failed to fetch membership plans for fallback:", planError);
             }
           }
-          
+
           // console.log("Setting KP discount:", discount);
           setKpDiscount(discount);
         } catch (error) {
@@ -148,7 +148,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     if (membershipStatus?.discountPercentage && membershipStatus.discountPercentage > 0) {
       return membershipStatus.discountPercentage;
     }
-    
+
     // Fallback to the kpDiscount state (which includes plans fallback)
     return kpDiscount;
   };
@@ -247,8 +247,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
       if (!item.variant.inStock || item.variant.units_in_stock <= 0) {
         toast.error(
-          `${item.product?.name || "Item"} (${
-            item.variant.weight
+          `${item.product?.name || "Item"} (${item.variant.weight
           }) is out of stock`
         );
         return;
@@ -256,8 +255,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
       if (item.quantity > item.variant.units_in_stock) {
         toast.error(
-          `${item.product?.name || "Item"} (${item.variant.weight}) - Only ${
-            item.variant.units_in_stock
+          `${item.product?.name || "Item"} (${item.variant.weight}) - Only ${item.variant.units_in_stock
           } units available. Requested: ${item.quantity}`
         );
         return;
@@ -284,10 +282,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     }, 0);
   };
 
-  // Calculate original total without KP discount (but GST-inclusive)
+  // Calculate original total (MSRP)
   const calculateOriginalTotal = () => {
     return cartItems.reduce((total, item) => {
-      const price = item.variant?.price || 0;
+      const price = item.variant?.originalPrice || item.variant?.price || 0;
       const gst = item.variant?.gstPercentage;
       return total + getRegularPriceWithGST(price, gst) * item.quantity;
     }, 0);
@@ -327,15 +325,13 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   return (
     <>
       <div
-        className={`fixed inset-0 bg-gray-900/30 transition-opacity z-50 ${
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-gray-900/30 transition-opacity z-50 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
         onClick={onClose}
       />
       <div
-        className={`fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 ${isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="h-full flex flex-col">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
@@ -403,8 +399,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                       <div className="flex gap-4">
                         <img
                           src={
-                            item.product?.images.main ||
-                            "https://picsum.photos/200/300"
+                            item.product?.images.main
+
                           }
                           alt={item.product?.name || "Product"}
                           className="w-20 h-20 object-cover rounded-lg"
@@ -420,7 +416,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                           {item.variant && (
                             <div className="mt-1">
                               {!item.variant.inStock ||
-                              item.variant.units_in_stock <= 0 ? (
+                                item.variant.units_in_stock <= 0 ? (
                                 <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
                                   Out of Stock
                                 </span>
@@ -460,11 +456,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                                   updatingItems[item.id] ||
                                   (item.variant &&
                                     item.quantity >=
-                                      item.variant.units_in_stock)
+                                    item.variant.units_in_stock)
                                 }
                                 title={
                                   item.variant &&
-                                  item.quantity >= item.variant.units_in_stock
+                                    item.quantity >= item.variant.units_in_stock
                                     ? `Only ${item.variant.units_in_stock} available`
                                     : "Increase quantity"
                                 }
@@ -482,88 +478,44 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                           </div>
                         </div>
                         <div className="text-right">
-                          {item.variant && (
-                            <>
-                              {/* {console.log("Cart item price rendering:", {
-                                itemId: item.id,
-                                isKPMember,
-                                effectiveDiscount,
-                                variantPrice: item.variant.price,
-                                quantity: item.quantity,
-                                shouldShowKPPrice: isKPMember && effectiveDiscount > 0
-                              })} */}
-                              {isKPMember && effectiveDiscount > 0 ? (
-                                <>
-                                  {/* KP Member Price */}
-                                  <p className="font-medium text-[#4A5D23]">
-                                    ₹
-                                    {(
-                                      getKPMemberPriceWithGST(item.variant.price, item.variant.gstPercentage) * item.quantity
-                                    ).toLocaleString("en-IN")}
-                                  </p>
-                                  {/* Original Price (crossed out) */}
-                                  <p className="text-xs text-gray-500 line-through">
-                                    ₹
-                                    {(
-                                      getRegularPriceWithGST(item.variant.price, item.variant.gstPercentage) * item.quantity
-                                    ).toLocaleString("en-IN")}
-                                  </p>
-                                  {/* KP Member Badge */}
-                                  <p className="text-xs text-green-600 font-medium">
-                                    KP Member ({effectiveDiscount}% off)
-                                  </p>
-                                  {/* Savings amount */}
-                                  <p className="text-xs text-green-700">
-                                    Save ₹{((
-                                      getRegularPriceWithGST(item.variant.price, item.variant.gstPercentage) -
-                                      getKPMemberPriceWithGST(item.variant.price, item.variant.gstPercentage)
-                                    ) * item.quantity).toLocaleString("en-IN")}
-                                  </p>
-                                </>
-                              ) : (
-                                <>
-                                  {/* Regular Price */}
-                                  <p className="font-medium text-[#4A5D23]">
-                                    ₹
-                                    {(
-                                      getRegularPriceWithGST(item.variant.price, item.variant.gstPercentage) * item.quantity
-                                    ).toLocaleString("en-IN")}
-                                  </p>
-                                  {/* Show KP Member Price for non-members if discount is available */}
-                                  {effectiveDiscount > 0 && (
-                                    <>
-                                      <p className="text-xs text-green-600">
-                                        KP Member: ₹
-                                        {(
-                                          getKPMemberPriceWithGST(item.variant.price, item.variant.gstPercentage) * item.quantity
-                                        ).toLocaleString("en-IN")}
-                                      </p>
-                                      <p className="text-xs text-gray-500">
-                                        Save ₹{((
-                                          getRegularPriceWithGST(item.variant.price, item.variant.gstPercentage) -
-                                          getKPMemberPriceWithGST(item.variant.price, item.variant.gstPercentage)
-                                        ) * item.quantity).toLocaleString("en-IN")}
-                                      </p>
-                                    </>
-                                  )}
-                                </>
-                              )}
-                              {/* Existing variant discount display */}
-                              {item.variant.discount! > 0 && (
-                                <p className="text-xs text-gray-500 line-through">
-                                  ₹
-                                  {(
-                                    getRegularPriceWithGST(item.variant.originalPrice!, item.variant.gstPercentage) * item.quantity
-                                  ).toLocaleString("en-IN")}
+                          {item.variant && (() => {
+                            const basePriceValue = item.variant.originalPrice || item.variant.price;
+                            const basePriceWithGST = getRegularPriceWithGST(basePriceValue, item.variant.gstPercentage) * item.quantity;
+                            const finalPriceWithGST = (isKPMember && effectiveDiscount > 0
+                              ? getKPMemberPriceWithGST(item.variant.price, item.variant.gstPercentage)
+                              : getRegularPriceWithGST(item.variant.price, item.variant.gstPercentage)) * item.quantity;
+
+                            const hasDiscount = basePriceWithGST > finalPriceWithGST;
+                            const totalDiscountPercentage = hasDiscount
+                              ? Math.round(((basePriceWithGST - finalPriceWithGST) / basePriceWithGST) * 100)
+                              : 0;
+
+                            return (
+                              <>
+                                <p className="font-medium text-[#4A5D23]">
+                                  ₹{finalPriceWithGST.toLocaleString("en-IN")}
                                 </p>
-                              )}
-                              {item.variant.discount! > 0 && (
-                                <p className="text-xs text-green-600">
-                                  {item.variant.discount}% off
-                                </p>
-                              )}
-                            </>
-                          )}
+                                {hasDiscount && (
+                                  <>
+                                    <p className="text-xs text-gray-500 line-through">
+                                      ₹{basePriceWithGST.toLocaleString("en-IN")}
+                                    </p>
+                                    <p className="text-xs text-green-600 font-medium">
+                                      {totalDiscountPercentage}% off
+                                      {isKPMember && effectiveDiscount > 0 && " (KP Member)"}
+                                    </p>
+                                  </>
+                                )}
+                                {!isKPMember && effectiveDiscount > 0 && (
+                                  <div className="mt-1">
+                                    <p className="text-[10px] text-green-600">
+                                      KP Member: ₹{(getKPMemberPriceWithGST(item.variant.price, item.variant.gstPercentage) * item.quantity).toLocaleString("en-IN")}
+                                    </p>
+                                  </div>
+                                )}
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     )}
@@ -587,7 +539,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                         • {item.product?.name || "Item"} (
                         {item.variant?.weight || "Variant"}) -
                         {!item.variant?.inStock ||
-                        (item.variant?.units_in_stock || 0) <= 0
+                          (item.variant?.units_in_stock || 0) <= 0
                           ? " Out of stock"
                           : ` Only ${item.variant?.units_in_stock} available (requested: ${item.quantity})`}
                       </p>
@@ -599,29 +551,23 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               <div className="flex items-center justify-between text-lg font-semibold">
                 <span>Total ({getTotalItems()} items)</span>
                 <div className="text-right">
-                  {isKPMember && effectiveDiscount > 0 ? (
-                    <>
-                      <span className="text-[#4A5D23]">
-                        ₹{calculateTotal().toLocaleString("en-IN")}
-                      </span>
-                      <div className="text-sm text-gray-500 line-through">
-                        ₹{calculateOriginalTotal().toLocaleString("en-IN")}
-                      </div>
-                    </>
-                  ) : (
-                    <span className="text-[#4A5D23]">
-                      ₹{calculateTotal().toLocaleString("en-IN")}
-                    </span>
+                  <span className="text-[#4A5D23]">
+                    ₹{calculateTotal().toLocaleString("en-IN")}
+                  </span>
+                  {calculateOriginalTotal() > calculateTotal() && (
+                    <div className="text-sm text-gray-500 line-through">
+                      ₹{calculateOriginalTotal().toLocaleString("en-IN")}
+                    </div>
                   )}
                 </div>
               </div>
-              
+
               {/* KP Member Discount Summary */}
               {isKPMember && effectiveDiscount > 0 && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-green-800 font-medium">
-                      KP Member Discount ({effectiveDiscount}%)
+                      Your Total Savings
                     </span>
                     <span className="text-green-700 font-bold">
                       -₹{(calculateOriginalTotal() - calculateTotal()).toLocaleString("en-IN")}
@@ -629,14 +575,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   </div>
                 </div>
               )}
-              
+
               {/* KP Member Promotion for Non-Members */}
               {!isKPMember && effectiveDiscount > 0 && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <div className="text-sm text-blue-800">
                     <div className="font-medium mb-1">Become a KP Member!</div>
                     <div className="text-xs">
-                      Save {effectiveDiscount}% on all products. 
+                      Save {effectiveDiscount}% on all products.
                       <button
                         onClick={() => {
                           onClose();
@@ -652,11 +598,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               )}
               <button
                 onClick={handleCheckout}
-                className={`button w-full py-3 rounded-lg transition-colors ${
-                  hasOutOfStockItems()
+                className={`button w-full py-3 rounded-lg transition-colors ${hasOutOfStockItems()
                     ? "bg-gray-400 text-gray-600 cursor-not-allowed"
                     : "bg-green-800 text-white hover:bg-[#3A4D13]"
-                }`}
+                  }`}
                 disabled={hasOutOfStockItems()}
               >
                 {hasOutOfStockItems()

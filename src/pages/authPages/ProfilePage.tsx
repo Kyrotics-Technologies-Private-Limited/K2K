@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   FileEdit,
   Save,
@@ -6,251 +6,77 @@ import {
   Phone,
   Mail,
   Calendar,
+  Camera,
+  LogOut,
+  ShoppingBag,
+  ShieldCheck,
+  Bell,
+  X,
+  Loader2,
+  CheckCircle2
 } from "lucide-react";
-import { db, storage } from "../../services/firebase/firebase";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { storage } from "../../services/firebase/firebase";
 import {
   ref,
   uploadBytes,
   getDownloadURL,
-  deleteObject,
 } from "firebase/storage";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-
-// User interface
-export interface User {
-  uid: string;
-  name: string;
-  email: string | null;
-  phone: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  profilePicture?: string;
-}
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store/store";
+import { signOut, getCurrentUser, saveUserInfo, updatePassword } from "../../store/slices/authSlice";
+import { fetchMembershipStatus } from "../../store/slices/membershipSlice";
+import { User } from "../../types/user";
+import { useNavigate, Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { format } from "date-fns";
 
 const UserProfilePage: React.FC = () => {
-  //const dispatch = useDispatch();
-  const { user: authUser, loading: authLoading } = useSelector(
-    (state: RootState) => state.auth
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { status: membershipStatus } = useSelector(
+    (state: RootState) => state.membership
   );
+
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [profilePicture, setProfilePicture] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<"info" | "orders" | "security">("info");
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
   });
 
-  const fetchUserData = async (uid: string): Promise<User> => {
-    try {
-      const userRef = doc(db, "users", uid);
-      const docSnap = await getDoc(userRef);
-
-      if (docSnap.exists()) {
-        return {
-          uid: docSnap.id,
-          ...docSnap.data(),
-        } as User;
-      } else {
-        // Create a new user document if it doesn't exist
-        const newUser: User = {
-          uid,
-          name: authUser?.name || "",
-          email: authUser?.email || null,
-          phone: authUser?.phone || "",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-
-        await setDoc(userRef, newUser);
-        return newUser;
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      throw error;
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      // Validate file type and size
-      if (!file.type.startsWith("image/")) {
-        setError("Please upload an image file (JPEG, PNG)");
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        // 5MB limit
-        setError("File size should be less than 5MB");
-        return;
-      }
-      setSelectedFile(file);
-      setError(null);
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!selectedFile || !user) {
-      setError("No file selected or user not found");
-      return;
-    }
-
-    setUploading(true);
-    setError(null);
-
-    try {
-      // Create a reference to the storage location
-      const storageRef = ref(storage, `profilePictures/${user.uid}`);
-
-      // Upload the file
-      const snapshot = await uploadBytes(storageRef, selectedFile);
-
-      // Get the download URL
-      const downloadURL = await getDownloadURL(snapshot.ref);
-
-      // Update the user document with the photo URL
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        profilePicture: downloadURL,
-        updatedAt: new Date(),
-      });
-
-      // Update local state
-      setProfilePicture(downloadURL);
-      setSelectedFile(null);
-    } catch (error) {
-      console.error("Error uploading profile picture:", error);
-      setError("Failed to upload profile picture");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const removeProfilePicture = async () => {
-    if (!user) return;
-
-    try {
-      // Delete the file from storage
-      if (user.profilePicture) {
-        const storageRef = ref(storage, `profilePictures/${user.uid}`);
-        await deleteObject(storageRef);
-      }
-
-      // Update the user document
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        profilePicture: null,
-        updatedAt: new Date(),
-      });
-
-      // Update local state
-      setProfilePicture(null);
-    } catch (error) {
-      console.error("Error removing profile picture:", error);
-      setError("Failed to remove profile picture");
-    }
-  };
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-
-    // For name field, only allow alphabets and spaces
-    if (name === "name") {
-      const cleanedValue = value.replace(/[^a-zA-Z\s]/g, "");
-      setFormData((prev) => ({
-        ...prev,
-        [name]: cleanedValue,
-      }));
-    }
-    // For phone field, only allow numeric input and handle +91 prefix
-    else if (name === "phone") {
-      // Remove any non-numeric characters except '+'
-      const cleanedValue = value.replace(/[^\d+]/g, "");
-
-      // Handle the +91 prefix
-      let formattedValue = cleanedValue;
-      if (!cleanedValue.startsWith("+91")) {
-        // If input doesn't start with +91, remove any + if present
-        const numericOnly = cleanedValue.replace(/\+/g, "");
-        // Only add +91 if there are numbers
-        formattedValue = numericOnly ? `+91${numericOnly}` : "";
-      }
-
-      // Limit the total length to 13 characters (+91 plus 10 digits)
-      formattedValue = formattedValue.slice(0, 13);
-
-      setFormData((prev) => ({
-        ...prev,
-        [name]: formattedValue,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
-  };
-
-  const handleSaveProfile = async () => {
-    if (!user) return;
-
-    try {
-      setError(null);
-
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        updatedAt: new Date(),
-      });
-
-      // Update local state
-      setUser({
-        ...user,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        updatedAt: new Date(),
-      });
-
-      setEditMode(false);
-    } catch (error) {
-      console.error("Error saving profile:", error);
-      setError("Failed to save profile information");
-    }
-  };
+  const [passwordData, setPasswordData] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
-      if (authLoading || !authUser?.uid) return;
-
       try {
-        const userData = await fetchUserData(authUser.uid);
-        setUser(userData);
-
-        // Set form data from Firestore
-        setFormData({
-          name: userData.name || "",
-          email: userData.email || "",
-          phone: userData.phone || "",
-        });
-
-        // Set profile picture if it exists in Firestore
-        if (userData.profilePicture) {
-          setProfilePicture(userData.profilePicture);
+        setLoading(true);
+        const resultAction = await dispatch(getCurrentUser());
+        if (getCurrentUser.fulfilled.match(resultAction)) {
+          const userData = resultAction.payload as User;
+          setUser(userData);
+          setFormData({
+            name: userData.name || "",
+            email: userData.email || "",
+            phone: userData.phone || "",
+          });
         }
-      } catch (error) {
-        console.error("Error loading user data:", error);
+      } catch (err) {
+        console.error("Error loading user data:", err);
         setError("Failed to load user data");
       } finally {
         setLoading(false);
@@ -258,240 +84,582 @@ const UserProfilePage: React.FC = () => {
     };
 
     loadData();
-  }, [authUser, authLoading]);
+    dispatch(fetchMembershipStatus());
+  }, [dispatch]);
 
-  if (authLoading || loading) {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = e.target;
+
+    // For phone, only allow digits and +
+    if (name === "phone") {
+      const cleaned = value.replace(/[^\d+]/g, "").slice(0, 15);
+      setFormData(prev => ({ ...prev, [name]: cleaned }));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    try {
+      setLoading(true);
+      setError(null);
+      const resultAction = await dispatch(saveUserInfo({
+        ...formData,
+        profilePicture: user.profilePicture || null,
+      }));
+
+      if (saveUserInfo.fulfilled.match(resultAction)) {
+        setUser(resultAction.payload as User);
+        setEditMode(false);
+        setSuccess("Profile updated successfully!");
+        setTimeout(() => setSuccess(null), 3000);
+      } else {
+        setError("Failed to save profile information");
+      }
+    } catch (err) {
+      console.error("Error saving profile:", err);
+      setError("Failed to save profile information");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0] && user) {
+      const file = e.target.files[0];
+      if (!file.type.startsWith("image/")) {
+        setError("Please upload an image file");
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        setError("File size should be less than 2MB");
+        return;
+      }
+
+      setUploading(true);
+      try {
+        const storageRef = ref(storage, `profilePictures/${user.uid}`);
+        const snapshot = await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        const resultAction = await dispatch(saveUserInfo({
+          ...formData,
+          profilePicture: downloadURL,
+        }));
+
+        if (saveUserInfo.fulfilled.match(resultAction)) {
+          setUser(resultAction.payload as User);
+          setSuccess("Profile picture updated!");
+          setTimeout(() => setSuccess(null), 3000);
+        } else {
+          setError("Failed to upload profile picture");
+        }
+      } catch (err) {
+        console.error("Error uploading picture:", err);
+        setError("Failed to upload profile picture");
+      } finally {
+        setUploading(false);
+      }
+    }
+  };
+
+  const handleLogout = async () => {
+    await dispatch(signOut());
+    navigate("/");
+  };
+
+  const formatDateSafely = (dateValue: any, formatStr: string = "MMM dd, yyyy") => {
+    if (!dateValue) return "N/A";
+    try {
+      let dateObj: Date;
+
+      if (dateValue && typeof dateValue === 'object') {
+        const s = dateValue.seconds ?? dateValue._seconds ?? dateValue.seconds;
+        if (typeof s === 'number') {
+          dateObj = new Date(s * 1000);
+        } else if (dateValue.toDate && typeof dateValue.toDate === 'function') {
+          dateObj = dateValue.toDate();
+        } else {
+          dateObj = new Date(dateValue);
+        }
+      } else {
+        dateObj = new Date(dateValue);
+      }
+
+      if (isNaN(dateObj.getTime())) {
+        // Attempt to parse strings like "February 18, 2026 at 5:53:18 PM"
+        if (typeof dateValue === 'string') {
+          const cleaned = dateValue.replace(/\s+at\s+/i, ' ');
+          const attempt = new Date(cleaned);
+          if (!isNaN(attempt.getTime())) return format(attempt, formatStr);
+        }
+        return "N/A";
+      }
+
+      return format(dateObj, formatStr);
+    } catch (err) {
+      console.error("Date formatting error:", err);
+      return "N/A";
+    }
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      setError("Password should be at least 6 characters long");
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+      setError(null);
+      const resultAction = await dispatch(updatePassword(passwordData.newPassword));
+
+      if (updatePassword.fulfilled.match(resultAction)) {
+        setSuccess("Password updated successfully!");
+        setIsChangingPassword(false);
+        setPasswordData({ newPassword: "", confirmPassword: "" });
+        setTimeout(() => setSuccess(null), 3000);
+      } else {
+        setError(resultAction.payload as string || "Failed to update password");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred");
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  if (loading && !user) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-600"></div>
+      <div className="flex flex-col items-center justify-center h-screen bg-slate-50">
+        <Loader2 className="w-12 h-12 text-green-600 animate-spin mb-4" />
+        <p className="text-slate-600 font-medium animate-pulse">Loading your profile...</p>
       </div>
     );
   }
 
-  if (!user) {
+  if (!user && !loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <p className="text-gray-700">No user data available</p>
-        {error && <p className="text-red-500 mt-2">{error}</p>}
+      <div className="flex flex-col items-center justify-center h-screen bg-slate-50 p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
+          <UserIcon className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-slate-800 mb-2">Profile Not Found</h2>
+          <p className="text-slate-500 mb-6">We couldn't retrieve your profile details. Please try logging in again.</p>
+          <button
+            onClick={() => navigate("/login")}
+            className="w-full py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-all shadow-lg hover:shadow-green-200"
+          >
+            Login
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 className="text-xl font-semibold text-gray-800">
-            {user.name ? `${user.name}'s Profile` : "Your Profile"}
-          </h1>
+    <div className="min-h-screen bg-slate-50 pb-20">
+      {/* Premium Hero Header */}
+      <div className="relative h-80 bg-gradient-to-br from-green-700 via-green-800 to-slate-900 overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white" />
+          </svg>
+        </div>
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/leaf.png')] opacity-10"></div>
+
+        <div className="max-w-6xl mx-auto px-4 h-full flex items-center md:items-end pb-8 md:pb-12">
+          <div className="flex flex-col md:flex-row items-center md:items-end gap-6 w-full pt-16 md:pt-0">
+            {/* Profile Avatar */}
+            <div className="relative group">
+              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white">
+                {user?.profilePicture ? (
+                  <img src={user.profilePicture} alt={user.name ?? undefined} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-green-50">
+                    <UserIcon className="w-16 h-16 text-green-600" />
+                  </div>
+                )}
+
+                {uploading && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 text-white animate-spin" />
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-1 right-1 p-2.5 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-all transform hover:scale-110 active:scale-95"
+              >
+                <Camera className="w-5 h-5" />
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept="image/*"
+              />
+            </div>
+
+            <div className="flex-1 text-center md:text-left mb-2">
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-3xl md:text-4xl font-bold text-white mb-1"
+              >
+                {user?.name || "Welcome Back"}
+              </motion.h1>
+              <p className="text-green-100 flex items-center justify-center md:justify-start gap-2">
+                <ShieldCheck className="w-4 h-4" />
+                Verified Account
+              </p>
+            </div>
+
+            {/* Logout removed from here, secondary logout remains in Account Info */}
+          </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {error && (
-          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-md">
-            {error}
-          </div>
-        )}
+      {/* Main Content Area */}
+      <div className="max-w-6xl mx-auto px-4 -mt-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
-        {/* Profile Card */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          {/* Profile Header */}
-          <div className="bg-green-600 h-24 relative"></div>
-
-          <div className="flex flex-col md:flex-row">
-            {/* Profile Picture Section */}
-            <div className="md:w-1/3 p-6 bg-gray-50 border-r border-gray-200 flex flex-col items-center relative">
-              <div className="relative mb-6 group">
-                <div className="absolute -top-16 w-32 h-32">
-                  {profilePicture ? (
-                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl group-hover:opacity-90 transition-opacity">
-                      <img
-                        src={profilePicture}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                      />
-                      {/* {editMode && (
-                        <button
-                          onClick={removeProfilePicture}
-                          className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                          title="Remove photo"
-                        >
-                          <span className="text-xs">×</span>
-                        </button>
-                      )} */}
-                    </div>
-                  ) : (
-                    <div className="w-32 h-32 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center border-4 border-white shadow-xl">
-                      <UserIcon className="text-gray-500 h-16 w-16" />
-                    </div>
-                  )}
+          {/* Sidebar Navigation */}
+          <div className="lg:col-span-1 space-y-4">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-2">
+              <button
+                onClick={() => setActiveTab("info")}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'info' ? 'bg-green-50 text-green-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'}`}
+              >
+                <UserIcon className="w-5 h-5" />
+                Account Details
+              </button>
+              <Link
+                to="/orders"
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-600 hover:bg-slate-50`}
+              >
+                <ShoppingBag className="w-5 h-5" />
+                My Orders
+              </Link>
+              <button
+                onClick={() => setActiveTab("security")}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'security' ? 'bg-green-50 text-green-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'}`}
+              >
+                <ShieldCheck className="w-5 h-5" />
+                Security
+              </button>
+              <button
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all text-slate-600 hover:bg-slate-50`}
+              >
+                <div className="flex items-center gap-3">
+                  <Bell className="w-5 h-5" />
+                  Notifications
                 </div>
-
-                <div className="mt-16">
-                  {/* {editMode && (
-                    <div className="mt-2">
-                      <input
-                        type="file"
-                        id="profile-picture"
-                        onChange={handleFileChange}
-                        accept="image/*"
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="profile-picture"
-                        className="cursor-pointer inline-block w-full px-4 py-2 text-sm font-medium text-center text-green-600 bg-white border border-green-600 rounded-md hover:bg-green-50 transition-colors"
-                      >
-                        {profilePicture ? "Change Photo" : "Add Photo"}
-                      </label>
-
-                      {selectedFile && (
-                        <button
-                          onClick={handleUpload}
-                          disabled={uploading}
-                          className="w-full px-4 py-2 mt-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:bg-green-300 transition-colors"
-                        >
-                          {uploading ? "Uploading..." : "Upload"}
-                        </button>
-                      )}
-                    </div>
-                  )} */}
-                </div>
-              </div>
-
-              <div className="mt-6 w-full text-center">
-                <h2 className="text-xl font-bold text-gray-900">
-                  {formData.name || "Your Name"}
-                </h2>
-
-                {user.createdAt && (
-                  <div className="flex items-center justify-center mt-3 text-sm text-gray-600">
-                    <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                    {/* <span>Joined new Date({user.createdAt})</span> */}
-                  </div>
-                )}
-              </div>
+                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
+              </button>
             </div>
 
-            {/* Profile Details Section */}
-            <div className="md:w-2/3 p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  Account Information
-                </h3>
-
-                {!editMode ? (
-                  <button
-                    onClick={() => setEditMode(true)}
-                    className="flex items-center text-green-600 hover:text-green-800 bg-green-50 px-3 py-1.5 rounded-md text-sm transition-colors"
-                  >
-                    <FileEdit className="w-4 h-4 mr-1" />
-                    <span>Edit</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleSaveProfile}
-                    className="flex items-center text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md text-sm transition-colors"
-                  >
-                    <Save className="w-4 h-4 mr-1" />
-                    <span>Save</span>
-                  </button>
-                )}
+            <div className="bg-gradient-to-br from-green-600 to-green-800 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+              <div className="absolute -right-4 -bottom-4 opacity-20 transform rotate-12">
+                <ShoppingBag className="w-24 h-24" />
               </div>
+              <h3 className="text-lg font-bold mb-2">
+                {membershipStatus?.isMember ? `${membershipStatus.membershipType} Member` : "Kishan Parivar"}
+              </h3>
 
-              {editMode ? (
-                <div className="space-y-4">
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-                      placeholder="your.email@example.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="phone"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-                      placeholder="+91 Enter your 10-digit number"
-                    />
-                  </div>
+              {membershipStatus?.isMember ? (
+                <div className="space-y-2 mb-4">
+                  <p className="text-green-100 text-xs">
+                    <span className="font-bold">Started: </span>
+                    {formatDateSafely(membershipStatus.membershipStart)}
+                  </p>
+                  <p className="text-green-100 text-xs">
+                    <span className="font-bold">Expires: </span>
+                    {formatDateSafely(membershipStatus.membershipEnd)}
+                  </p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center py-2 border-b border-gray-100">
-                    <Mail className="w-5 h-5 text-gray-400 mr-3" />
+                <p className="text-green-100 text-sm mb-4">Join Kishan Parivar and save on every purchase!</p>
+              )}
+
+              <Link
+                to="/kishanParivarPage"
+                className="inline-block px-4 py-2 bg-white text-green-700 rounded-lg text-xs font-bold hover:bg-green-50 transition-colors"
+              >
+                {membershipStatus?.isMember ? "Manage Membership" : "Join Now"}
+              </Link>
+            </div>
+          </div>
+
+          {/* Content Card */}
+          <div className="lg:col-span-3">
+            <AnimatePresence mode="wait">
+              {activeTab === "info" && (
+                <motion.div
+                  key="info"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"
+                >
+                  <div className="p-6 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50">
                     <div>
-                      <p className="text-xs text-gray-500">Email</p>
-                      <p className="text-gray-800">
-                        {user.email || "Not provided"}
-                      </p>
+                      <h2 className="text-xl font-bold text-slate-800">Account Information</h2>
+                      <p className="text-sm text-slate-500">Manage your personal details and contact info</p>
                     </div>
+                    <button
+                      onClick={() => setEditMode(!editMode)}
+                      className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${editMode ? 'bg-slate-200 text-slate-700' : 'bg-green-600 text-white shadow-md shadow-green-200'}`}
+                    >
+                      {editMode ? <X className="w-4 h-4" /> : <FileEdit className="w-4 h-4" />}
+                      {editMode ? "Cancel" : "Edit Profile"}
+                    </button>
                   </div>
 
-                  <div className="flex items-center py-2 border-b border-gray-100">
-                    <Phone className="w-5 h-5 text-gray-400 mr-3" />
-                    <div>
-                      <p className="text-xs text-gray-500">Phone</p>
-                      <p className="text-gray-800">
-                        {user.phone || "Not provided"}
-                      </p>
-                    </div>
-                  </div>
+                  <div className="p-8">
+                    <AnimatePresence>
+                      {error && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl flex items-center gap-3 text-sm border border-red-100"
+                        >
+                          <Bell className="w-5 h-5 flex-shrink-0" />
+                          {error}
+                        </motion.div>
+                      )}
+                      {success && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          className="mb-6 p-4 bg-green-50 text-green-600 rounded-xl flex items-center gap-3 text-sm border border-green-100"
+                        >
+                          <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+                          {success}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
-                  {user.updatedAt && (
-                    <div className="flex items-center py-2">
-                      <div>
-                        <p className="text-xs text-gray-500">Last updated</p>
-                        <p className="text-gray-500 text-sm">
-                          {/* {user.updatedAt} */}
-                        </p>
+                    <div className="space-y-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Full Name</label>
+                          <div className="relative group">
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                              <UserIcon className="w-5 h-5" />
+                            </div>
+                            {editMode ? (
+                              <input
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleInputChange}
+                                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                                placeholder="Your full name"
+                              />
+                            ) : (
+                              <div className="w-full pl-12 pr-4 py-3 bg-slate-50/50 border border-transparent rounded-xl text-slate-800 font-medium">
+                                {user?.name || "Not set"}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Email Address</label>
+                          <div className="relative group">
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                              <Mail className="w-5 h-5" />
+                            </div>
+                            {editMode ? (
+                              <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                                placeholder="email@example.com"
+                              />
+                            ) : (
+                              <div className="w-full pl-12 pr-4 py-3 bg-slate-50/50 border border-transparent rounded-xl text-slate-800 font-medium">
+                                {user?.email || "Not set"}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Phone Number</label>
+                          <div className="relative group">
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                              <Phone className="w-5 h-5" />
+                            </div>
+                            {editMode ? (
+                              <input
+                                type="tel"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleInputChange}
+                                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                                placeholder="+91 XXXXX XXXXX"
+                              />
+                            ) : (
+                              <div className="w-full pl-12 pr-4 py-3 bg-slate-50/50 border border-transparent rounded-xl text-slate-800 font-medium">
+                                {user?.phone || "Not set"}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Joined Since</label>
+                          <div className="relative group">
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                              <Calendar className="w-5 h-5" />
+                            </div>
+                            <div className="w-full pl-12 pr-4 py-3 bg-slate-100 border border-transparent rounded-xl text-slate-500 font-medium italic">
+                              {formatDateSafely(user?.createdAt, "MMMM dd, yyyy")}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {editMode && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="pt-6 flex justify-end"
+                        >
+                          <button
+                            onClick={handleSaveProfile}
+                            disabled={loading}
+                            className="flex items-center gap-2 px-8 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-all shadow-lg shadow-green-100 disabled:opacity-50"
+                          >
+                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                            Save Changes
+                          </button>
+                        </motion.div>
+                      )}
+
+                      {/* Mobile Logout Option */}
+                      <div className="pt-10 border-t border-slate-100 mt-10">
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 ml-1">Account Actions</p>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 border-2 border-green-200 text-green-600 rounded-xl font-bold hover:bg-green-50 hover:border-green-200 transition-all"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Log Out
+                        </button>
                       </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+
+
+                </motion.div>
               )}
-            </div>
+
+              {activeTab === "security" && (
+                <motion.div
+                  key="security"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8"
+                >
+                  <h2 className="text-xl font-bold text-slate-800 mb-6">Security Settings</h2>
+                  <div className="space-y-6">
+                    <div className="flex flex-col border border-slate-100 rounded-2xl hover:bg-slate-50 transition-colors overflow-hidden">
+                      <div className="flex items-center justify-between p-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
+                            <ShieldCheck className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-800">Password</p>
+                            <p className="text-sm text-slate-500">Update your account password</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setIsChangingPassword(!isChangingPassword)}
+                          className="px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold hover:bg-white transition-all"
+                        >
+                          {isChangingPassword ? "Cancel" : "Change"}
+                        </button>
+                      </div>
+
+                      <AnimatePresence>
+                        {isChangingPassword && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="bg-slate-50/50 border-t border-slate-100 p-6"
+                          >
+                            <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
+                              <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-400 uppercase ml-1">New Password</label>
+                                <input
+                                  type="password"
+                                  required
+                                  value={passwordData.newPassword}
+                                  onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition-all"
+                                  placeholder="••••••••"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-400 uppercase ml-1">Confirm New Password</label>
+                                <input
+                                  type="password"
+                                  required
+                                  value={passwordData.confirmPassword}
+                                  onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition-all"
+                                  placeholder="••••••••"
+                                />
+                              </div>
+                              <button
+                                type="submit"
+                                disabled={passwordLoading}
+                                className="w-full py-2.5 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-all shadow-md shadow-green-100 disabled:opacity-50 flex items-center justify-center gap-2"
+                              >
+                                {passwordLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                Update Password
+                              </button>
+                            </form>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    <div className="flex items-center justify-between p-6 border border-slate-100 rounded-2xl hover:bg-slate-50 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                          <Phone className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-800">Phone Verification</p>
+                          <p className="text-sm text-slate-500">Your phone number is verified</p>
+                        </div>
+                      </div>
+                      <div className="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full">ACTIVE</div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -500,3 +668,4 @@ const UserProfilePage: React.FC = () => {
 };
 
 export default UserProfilePage;
+
