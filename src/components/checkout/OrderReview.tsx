@@ -1,6 +1,6 @@
+import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { setStep } from "../../store/slices/checkoutSlice";
-import { useState } from "react";
 import { toast } from "react-toastify";
 import { orderApi } from "../../services/api/orderApi";
 
@@ -137,37 +137,28 @@ export const OrderReview = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    {/* KP Member View */}
-                    {isKPMember ? (
-                      <>
-                        <p className="text-sm text-gray-500 line-through">
-                          ₹{(
-                            getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
-                          ).toLocaleString("en-IN")}
-                        </p>
-                        <p className="text-sm text-green-600">
-                          KP Member: ₹{(
-                            getKPMemberPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
-                          ).toLocaleString("en-IN")}
-                        </p>
-                      </>
-                    ) : (
-                      /* Non-Member View */
-                      <>
-                        {item.variant?.originalPrice && (
-                          <p className="text-sm text-gray-500 line-through">
-                            ₹{(
-                              getRegularPriceWithGST(item.variant.originalPrice, item.variant?.gstPercentage) * item.quantity
-                            ).toLocaleString("en-IN")}
+                    {item.variant && (() => {
+                      const basePriceValue = item.variant.originalPrice || item.variant.price;
+                      const basePriceWithGST = getRegularPriceWithGST(basePriceValue, item.variant.gstPercentage) * item.quantity;
+                      const finalPriceWithGST = (isKPMember
+                        ? getKPMemberPriceWithGST(item.variant.price, item.variant.gstPercentage)
+                        : getRegularPriceWithGST(item.variant.price, item.variant.gstPercentage)) * item.quantity;
+
+                      const hasDiscount = basePriceWithGST > finalPriceWithGST;
+
+                      return (
+                        <>
+                          <p className={`font-semibold ${isKPMember ? "text-green-600" : "text-gray-900"}`}>
+                            {isKPMember ? "KP Member: " : ""}₹{finalPriceWithGST.toLocaleString("en-IN")}
                           </p>
-                        )}
-                        <p className="text-lg font-semibold">
-                          ₹{(
-                            getRegularPriceWithGST(item.variant?.price || 0, item.variant?.gstPercentage) * item.quantity
-                          ).toLocaleString("en-IN")}
-                        </p>
-                      </>
-                    )}
+                          {hasDiscount && (
+                            <p className="text-sm text-gray-500 line-through">
+                              ₹{basePriceWithGST.toLocaleString("en-IN")}
+                            </p>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 </>
               )}
@@ -187,18 +178,14 @@ export const OrderReview = () => {
             <span>₹{orderSummary.subtotal.toFixed(2)}</span>
           </div>
 
-          {/* Show original subtotal for KP members */}
-          {isKPMember && (
+          {/* Show original subtotal if there are any discounts (variant or KP) */}
+          {/* {(orderSummary.originalTotal - orderSummary.shipping) > orderSummary.subtotal && (
             <div className="flex justify-between text-gray-500">
               <span>Original Subtotal</span>
-              <span className="line-through">₹{(orderSummary.subtotal + orderSummary.kpDiscountAmount).toFixed(2)}</span>
+              <span className="line-through">₹{(orderSummary.originalTotal - orderSummary.shipping).toFixed(2)}</span>
             </div>
-          )}
+          )} */}
 
-          {/* <div className="flex justify-between">
-            <span>GST (18%)</span>
-            <span>₹{localOrderSummary.tax.toFixed(2)}</span>
-          </div> */}
           <div className="flex justify-between">
             <span>Shipping</span>
             <span>
@@ -210,26 +197,29 @@ export const OrderReview = () => {
           <div className="flex justify-between font-semibold text-lg pt-2 border-t">
             <span>Total</span>
             <div className="text-right">
-              {isKPMember ? (
-                <>
-                  <span className="text-green-600">₹{orderSummary.total.toFixed(2)}</span>
-                  <div className="text-sm text-gray-500 line-through">
-                    ₹{orderSummary.originalTotal.toFixed(2)}
-                  </div>
-                </>
-              ) : (
-                <span>₹{orderSummary.total.toFixed(2)}</span>
+              <span className={orderSummary.originalTotal > orderSummary.total ? "text-green-600" : ""}>
+                ₹{orderSummary.total.toFixed(2)}
+              </span>
+              {orderSummary.originalTotal > orderSummary.total && (
+                <div className="text-sm text-gray-500 line-through">
+                  ₹{orderSummary.originalTotal.toFixed(2)}
+                </div>
               )}
             </div>
           </div>
 
-          {/* Show total savings from KP membership */}
-          {isKPMember && (
+          {/* Show total savings */}
+          {orderSummary.originalTotal > orderSummary.total && (
             <div className="flex justify-between text-green-600 font-medium pt-2 border-t">
-              <span>Total Saved with KP Membership</span>
-              <span>₹{orderSummary.kpDiscountAmount.toFixed(2)}</span>
+              <span>KP Member Savings</span>
+              <span>₹{(orderSummary.originalTotal - orderSummary.total).toFixed(2)}</span>
             </div>
           )}
+          {/* {isKPMember && (
+            <p className="text-[10px] text-green-600 text-right mt-1">
+              (Includes ₹{orderSummary.kpDiscountAmount.toFixed(2)} KP Member savings)
+            </p>
+          )} */}
         </div>
       </div>
 

@@ -6,7 +6,6 @@ import { productApi } from "../../services/api/productApi";
 import variantApi from "../../services/api/variantApi";
 import { Product } from "@/types/index";
 import { Variant } from "@/types/variant";
-import { RootState } from "../store";
 
 interface CartItemWithDetails extends CartItem {
   product?: Product;
@@ -185,7 +184,7 @@ export const fetchCartItems = createAsyncThunk(
 export const addToCart = createAsyncThunk<
   CartItemWithDetails,
   Partial<CartItem>,
-  { state: RootState }
+  { state: any }
 >(
   'cart/addItem',
   async (itemData, { getState, dispatch }) => {

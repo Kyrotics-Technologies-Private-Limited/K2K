@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import {
@@ -32,8 +32,6 @@ export const Payment = () => {
   const itemsToCheckout = buyNowItem ? [buyNowItem] : cartItems;
   const totalQuantity = itemsToCheckout.reduce((acc, item) => acc + item.quantity, 0);
 
-  // Check if user is a KP member
-  const isKPMember = orderSummary.kpDiscountPercentage > 0 && orderSummary.kpDiscountAmount > 0;
 
 
 
@@ -216,13 +214,13 @@ export const Payment = () => {
             <span>₹{orderSummary.subtotal.toFixed(2)}</span>
           </div>
 
-          {/* Show original subtotal for KP members */}
-          {isKPMember && (
+          {/* Show original subtotal if there are any discounts (variant or KP) */}
+          {/* {(orderSummary.originalTotal - orderSummary.shipping) > orderSummary.subtotal && (
             <div className="flex justify-between text-gray-500">
               <span>Original Subtotal</span>
-              <span className="line-through">₹{(orderSummary.subtotal + orderSummary.kpDiscountAmount).toFixed(2)}</span>
+              <span className="line-through">₹{(orderSummary.originalTotal - orderSummary.shipping).toFixed(2)}</span>
             </div>
-          )}
+          )} */}
 
           <div className="flex justify-between">
             <span>Shipping</span>
@@ -235,24 +233,22 @@ export const Payment = () => {
           <div className="flex justify-between font-semibold text-lg pt-2 border-t">
             <span>Total</span>
             <div className="text-right">
-              {isKPMember ? (
-                <>
-                  <span className="text-green-600">₹{orderSummary.total.toFixed(2)}</span>
-                  <div className="text-sm text-gray-500 line-through">
-                    ₹{orderSummary.originalTotal.toFixed(2)}
-                  </div>
-                </>
-              ) : (
-                <span>₹{orderSummary.total.toFixed(2)}</span>
+              <span className={orderSummary.originalTotal > orderSummary.total ? "text-green-600" : ""}>
+                ₹{orderSummary.total.toFixed(2)}
+              </span>
+              {orderSummary.originalTotal > orderSummary.total && (
+                <div className="text-sm text-gray-500 line-through">
+                  ₹{orderSummary.originalTotal.toFixed(2)}
+                </div>
               )}
             </div>
           </div>
 
-          {/* Show total savings from KP membership */}
-          {isKPMember && (
+          {/* Show total savings */}
+          {orderSummary.originalTotal > orderSummary.total && (
             <div className="flex justify-between text-green-600 font-medium pt-2 border-t">
-              <span>Total Saved with KP Membership</span>
-              <span>₹{orderSummary.kpDiscountAmount.toFixed(2)}</span>
+              <span>KP Member Savings</span>
+              <span>₹{(orderSummary.originalTotal - orderSummary.total).toFixed(2)}</span>
             </div>
           )}
         </div>

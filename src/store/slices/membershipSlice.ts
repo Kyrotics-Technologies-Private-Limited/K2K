@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { membershipApi } from '../../services/api/membershipApi';
 import { MembershipSettings, MembershipPlan, MembershipStatus } from '../../types/membership';
-import { RootState } from '../store';
 import { isActiveKPMember } from '../../lib/utils';
 
 // Thunks
@@ -147,31 +146,31 @@ export const { clearMembershipState } = membershipSlice.actions;
 export default membershipSlice.reducer;
 
 // Selectors
-export const selectMembershipStatus = (state: RootState) => state.membership.status;
-export const selectMembershipSettings = (state: RootState) => state.membership.settings;
-export const selectMembershipPlans = (state: RootState) => state.membership.plans;
+export const selectMembershipStatus = (state: any) => state.membership.status;
+export const selectMembershipSettings = (state: any) => state.membership.settings;
+export const selectMembershipPlans = (state: any) => state.membership.plans;
 
-export const selectIsMember = (state: RootState) => isActiveKPMember(state.membership.status);
-export const selectKPDiscount = (state: RootState) => {
+export const selectIsMember = (state: any) => isActiveKPMember(state.membership.status);
+export const selectKPDiscount = (state: any) => {
   // Only give discount if membership is active (not expired)
   const membershipStatus = state.membership.status;
-  
+
   if (!isActiveKPMember(membershipStatus)) {
     return 0; // Return 0% discount for expired/inactive memberships
   }
-  
+
   // Try to get discount from user's membership status first, then from plans
   const userDiscount = membershipStatus?.discountPercentage;
   if (userDiscount !== undefined) return userDiscount;
-  
+
   // Fallback to first plan's discount if available
   const firstPlan = state.membership.plans?.[0];
   return firstPlan?.discountPercentage || 0;
 };
-export const selectKPPlanPrices = (state: RootState) => {
+export const selectKPPlanPrices = (state: any) => {
   const plans = state.membership.plans || [];
   return {
-    plans: plans.map(plan => ({
+    plans: plans.map((plan: any) => ({
       id: plan.id,
       type: plan.type,
       price: plan.price,

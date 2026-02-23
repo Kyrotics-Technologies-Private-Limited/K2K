@@ -74,9 +74,6 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
     }
   };
 
-  const toggleUserMenu = () => {
-    setShowUserMenu(!showUserMenu);
-  };
 
   return (
     <nav className="sticky top-0 w-full z-40 bg-white shadow-sm">
@@ -128,9 +125,9 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
                 <Link
                   to="/all-products"
                   className={`text-sm xl:text-base transition px-4 flex items-center h-full ${location.pathname === "/all-products" ||
-                      location.pathname.startsWith("/product/")
-                      ? "text-green-800 font-semibold "
-                      : "text-gray-500 hover:text-gray-900"
+                    location.pathname.startsWith("/product/")
+                    ? "text-green-800 font-semibold "
+                    : "text-gray-500 hover:text-gray-900"
                     }`}
                 >
                   All Products
@@ -187,7 +184,10 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
           <div className="flex items-center justify-self-end lg:justify-self-auto">
             {isAuthenticated ? (
               <div className="relative group hidden lg:block">
-                <div className="w-7 h-7 mr-2 rounded-full bg-green-600 text-white flex items-center justify-center cursor-pointer">
+                <div
+                  onClick={() => handleNavigation("/profile")}
+                  className="w-7 h-7 mr-2 rounded-full bg-green-600 text-white flex items-center justify-center cursor-pointer"
+                >
                   {displayName.charAt(0).toUpperCase()}
                 </div>
                 <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg py-2 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-50">
@@ -228,7 +228,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCartClick }) => {
             <div className="hidden md:flex lg:hidden items-center">
               {isAuthenticated ? (
                 <button
-                  onClick={toggleUserMenu}
+                  onClick={() => handleNavigation("/profile")}
                   className="w-6 h-6 sm:w-7 sm:h-7 mr-1.5 sm:mr-2 rounded-full bg-green-600 text-white flex items-center justify-center cursor-pointer text-sm sm:text-base"
                 >
                   {displayName.charAt(0).toUpperCase()}
